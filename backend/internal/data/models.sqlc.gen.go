@@ -19,16 +19,19 @@ type Block struct {
 }
 
 type DecryptedTx struct {
-	Slot      int64
-	TxIndex   int64
-	TxHash    []byte
-	TxStatus  interface{}
-	CreatedAt pgtype.Timestamptz
-	UpdatedAt pgtype.Timestamptz
+	Slot                        int64
+	TxIndex                     int64
+	TxHash                      []byte
+	TxStatus                    interface{}
+	DecryptionKeyID             pgtype.Int8
+	TransactionSubmittedEventID pgtype.Int8
+	CreatedAt                   pgtype.Timestamptz
+	UpdatedAt                   pgtype.Timestamptz
 }
 
 type DecryptionKey struct {
-	Eon              int64
+	ID               int64
+	Eon              pgtype.Int8
 	IdentityPreimage []byte
 	Key              []byte
 	CreatedAt        pgtype.Timestamptz
@@ -55,12 +58,11 @@ type DecryptionKeysMessage struct {
 }
 
 type DecryptionKeysMessageDecryptionKey struct {
-	DecryptionKeysMessageSlot     int64
-	KeyIndex                      int64
-	DecryptionKeyEon              int64
-	DecryptionKeyIdentityPreimage []byte
-	CreatedAt                     pgtype.Timestamptz
-	UpdatedAt                     pgtype.Timestamptz
+	DecryptionKeysMessageSlot int64
+	KeyIndex                  int64
+	DecryptionKeyID           int64
+	CreatedAt                 pgtype.Timestamptz
+	UpdatedAt                 pgtype.Timestamptz
 }
 
 type Greeter struct {
@@ -68,10 +70,11 @@ type Greeter struct {
 }
 
 type TransactionSubmittedEvent struct {
+	ID                   int64
 	EventBlockHash       []byte
-	EventBlockNumber     int64
-	EventTxIndex         int64
-	EventLogIndex        int64
+	EventBlockNumber     pgtype.Int8
+	EventTxIndex         pgtype.Int8
+	EventLogIndex        pgtype.Int8
 	Eon                  int64
 	TxIndex              int64
 	IdentityPrefix       []byte

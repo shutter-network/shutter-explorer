@@ -16,27 +16,28 @@ CREATE TABLE decryption_keys_message (
 );
 
 CREATE TABLE decryption_key (
+    id                          BIGINT PRIMARY KEY,
     eon                         BIGINT,
     identity_preimage           BYTEA,
     key                         BYTEA NOT NULL,
     created_at                  TIMESTAMP WITH TIME ZONE DEFAULT NOW()  NOT NULL,
     updated_at                  TIMESTAMP WITH TIME ZONE DEFAULT NOW()  NOT NULL,
-    PRIMARY KEY                 (eon, identity_preimage)
+    UNIQUE (eon, identity_preimage)
 );
 
 CREATE TABLE decryption_keys_message_decryption_key (
     decryption_keys_message_slot            BIGINT,
     key_index                               BIGINT,
-    decryption_key_eon                      BIGINT,
-    decryption_key_identity_preimage        BYTEA,
+    decryption_key_id                       BIGINT NOT NULL,
     created_at                              TIMESTAMP WITH TIME ZONE DEFAULT NOW()  NOT NULL,
     updated_at                              TIMESTAMP WITH TIME ZONE DEFAULT NOW()  NOT NULL,
-    PRIMARY KEY (decryption_keys_message_slot, decryption_key_eon, decryption_key_identity_preimage, key_index),
+    PRIMARY KEY (decryption_keys_message_slot, decryption_key_id, key_index),
     FOREIGN KEY (decryption_keys_message_slot) REFERENCES decryption_keys_message (slot),
-    FOREIGN KEY (decryption_key_eon, decryption_key_identity_preimage) REFERENCES decryption_key (eon, identity_preimage)
+    FOREIGN KEY (decryption_key_id) REFERENCES decryption_key (id)
 );
 
 CREATE TABLE transaction_submitted_event (
+    id                                  BIGINT PRIMARY KEY,
     event_block_hash                    BYTEA,
     event_block_number                  BIGINT,
     event_tx_index                      BIGINT,
@@ -48,7 +49,7 @@ CREATE TABLE transaction_submitted_event (
     encrypted_transaction               BYTEA  NOT NULL,
     created_at                          TIMESTAMP WITH TIME ZONE DEFAULT NOW()  NOT NULL,
     updated_at                          TIMESTAMP WITH TIME ZONE DEFAULT NOW()  NOT NULL,
-    PRIMARY KEY (event_block_hash, event_block_number, event_tx_index, event_log_index)
+    UNIQUE (event_block_hash, event_block_number, event_tx_index, event_log_index)
 );
 
 CREATE TABLE IF NOT EXISTS decryption_key_share
@@ -77,11 +78,13 @@ CREATE TABLE IF NOT EXISTS block
 
 CREATE TABLE IF NOT EXISTS decrypted_tx
 (
-    slot                BIGINT,
-    tx_index            BIGINT,
-    tx_hash             BYTEA NOT NULL,
-    tx_status           tx_status_val NOT NULL,
-    created_at          TIMESTAMP WITH TIME ZONE DEFAULT NOW()  NOT NULL,
-    updated_at          TIMESTAMP WITH TIME ZONE DEFAULT NOW()  NOT NULL,
+    slot                                BIGINT,
+    tx_index                            BIGINT,
+    tx_hash                             BYTEA NOT NULL,
+    tx_status                           tx_status_val NOT NULL,
+    decryption_key_id                   BIGINT,
+    transaction_submitted_event_id      BIGINT,
+    created_at                          TIMESTAMP WITH TIME ZONE DEFAULT NOW()  NOT NULL,
+    updated_at                          TIMESTAMP WITH TIME ZONE DEFAULT NOW()  NOT NULL,
     PRIMARY KEY (slot, tx_index)
 );
