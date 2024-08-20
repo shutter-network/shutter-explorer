@@ -19,7 +19,7 @@ func NewRouter(usecases *usecase.Usecases) *gin.Engine {
 	}
 	{
 		dec := api.Group("/decrypted")
-		dec.GET("/get-tx", usecases.Greeter.QueryDecryptedTX)
+		dec.GET("/get-tx", usecases.DecryptedTx.QueryDecryptedTX)
 	}
 
 	return router

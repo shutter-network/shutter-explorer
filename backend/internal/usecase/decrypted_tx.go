@@ -24,7 +24,7 @@ func NewDecryptedTxUsecase(
 	}
 }
 
-func (uc *GreeterUsecase) QueryDecryptedTX(ctx *gin.Context) {
+func (uc *DecryptedTxUsecase) QueryDecryptedTX(ctx *gin.Context) {
 	ecTx, ok := ctx.GetQuery("encryptedTx")
 	if !ok {
 		err := error.NewHttpError(
