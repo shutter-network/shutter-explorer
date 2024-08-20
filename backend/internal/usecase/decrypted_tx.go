@@ -55,7 +55,7 @@ func (uc *DecryptedTxUsecase) QueryDecryptedTX(ctx *gin.Context) {
 		ctx.Error(err)
 		return
 	}
-	ctx.JSON(200, gin.H{
+	ctx.JSON(http.StatusOK, gin.H{
 		"message": decryptedTx,
 	})
 }
