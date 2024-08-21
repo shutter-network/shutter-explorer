@@ -88,3 +88,16 @@ CREATE TABLE IF NOT EXISTS decrypted_tx
     updated_at                          TIMESTAMP WITH TIME ZONE DEFAULT NOW()  NOT NULL,
     PRIMARY KEY (slot, tx_index)
 );
+
+CREATE TABLE IF NOT EXISTS transaction_details
+(
+    address                 TEXT,
+    nonce                   BIGINT,
+    tx_hash                 TEXT,
+    encrypted_tx_hash       TEXT,
+    submission_time         BIGINT,
+    inclusion_time          BIGINT,
+    retries                 BIGINT,
+    is_cancelled            BOOLEAN,
+    PRIMARY KEY (address, nonce, tx_hash, encrypted_tx_hash)
+)

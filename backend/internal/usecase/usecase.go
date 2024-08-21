@@ -8,9 +8,12 @@ type Usecases struct {
 	// Add more usecases as needed
 }
 
-func NewUsecases(db *pgxpool.Pool) *Usecases {
+func NewUsecases(
+	observerDB *pgxpool.Pool,
+	erpcDB *pgxpool.Pool,
+) *Usecases {
 	return &Usecases{
-		Greeter:     NewGreeterUsecase(db),
-		DecryptedTx: NewDecryptedTxUsecase(db),
+		Greeter:     NewGreeterUsecase(observerDB),
+		DecryptedTx: NewDecryptedTxUsecase(observerDB, erpcDB),
 	}
 }

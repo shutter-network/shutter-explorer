@@ -69,6 +69,17 @@ type Greeter struct {
 	Hello string
 }
 
+type TransactionDetail struct {
+	Address         string
+	Nonce           int64
+	TxHash          string
+	EncryptedTxHash string
+	SubmissionTime  pgtype.Int8
+	InclusionTime   pgtype.Int8
+	Retries         pgtype.Int8
+	IsCancelled     pgtype.Bool
+}
+
 type TransactionSubmittedEvent struct {
 	ID                   int64
 	EventBlockHash       []byte

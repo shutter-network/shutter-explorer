@@ -11,16 +11,21 @@ import (
 )
 
 type DecryptedTxUsecase struct {
-	db      *pgxpool.Pool
-	dbQuery *data.Queries
+	observerDB      *pgxpool.Pool
+	erpcDB          *pgxpool.Pool
+	observerDBQuery *data.Queries
+	erpcDBQuery     *data.Queries
 }
 
 func NewDecryptedTxUsecase(
-	db *pgxpool.Pool,
+	observerDB *pgxpool.Pool,
+	erpcDB *pgxpool.Pool,
 ) *DecryptedTxUsecase {
 	return &DecryptedTxUsecase{
-		db:      db,
-		dbQuery: data.New(db),
+		observerDB:      observerDB,
+		observerDBQuery: data.New(observerDB),
+		erpcDB:          erpcDB,
+		erpcDBQuery:     data.New(erpcDB),
 	}
 }
 
@@ -45,7 +50,7 @@ func (uc *DecryptedTxUsecase) QueryDecryptedTX(ctx *gin.Context) {
 		ctx.Error(err)
 		return
 	}
-	decryptedTx, err := uc.dbQuery.QueryDecryptedTXForEncryptedTX(ctx, ecTxBytes)
+	decryptedTx, err := uc.observerDBQuery.QueryDecryptedTXForEncryptedTX(ctx, ecTxBytes)
 	if err != nil {
 		err := error.NewHttpError(
 			"error encountered while querying for data",

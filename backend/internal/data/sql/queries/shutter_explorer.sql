@@ -24,7 +24,7 @@ WHERE tx_status = $1
 GROUP BY DATE_TRUNC('month', created_at)
 ORDER BY month;
 
--- name: QueryLatestPendingShutterizedTXs :many
+-- name: QueryLatestPendingShutterizedTXsWhichCanBeDecrypted :many
 WITH latest_per_hash AS (
   SELECT 
     tx_hash,
@@ -50,14 +50,36 @@ SELECT
   lt.latest_created_at AS created_at
 FROM latest_transactions lt;
 
--- name: QueryLatestShutterizedTXsForEachTXStatus :many
-SELECT 
-    dt.tx_hash, dt.tx_status,
-    tse.encrypted_transaction,
-    dk.key
-FROM decrypted_tx dt 
-INNER JOIN transaction_submitted_event tse ON dt.transaction_submitted_event_id = tse.id
-INNER JOIN decryption_key dk ON dt.decryption_key_id = dk.id
-WHERE dt.tx_status = $1
-ORDER BY dt.created_at DESC
-LIMIT $2;
+-- name: QueryLatestShutterizedTXsWhichArentIncluded :many
+WITH latest_events AS (
+    SELECT DISTINCT ON (encrypted_transaction)
+        id,
+        encrypted_transaction,
+        created_at
+    FROM transaction_submitted_event
+    ORDER BY encrypted_transaction, created_at DESC
+	  LIMIT 10
+),
+decryption_status AS (
+    SELECT
+        encrypted_transaction,
+        MAX(tx_status) AS max_status
+    FROM decrypted_tx
+    JOIN latest_events le ON decrypted_tx.transaction_submitted_event_id = le.id
+    GROUP BY encrypted_transaction
+)
+SELECT
+    '0x' || encode(le.encrypted_transaction, 'hex') encrypted_tx_hash,
+    le.created_at
+FROM latest_events le
+LEFT JOIN decryption_status ds ON le.encrypted_transaction = ds.encrypted_transaction
+WHERE ds.max_status IS DISTINCT FROM 'included' OR ds.max_status IS NULL
+ORDER BY le.created_at DESC;
+
+-- name: QueryTxHashFromTransactionDetails :many
+SELECT DISTINCT ON (encrypted_tx_hash) 
+    encrypted_tx_hash, 
+    tx_hash
+FROM  transaction_details
+WHERE encrypted_tx_hash IN (SELECT UNNEST($1::text[]))
+ORDER BY encrypted_tx_hash, submission_time DESC;

@@ -78,7 +78,7 @@ func (q *Queries) QueryGreeter(ctx context.Context) ([]string, error) {
 	return items, nil
 }
 
-const queryLatestPendingShutterizedTXs = `-- name: QueryLatestPendingShutterizedTXs :many
+const queryLatestPendingShutterizedTXsWhichCanBeDecrypted = `-- name: QueryLatestPendingShutterizedTXsWhichCanBeDecrypted :many
 WITH latest_per_hash AS (
   SELECT 
     tx_hash,
@@ -105,20 +105,20 @@ SELECT
 FROM latest_transactions lt
 `
 
-type QueryLatestPendingShutterizedTXsRow struct {
+type QueryLatestPendingShutterizedTXsWhichCanBeDecryptedRow struct {
 	TxHash    interface{}
 	CreatedAt interface{}
 }
 
-func (q *Queries) QueryLatestPendingShutterizedTXs(ctx context.Context, limit int32) ([]QueryLatestPendingShutterizedTXsRow, error) {
-	rows, err := q.db.Query(ctx, queryLatestPendingShutterizedTXs, limit)
+func (q *Queries) QueryLatestPendingShutterizedTXsWhichCanBeDecrypted(ctx context.Context, limit int32) ([]QueryLatestPendingShutterizedTXsWhichCanBeDecryptedRow, error) {
+	rows, err := q.db.Query(ctx, queryLatestPendingShutterizedTXsWhichCanBeDecrypted, limit)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []QueryLatestPendingShutterizedTXsRow
+	var items []QueryLatestPendingShutterizedTXsWhichCanBeDecryptedRow
 	for rows.Next() {
-		var i QueryLatestPendingShutterizedTXsRow
+		var i QueryLatestPendingShutterizedTXsWhichCanBeDecryptedRow
 		if err := rows.Scan(&i.TxHash, &i.CreatedAt); err != nil {
 			return nil, err
 		}
@@ -130,46 +130,48 @@ func (q *Queries) QueryLatestPendingShutterizedTXs(ctx context.Context, limit in
 	return items, nil
 }
 
-const queryLatestShutterizedTXsForEachTXStatus = `-- name: QueryLatestShutterizedTXsForEachTXStatus :many
-SELECT 
-    dt.tx_hash, dt.tx_status,
-    tse.encrypted_transaction,
-    dk.key
-FROM decrypted_tx dt 
-INNER JOIN transaction_submitted_event tse ON dt.transaction_submitted_event_id = tse.id
-INNER JOIN decryption_key dk ON dt.decryption_key_id = dk.id
-WHERE dt.tx_status = $1
-ORDER BY dt.created_at DESC
-LIMIT $2
+const queryLatestShutterizedTXsWhichArentIncluded = `-- name: QueryLatestShutterizedTXsWhichArentIncluded :many
+WITH latest_events AS (
+    SELECT DISTINCT ON (encrypted_transaction)
+        id,
+        encrypted_transaction,
+        created_at
+    FROM transaction_submitted_event
+    ORDER BY encrypted_transaction, created_at DESC
+	  LIMIT 10
+),
+decryption_status AS (
+    SELECT
+        encrypted_transaction,
+        MAX(tx_status) AS max_status
+    FROM decrypted_tx
+    JOIN latest_events le ON decrypted_tx.transaction_submitted_event_id = le.id
+    GROUP BY encrypted_transaction
+)
+SELECT
+    '0x' || encode(le.encrypted_transaction, 'hex') encrypted_tx_hash,
+    le.created_at
+FROM latest_events le
+LEFT JOIN decryption_status ds ON le.encrypted_transaction = ds.encrypted_transaction
+WHERE ds.max_status IS DISTINCT FROM 'included' OR ds.max_status IS NULL
+ORDER BY le.created_at DESC
 `
 
-type QueryLatestShutterizedTXsForEachTXStatusParams struct {
-	TxStatus interface{}
-	Limit    int32
+type QueryLatestShutterizedTXsWhichArentIncludedRow struct {
+	EncryptedTxHash interface{}
+	CreatedAt       pgtype.Timestamptz
 }
 
-type QueryLatestShutterizedTXsForEachTXStatusRow struct {
-	TxHash               []byte
-	TxStatus             interface{}
-	EncryptedTransaction []byte
-	Key                  []byte
-}
-
-func (q *Queries) QueryLatestShutterizedTXsForEachTXStatus(ctx context.Context, arg QueryLatestShutterizedTXsForEachTXStatusParams) ([]QueryLatestShutterizedTXsForEachTXStatusRow, error) {
-	rows, err := q.db.Query(ctx, queryLatestShutterizedTXsForEachTXStatus, arg.TxStatus, arg.Limit)
+func (q *Queries) QueryLatestShutterizedTXsWhichArentIncluded(ctx context.Context) ([]QueryLatestShutterizedTXsWhichArentIncludedRow, error) {
+	rows, err := q.db.Query(ctx, queryLatestShutterizedTXsWhichArentIncluded)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []QueryLatestShutterizedTXsForEachTXStatusRow
+	var items []QueryLatestShutterizedTXsWhichArentIncludedRow
 	for rows.Next() {
-		var i QueryLatestShutterizedTXsForEachTXStatusRow
-		if err := rows.Scan(
-			&i.TxHash,
-			&i.TxStatus,
-			&i.EncryptedTransaction,
-			&i.Key,
-		); err != nil {
+		var i QueryLatestShutterizedTXsWhichArentIncludedRow
+		if err := rows.Scan(&i.EncryptedTxHash, &i.CreatedAt); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
@@ -216,6 +218,40 @@ func (q *Queries) QueryTotalShutterizedTXsForEachTXStatusPerMonth(ctx context.Co
 	for rows.Next() {
 		var i QueryTotalShutterizedTXsForEachTXStatusPerMonthRow
 		if err := rows.Scan(&i.Month, &i.TotalIncludedTxs); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const queryTxHashFromTransactionDetails = `-- name: QueryTxHashFromTransactionDetails :many
+SELECT DISTINCT ON (encrypted_tx_hash) 
+    encrypted_tx_hash, 
+    tx_hash
+FROM  transaction_details
+WHERE encrypted_tx_hash IN (SELECT UNNEST($1::text[]))
+ORDER BY encrypted_tx_hash, submission_time DESC
+`
+
+type QueryTxHashFromTransactionDetailsRow struct {
+	EncryptedTxHash string
+	TxHash          string
+}
+
+func (q *Queries) QueryTxHashFromTransactionDetails(ctx context.Context, dollar_1 []string) ([]QueryTxHashFromTransactionDetailsRow, error) {
+	rows, err := q.db.Query(ctx, queryTxHashFromTransactionDetails, dollar_1)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []QueryTxHashFromTransactionDetailsRow
+	for rows.Next() {
+		var i QueryTxHashFromTransactionDetailsRow
+		if err := rows.Scan(&i.EncryptedTxHash, &i.TxHash); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
