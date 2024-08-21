@@ -12,10 +12,10 @@ INNER JOIN transaction_submitted_event tse ON dt.transaction_submitted_event_id 
 INNER JOIN decryption_key dk ON dt.decryption_key_id = dk.id
 WHERE tse.encrypted_transaction = $1;
 
--- name: QueryTotalShutterizedTXsForEachTXStatus :one
+-- name: QueryTotalTXsForEachTXStatus :one
 SELECT COUNT(*) FROM public.decrypted_tx where tx_status = $1;
 
--- name: QueryTotalShutterizedTXsForEachTXStatusPerMonth :many
+-- name: QueryTotalTXsForEachTXStatusPerMonth :many
 SELECT 
     TO_CHAR(DATE_TRUNC('month', created_at), 'YYYY-MM-DD') AS month, 
     COUNT(*) AS total_txs
@@ -24,7 +24,7 @@ WHERE tx_status = $1
 GROUP BY DATE_TRUNC('month', created_at)
 ORDER BY month;
 
--- name: QueryLatestPendingShutterizedTXsWhichCanBeDecrypted :many
+-- name: QueryLatestPendingTXsWhichCanBeDecrypted :many
 WITH latest_per_hash AS (
   SELECT 
     tx_hash,
@@ -50,7 +50,7 @@ SELECT
   lt.latest_created_at AS created_at
 FROM latest_transactions lt;
 
--- name: QueryLatestShutterizedTXsWhichArentIncluded :many
+-- name: QueryLatestTXsWhichArentIncluded :many
 WITH latest_events AS (
     SELECT DISTINCT ON (encrypted_transaction)
         id,
@@ -83,3 +83,11 @@ SELECT DISTINCT ON (encrypted_tx_hash)
 FROM  transaction_details
 WHERE encrypted_tx_hash IN (SELECT UNNEST($1::text[]))
 ORDER BY encrypted_tx_hash, submission_time DESC;
+
+-- name: QueryIncludedTransactions :many
+SELECT dt.tx_hash, tse.encrypted_transaction, dt.created_at
+FROM decrypted_tx dt
+INNER JOIN transaction_submitted_event tse ON dt.transaction_submitted_event_id = tse.id
+WHERE dt.tx_status = 'included'
+ORDER BY dt.created_at
+LIMIT $1;

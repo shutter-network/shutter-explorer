@@ -8,6 +8,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/rs/zerolog/log"
 	"github.com/shutter-network/shutter-explorer/backend/internal/data"
 	"github.com/shutter-network/shutter-explorer/backend/internal/error"
 )
@@ -54,6 +55,7 @@ func (uc *TransactionUsecase) QueryDecryptedTX(ctx *gin.Context) {
 	}
 	decryptedTx, err := uc.observerDBQuery.QueryDecryptedTXForEncryptedTX(ctx, ecTxBytes)
 	if err != nil {
+		log.Err(err).Msg("err encountered while querying DB")
 		err := error.NewHttpError(
 			"error encountered while querying for data",
 			"",
@@ -88,8 +90,9 @@ func (uc *TransactionUsecase) QueryPendingShutterizedTX(ctx *gin.Context) {
 		ctx.Error(err)
 		return
 	}
-	pendingObserverTxs, err := uc.observerDBQuery.QueryLatestShutterizedTXsWhichArentIncluded(ctx, int32(txLimit))
+	pendingObserverTxs, err := uc.observerDBQuery.QueryLatestTXsWhichArentIncluded(ctx, int32(txLimit))
 	if err != nil {
+		log.Err(err).Msg("err encountered while querying DB")
 		err := error.NewHttpError(
 			"error encountered while querying for data",
 			"",
@@ -106,6 +109,7 @@ func (uc *TransactionUsecase) QueryPendingShutterizedTX(ctx *gin.Context) {
 
 	erpcTXs, err := uc.erpcDBQuery.QueryTxHashFromTransactionDetails(ctx, ecTXHashes)
 	if err != nil {
+		log.Err(err).Msg("err encountered while querying DB")
 		err := error.NewHttpError(
 			"error encountered while querying for dataz",
 			"",
@@ -131,8 +135,9 @@ func (uc *TransactionUsecase) QueryTotalExecutedTXsForEachTXStatus(ctx *gin.Cont
 		return
 	}
 
-	totalTxs, err := uc.observerDBQuery.QueryTotalShutterizedTXsForEachTXStatus(ctx, txStatus)
+	totalTxs, err := uc.observerDBQuery.QueryTotalTXsForEachTXStatus(ctx, txStatus)
 	if err != nil {
+		log.Err(err).Msg("err encountered while querying DB")
 		err := error.NewHttpError(
 			"error encountered while querying for data",
 			"",
@@ -159,9 +164,9 @@ func (uc *TransactionUsecase) QueryTotalExecutedTXsForEachTXStatusPerMonth(ctx *
 	}
 
 	fmt.Println("txStatus", txStatus)
-	totalTxsPerMonth, err := uc.observerDBQuery.QueryTotalShutterizedTXsForEachTXStatusPerMonth(ctx, txStatus)
+	totalTxsPerMonth, err := uc.observerDBQuery.QueryTotalTXsForEachTXStatusPerMonth(ctx, txStatus)
 	if err != nil {
-		fmt.Println("err", err.Error())
+		log.Err(err).Msg("err encountered while querying DB")
 		err := error.NewHttpError(
 			"error encountered while querying for data",
 			"",
@@ -173,5 +178,45 @@ func (uc *TransactionUsecase) QueryTotalExecutedTXsForEachTXStatusPerMonth(ctx *
 
 	ctx.JSON(http.StatusOK, gin.H{
 		"message": totalTxsPerMonth,
+	})
+}
+
+func (uc *TransactionUsecase) QueryIncludedTransactions(ctx *gin.Context) {
+	txLimitStringified, ok := ctx.GetQuery("txLimit")
+	if !ok {
+		err := error.NewHttpError(
+			"query parameter not found",
+			"txLimit query parameter is required",
+			http.StatusBadRequest,
+		)
+		ctx.Error(err)
+		return
+	}
+	txLimit, err := strconv.Atoi(txLimitStringified)
+	if err != nil {
+		log.Err(err).Msg("err encountered while querying DB")
+		err := error.NewHttpError(
+			"unable to decode txLimit",
+			"valid txLimit query parameter is required",
+			http.StatusBadRequest,
+		)
+		ctx.Error(err)
+		return
+	}
+
+	txs, err := uc.observerDBQuery.QueryIncludedTransactions(ctx, int32(txLimit))
+	if err != nil {
+		log.Err(err).Msg("err encountered while querying DB")
+		err := error.NewHttpError(
+			"error encountered while querying for data",
+			"",
+			http.StatusInternalServerError,
+		)
+		ctx.Error(err)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"message": txs,
 	})
 }

@@ -78,7 +78,42 @@ func (q *Queries) QueryGreeter(ctx context.Context) ([]string, error) {
 	return items, nil
 }
 
-const queryLatestPendingShutterizedTXsWhichCanBeDecrypted = `-- name: QueryLatestPendingShutterizedTXsWhichCanBeDecrypted :many
+const queryIncludedTransactions = `-- name: QueryIncludedTransactions :many
+SELECT dt.tx_hash, tse.encrypted_transaction, dt.created_at
+FROM decrypted_tx dt
+INNER JOIN transaction_submitted_event tse ON dt.transaction_submitted_event_id = tse.id
+WHERE dt.tx_status = 'included'
+ORDER BY dt.created_at
+LIMIT $1
+`
+
+type QueryIncludedTransactionsRow struct {
+	TxHash               []byte
+	EncryptedTransaction []byte
+	CreatedAt            pgtype.Timestamptz
+}
+
+func (q *Queries) QueryIncludedTransactions(ctx context.Context, limit int32) ([]QueryIncludedTransactionsRow, error) {
+	rows, err := q.db.Query(ctx, queryIncludedTransactions, limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []QueryIncludedTransactionsRow
+	for rows.Next() {
+		var i QueryIncludedTransactionsRow
+		if err := rows.Scan(&i.TxHash, &i.EncryptedTransaction, &i.CreatedAt); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const queryLatestPendingTXsWhichCanBeDecrypted = `-- name: QueryLatestPendingTXsWhichCanBeDecrypted :many
 WITH latest_per_hash AS (
   SELECT 
     tx_hash,
@@ -105,20 +140,20 @@ SELECT
 FROM latest_transactions lt
 `
 
-type QueryLatestPendingShutterizedTXsWhichCanBeDecryptedRow struct {
+type QueryLatestPendingTXsWhichCanBeDecryptedRow struct {
 	TxHash    interface{}
 	CreatedAt interface{}
 }
 
-func (q *Queries) QueryLatestPendingShutterizedTXsWhichCanBeDecrypted(ctx context.Context, limit int32) ([]QueryLatestPendingShutterizedTXsWhichCanBeDecryptedRow, error) {
-	rows, err := q.db.Query(ctx, queryLatestPendingShutterizedTXsWhichCanBeDecrypted, limit)
+func (q *Queries) QueryLatestPendingTXsWhichCanBeDecrypted(ctx context.Context, limit int32) ([]QueryLatestPendingTXsWhichCanBeDecryptedRow, error) {
+	rows, err := q.db.Query(ctx, queryLatestPendingTXsWhichCanBeDecrypted, limit)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []QueryLatestPendingShutterizedTXsWhichCanBeDecryptedRow
+	var items []QueryLatestPendingTXsWhichCanBeDecryptedRow
 	for rows.Next() {
-		var i QueryLatestPendingShutterizedTXsWhichCanBeDecryptedRow
+		var i QueryLatestPendingTXsWhichCanBeDecryptedRow
 		if err := rows.Scan(&i.TxHash, &i.CreatedAt); err != nil {
 			return nil, err
 		}
@@ -130,7 +165,7 @@ func (q *Queries) QueryLatestPendingShutterizedTXsWhichCanBeDecrypted(ctx contex
 	return items, nil
 }
 
-const queryLatestShutterizedTXsWhichArentIncluded = `-- name: QueryLatestShutterizedTXsWhichArentIncluded :many
+const queryLatestTXsWhichArentIncluded = `-- name: QueryLatestTXsWhichArentIncluded :many
 WITH latest_events AS (
     SELECT DISTINCT ON (encrypted_transaction)
         id,
@@ -157,20 +192,20 @@ WHERE ds.max_status IS DISTINCT FROM 'included' OR ds.max_status IS NULL
 ORDER BY le.created_at DESC
 `
 
-type QueryLatestShutterizedTXsWhichArentIncludedRow struct {
+type QueryLatestTXsWhichArentIncludedRow struct {
 	EncryptedTransaction []byte
 	CreatedAt            pgtype.Timestamptz
 }
 
-func (q *Queries) QueryLatestShutterizedTXsWhichArentIncluded(ctx context.Context, limit int32) ([]QueryLatestShutterizedTXsWhichArentIncludedRow, error) {
-	rows, err := q.db.Query(ctx, queryLatestShutterizedTXsWhichArentIncluded, limit)
+func (q *Queries) QueryLatestTXsWhichArentIncluded(ctx context.Context, limit int32) ([]QueryLatestTXsWhichArentIncludedRow, error) {
+	rows, err := q.db.Query(ctx, queryLatestTXsWhichArentIncluded, limit)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []QueryLatestShutterizedTXsWhichArentIncludedRow
+	var items []QueryLatestTXsWhichArentIncludedRow
 	for rows.Next() {
-		var i QueryLatestShutterizedTXsWhichArentIncludedRow
+		var i QueryLatestTXsWhichArentIncludedRow
 		if err := rows.Scan(&i.EncryptedTransaction, &i.CreatedAt); err != nil {
 			return nil, err
 		}
@@ -182,18 +217,18 @@ func (q *Queries) QueryLatestShutterizedTXsWhichArentIncluded(ctx context.Contex
 	return items, nil
 }
 
-const queryTotalShutterizedTXsForEachTXStatus = `-- name: QueryTotalShutterizedTXsForEachTXStatus :one
+const queryTotalTXsForEachTXStatus = `-- name: QueryTotalTXsForEachTXStatus :one
 SELECT COUNT(*) FROM public.decrypted_tx where tx_status = $1
 `
 
-func (q *Queries) QueryTotalShutterizedTXsForEachTXStatus(ctx context.Context, txStatus interface{}) (int64, error) {
-	row := q.db.QueryRow(ctx, queryTotalShutterizedTXsForEachTXStatus, txStatus)
+func (q *Queries) QueryTotalTXsForEachTXStatus(ctx context.Context, txStatus interface{}) (int64, error) {
+	row := q.db.QueryRow(ctx, queryTotalTXsForEachTXStatus, txStatus)
 	var count int64
 	err := row.Scan(&count)
 	return count, err
 }
 
-const queryTotalShutterizedTXsForEachTXStatusPerMonth = `-- name: QueryTotalShutterizedTXsForEachTXStatusPerMonth :many
+const queryTotalTXsForEachTXStatusPerMonth = `-- name: QueryTotalTXsForEachTXStatusPerMonth :many
 SELECT 
     TO_CHAR(DATE_TRUNC('month', created_at), 'YYYY-MM-DD') AS month, 
     COUNT(*) AS total_txs
@@ -203,20 +238,20 @@ GROUP BY DATE_TRUNC('month', created_at)
 ORDER BY month
 `
 
-type QueryTotalShutterizedTXsForEachTXStatusPerMonthRow struct {
+type QueryTotalTXsForEachTXStatusPerMonthRow struct {
 	Month    string
 	TotalTxs int64
 }
 
-func (q *Queries) QueryTotalShutterizedTXsForEachTXStatusPerMonth(ctx context.Context, txStatus interface{}) ([]QueryTotalShutterizedTXsForEachTXStatusPerMonthRow, error) {
-	rows, err := q.db.Query(ctx, queryTotalShutterizedTXsForEachTXStatusPerMonth, txStatus)
+func (q *Queries) QueryTotalTXsForEachTXStatusPerMonth(ctx context.Context, txStatus interface{}) ([]QueryTotalTXsForEachTXStatusPerMonthRow, error) {
+	rows, err := q.db.Query(ctx, queryTotalTXsForEachTXStatusPerMonth, txStatus)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []QueryTotalShutterizedTXsForEachTXStatusPerMonthRow
+	var items []QueryTotalTXsForEachTXStatusPerMonthRow
 	for rows.Next() {
-		var i QueryTotalShutterizedTXsForEachTXStatusPerMonthRow
+		var i QueryTotalTXsForEachTXStatusPerMonthRow
 		if err := rows.Scan(&i.Month, &i.TotalTxs); err != nil {
 			return nil, err
 		}
