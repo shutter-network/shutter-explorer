@@ -196,7 +196,7 @@ func (q *Queries) QueryTotalShutterizedTXsForEachTXStatus(ctx context.Context, t
 const queryTotalShutterizedTXsForEachTXStatusPerMonth = `-- name: QueryTotalShutterizedTXsForEachTXStatusPerMonth :many
 SELECT 
     DATE_TRUNC('month', created_at) AS month, 
-    COUNT(*) AS total_included_txs
+    COUNT(*) AS total_txs
 FROM decrypted_tx
 WHERE tx_status = $1
 GROUP BY DATE_TRUNC('month', created_at)
@@ -204,8 +204,8 @@ ORDER BY month
 `
 
 type QueryTotalShutterizedTXsForEachTXStatusPerMonthRow struct {
-	Month            pgtype.Interval
-	TotalIncludedTxs int64
+	Month    pgtype.Interval
+	TotalTxs int64
 }
 
 func (q *Queries) QueryTotalShutterizedTXsForEachTXStatusPerMonth(ctx context.Context, txStatus interface{}) ([]QueryTotalShutterizedTXsForEachTXStatusPerMonthRow, error) {
@@ -217,7 +217,7 @@ func (q *Queries) QueryTotalShutterizedTXsForEachTXStatusPerMonth(ctx context.Co
 	var items []QueryTotalShutterizedTXsForEachTXStatusPerMonthRow
 	for rows.Next() {
 		var i QueryTotalShutterizedTXsForEachTXStatusPerMonthRow
-		if err := rows.Scan(&i.Month, &i.TotalIncludedTxs); err != nil {
+		if err := rows.Scan(&i.Month, &i.TotalTxs); err != nil {
 			return nil, err
 		}
 		items = append(items, i)

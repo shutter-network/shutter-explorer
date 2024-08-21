@@ -21,6 +21,8 @@ func NewRouter(usecases *usecase.Usecases) *gin.Engine {
 		transaction := api.Group("/transaction")
 		transaction.GET("/get-decrypted-tx", usecases.Transaction.QueryDecryptedTX)
 		transaction.GET("/pending-txs", usecases.Transaction.QueryPendingShutterizedTX)
+		transaction.GET("/total-successful-txs", usecases.Transaction.QueryTotalExecutedTXsForEachTXStatus)
+		transaction.GET("/total-txs-month", usecases.Transaction.QueryTotalExecutedTXsForEachTXStatusPerMonth)
 	}
 
 	return router

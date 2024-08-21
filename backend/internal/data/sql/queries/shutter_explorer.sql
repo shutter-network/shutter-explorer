@@ -18,7 +18,7 @@ SELECT COUNT(*) FROM public.decrypted_tx where tx_status = $1;
 -- name: QueryTotalShutterizedTXsForEachTXStatusPerMonth :many
 SELECT 
     DATE_TRUNC('month', created_at) AS month, 
-    COUNT(*) AS total_included_txs
+    COUNT(*) AS total_txs
 FROM decrypted_tx
 WHERE tx_status = $1
 GROUP BY DATE_TRUNC('month', created_at)

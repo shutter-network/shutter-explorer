@@ -117,3 +117,57 @@ func (uc *TransactionUsecase) QueryPendingShutterizedTX(ctx *gin.Context) {
 		"message": erpcTXs,
 	})
 }
+
+func (uc *TransactionUsecase) QueryTotalExecutedTXsForEachTXStatus(ctx *gin.Context) {
+	txStatus, ok := ctx.GetQuery("txStatus")
+	if !ok {
+		err := error.NewHttpError(
+			"query parameter not found",
+			"encryptedTx query parameter is required",
+			http.StatusBadRequest,
+		)
+		ctx.Error(err)
+		return
+	}
+
+	totalTxs, err := uc.observerDBQuery.QueryTotalShutterizedTXsForEachTXStatus(ctx, txStatus)
+	if err != nil {
+		err := error.NewHttpError(
+			"error encountered while querying for data",
+			"",
+			http.StatusInternalServerError,
+		)
+		ctx.Error(err)
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{
+		"message": totalTxs,
+	})
+}
+
+func (uc *TransactionUsecase) QueryTotalExecutedTXsForEachTXStatusPerMonth(ctx *gin.Context) {
+	txStatus, ok := ctx.GetQuery("txStatus")
+	if !ok {
+		err := error.NewHttpError(
+			"query parameter not found",
+			"encryptedTx query parameter is required",
+			http.StatusBadRequest,
+		)
+		ctx.Error(err)
+		return
+	}
+
+	totalTxsPerMonth, err := uc.observerDBQuery.QueryTotalShutterizedTXsForEachTXStatusPerMonth(ctx, txStatus)
+	if err != nil {
+		err := error.NewHttpError(
+			"error encountered while querying for data",
+			"",
+			http.StatusInternalServerError,
+		)
+		ctx.Error(err)
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{
+		"message": totalTxsPerMonth,
+	})
+}
