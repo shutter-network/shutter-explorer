@@ -138,7 +138,7 @@ WITH latest_events AS (
         created_at
     FROM transaction_submitted_event
     ORDER BY encrypted_transaction, created_at DESC
-	  LIMIT 10
+	  LIMIT $1
 ),
 decryption_status AS (
     SELECT
@@ -149,7 +149,7 @@ decryption_status AS (
     GROUP BY encrypted_transaction
 )
 SELECT
-    '0x' || encode(le.encrypted_transaction, 'hex') encrypted_tx_hash,
+    le.encrypted_transaction,
     le.created_at
 FROM latest_events le
 LEFT JOIN decryption_status ds ON le.encrypted_transaction = ds.encrypted_transaction
@@ -158,12 +158,12 @@ ORDER BY le.created_at DESC
 `
 
 type QueryLatestShutterizedTXsWhichArentIncludedRow struct {
-	EncryptedTxHash interface{}
-	CreatedAt       pgtype.Timestamptz
+	EncryptedTransaction []byte
+	CreatedAt            pgtype.Timestamptz
 }
 
-func (q *Queries) QueryLatestShutterizedTXsWhichArentIncluded(ctx context.Context) ([]QueryLatestShutterizedTXsWhichArentIncludedRow, error) {
-	rows, err := q.db.Query(ctx, queryLatestShutterizedTXsWhichArentIncluded)
+func (q *Queries) QueryLatestShutterizedTXsWhichArentIncluded(ctx context.Context, limit int32) ([]QueryLatestShutterizedTXsWhichArentIncludedRow, error) {
+	rows, err := q.db.Query(ctx, queryLatestShutterizedTXsWhichArentIncluded, limit)
 	if err != nil {
 		return nil, err
 	}
@@ -171,7 +171,7 @@ func (q *Queries) QueryLatestShutterizedTXsWhichArentIncluded(ctx context.Contex
 	var items []QueryLatestShutterizedTXsWhichArentIncludedRow
 	for rows.Next() {
 		var i QueryLatestShutterizedTXsWhichArentIncludedRow
-		if err := rows.Scan(&i.EncryptedTxHash, &i.CreatedAt); err != nil {
+		if err := rows.Scan(&i.EncryptedTransaction, &i.CreatedAt); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
