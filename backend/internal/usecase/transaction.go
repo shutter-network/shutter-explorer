@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"encoding/hex"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -157,8 +158,10 @@ func (uc *TransactionUsecase) QueryTotalExecutedTXsForEachTXStatusPerMonth(ctx *
 		return
 	}
 
+	fmt.Println("txStatus", txStatus)
 	totalTxsPerMonth, err := uc.observerDBQuery.QueryTotalShutterizedTXsForEachTXStatusPerMonth(ctx, txStatus)
 	if err != nil {
+		fmt.Println("err", err.Error())
 		err := error.NewHttpError(
 			"error encountered while querying for data",
 			"",
@@ -167,6 +170,7 @@ func (uc *TransactionUsecase) QueryTotalExecutedTXsForEachTXStatusPerMonth(ctx *
 		ctx.Error(err)
 		return
 	}
+
 	ctx.JSON(http.StatusOK, gin.H{
 		"message": totalTxsPerMonth,
 	})
