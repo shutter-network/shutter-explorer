@@ -167,33 +167,40 @@ func (q *Queries) QueryLatestPendingTXsWhichCanBeDecrypted(ctx context.Context, 
 
 const queryLatestTXsWhichArentIncluded = `-- name: QueryLatestTXsWhichArentIncluded :many
 WITH latest_events AS (
-    SELECT DISTINCT ON (encrypted_transaction)
+    SELECT 
         id,
         encrypted_transaction,
         created_at
-    FROM transaction_submitted_event
-    ORDER BY encrypted_transaction, created_at DESC
-	  LIMIT $1
-),
-decryption_status AS (
-    SELECT
-        encrypted_transaction,
-        MAX(tx_status) AS max_status
-    FROM decrypted_tx
-    JOIN latest_events le ON decrypted_tx.transaction_submitted_event_id = le.id
-    GROUP BY encrypted_transaction
+    FROM (
+        SELECT DISTINCT ON (encrypted_transaction)
+            id,
+            encrypted_transaction,
+            created_at
+        FROM 
+            transaction_submitted_event
+        ORDER BY 
+            encrypted_transaction, 
+            created_at DESC
+    ) subquery
+    ORDER BY 
+        created_at DESC
+    LIMIT $1
 )
 SELECT
+    le.id,
     le.encrypted_transaction,
+	  dt.tx_status,
     le.created_at
 FROM latest_events le
-LEFT JOIN decryption_status ds ON le.encrypted_transaction = ds.encrypted_transaction
-WHERE ds.max_status IS DISTINCT FROM 'included' OR ds.max_status IS NULL
+LEFT JOIN decrypted_tx dt ON le.id = dt.transaction_submitted_event_id
+WHERE dt.tx_status = 'not included' OR dt.tx_status IS NULL
 ORDER BY le.created_at DESC
 `
 
 type QueryLatestTXsWhichArentIncludedRow struct {
+	ID                   int64
 	EncryptedTransaction []byte
+	TxStatus             interface{}
 	CreatedAt            pgtype.Timestamptz
 }
 
@@ -206,7 +213,12 @@ func (q *Queries) QueryLatestTXsWhichArentIncluded(ctx context.Context, limit in
 	var items []QueryLatestTXsWhichArentIncludedRow
 	for rows.Next() {
 		var i QueryLatestTXsWhichArentIncludedRow
-		if err := rows.Scan(&i.EncryptedTransaction, &i.CreatedAt); err != nil {
+		if err := rows.Scan(
+			&i.ID,
+			&i.EncryptedTransaction,
+			&i.TxStatus,
+			&i.CreatedAt,
+		); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
