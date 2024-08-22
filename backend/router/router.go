@@ -5,6 +5,7 @@ import (
 	"github.com/shutter-network/shutter-explorer/backend/internal/middleware"
 	"github.com/shutter-network/shutter-explorer/backend/internal/service"
 	"github.com/shutter-network/shutter-explorer/backend/internal/usecase"
+	"github.com/shutter-network/shutter-explorer/backend/internal/websocket"
 )
 
 func NewRouter(usecases *usecase.Usecases) *gin.Engine {
@@ -13,6 +14,11 @@ func NewRouter(usecases *usecase.Usecases) *gin.Engine {
 	router.Use(gin.Recovery())
 
 	router.Use(middleware.ErrorHandler())
+	manager := websocket.NewClientManager()
+	// Start the WebSocket manager
+	go manager.Run()
+
+	router.GET("/ws", manager.HandleWebSocket)
 	transactionService := service.NewTransactionService(usecases.TransactionUsecase)
 	api := router.Group("/api")
 	{
