@@ -1,12 +1,11 @@
 package usecase
 
 import (
+	"context"
 	"encoding/hex"
-	"fmt"
 	"net/http"
 	"strconv"
 
-	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/rs/zerolog/log"
 	"github.com/shutter-network/shutter-explorer/backend/internal/data"
@@ -32,17 +31,7 @@ func NewTransactionUsecase(
 	}
 }
 
-func (uc *TransactionUsecase) QueryDecryptedTX(ctx *gin.Context) {
-	ecTx, ok := ctx.GetQuery("encryptedTx")
-	if !ok {
-		err := error.NewHttpError(
-			"query parameter not found",
-			"encryptedTx query parameter is required",
-			http.StatusBadRequest,
-		)
-		ctx.Error(err)
-		return
-	}
+func (uc *TransactionUsecase) QueryDecryptedTX(ctx context.Context, ecTx string) ([]data.QueryDecryptedTXForEncryptedTXRow, *error.Http) {
 	ecTxBytes, err := hex.DecodeString(ecTx)
 	if err != nil {
 		err := error.NewHttpError(
@@ -50,8 +39,7 @@ func (uc *TransactionUsecase) QueryDecryptedTX(ctx *gin.Context) {
 			"valid encryptedTx query parameter is required",
 			http.StatusBadRequest,
 		)
-		ctx.Error(err)
-		return
+		return nil, &err
 	}
 	decryptedTx, err := uc.observerDBQuery.QueryDecryptedTXForEncryptedTX(ctx, ecTxBytes)
 	if err != nil {
@@ -61,25 +49,12 @@ func (uc *TransactionUsecase) QueryDecryptedTX(ctx *gin.Context) {
 			"",
 			http.StatusInternalServerError,
 		)
-		ctx.Error(err)
-		return
+		return nil, &err
 	}
-	ctx.JSON(http.StatusOK, gin.H{
-		"message": decryptedTx,
-	})
+	return decryptedTx, nil
 }
 
-func (uc *TransactionUsecase) QueryPendingShutterizedTX(ctx *gin.Context) {
-	txLimitStringified, ok := ctx.GetQuery("txLimit")
-	if !ok {
-		err := error.NewHttpError(
-			"query parameter not found",
-			"txLimit query parameter is required",
-			http.StatusBadRequest,
-		)
-		ctx.Error(err)
-		return
-	}
+func (uc *TransactionUsecase) QueryPendingShutterizedTX(ctx context.Context, txLimitStringified string) ([]data.QueryTxHashFromTransactionDetailsRow, *error.Http) {
 	txLimit, err := strconv.Atoi(txLimitStringified)
 	if err != nil {
 		err := error.NewHttpError(
@@ -87,8 +62,7 @@ func (uc *TransactionUsecase) QueryPendingShutterizedTX(ctx *gin.Context) {
 			"valid txLimit query parameter is required",
 			http.StatusBadRequest,
 		)
-		ctx.Error(err)
-		return
+		return nil, &err
 	}
 	pendingObserverTxs, err := uc.observerDBQuery.QueryLatestTXsWhichArentIncluded(ctx, int32(txLimit))
 	if err != nil {
@@ -98,8 +72,7 @@ func (uc *TransactionUsecase) QueryPendingShutterizedTX(ctx *gin.Context) {
 			"",
 			http.StatusInternalServerError,
 		)
-		ctx.Error(err)
-		return
+		return nil, &err
 	}
 	ecTXHashes := make([]string, len(pendingObserverTxs))
 
@@ -115,26 +88,12 @@ func (uc *TransactionUsecase) QueryPendingShutterizedTX(ctx *gin.Context) {
 			"",
 			http.StatusInternalServerError,
 		)
-		ctx.Error(err)
-		return
+		return nil, &err
 	}
-	ctx.JSON(http.StatusOK, gin.H{
-		"message": erpcTXs,
-	})
+	return erpcTXs, nil
 }
 
-func (uc *TransactionUsecase) QueryTotalExecutedTXsForEachTXStatus(ctx *gin.Context) {
-	txStatus, ok := ctx.GetQuery("txStatus")
-	if !ok {
-		err := error.NewHttpError(
-			"query parameter not found",
-			"encryptedTx query parameter is required",
-			http.StatusBadRequest,
-		)
-		ctx.Error(err)
-		return
-	}
-
+func (uc *TransactionUsecase) QueryTotalExecutedTXsForEachTXStatus(ctx context.Context, txStatus string) (int64, *error.Http) {
 	totalTxs, err := uc.observerDBQuery.QueryTotalTXsForEachTXStatus(ctx, txStatus)
 	if err != nil {
 		log.Err(err).Msg("err encountered while querying DB")
@@ -143,27 +102,12 @@ func (uc *TransactionUsecase) QueryTotalExecutedTXsForEachTXStatus(ctx *gin.Cont
 			"",
 			http.StatusInternalServerError,
 		)
-		ctx.Error(err)
-		return
+		return 0, &err
 	}
-	ctx.JSON(http.StatusOK, gin.H{
-		"message": totalTxs,
-	})
+	return totalTxs, nil
 }
 
-func (uc *TransactionUsecase) QueryTotalExecutedTXsForEachTXStatusPerMonth(ctx *gin.Context) {
-	txStatus, ok := ctx.GetQuery("txStatus")
-	if !ok {
-		err := error.NewHttpError(
-			"query parameter not found",
-			"encryptedTx query parameter is required",
-			http.StatusBadRequest,
-		)
-		ctx.Error(err)
-		return
-	}
-
-	fmt.Println("txStatus", txStatus)
+func (uc *TransactionUsecase) QueryTotalExecutedTXsForEachTXStatusPerMonth(ctx context.Context, txStatus string) ([]data.QueryTotalTXsForEachTXStatusPerMonthRow, *error.Http) {
 	totalTxsPerMonth, err := uc.observerDBQuery.QueryTotalTXsForEachTXStatusPerMonth(ctx, txStatus)
 	if err != nil {
 		log.Err(err).Msg("err encountered while querying DB")
@@ -172,26 +116,12 @@ func (uc *TransactionUsecase) QueryTotalExecutedTXsForEachTXStatusPerMonth(ctx *
 			"",
 			http.StatusInternalServerError,
 		)
-		ctx.Error(err)
-		return
+		return nil, &err
 	}
-
-	ctx.JSON(http.StatusOK, gin.H{
-		"message": totalTxsPerMonth,
-	})
+	return totalTxsPerMonth, nil
 }
 
-func (uc *TransactionUsecase) QueryIncludedTransactions(ctx *gin.Context) {
-	txLimitStringified, ok := ctx.GetQuery("txLimit")
-	if !ok {
-		err := error.NewHttpError(
-			"query parameter not found",
-			"txLimit query parameter is required",
-			http.StatusBadRequest,
-		)
-		ctx.Error(err)
-		return
-	}
+func (uc *TransactionUsecase) QueryIncludedTransactions(ctx context.Context, txLimitStringified string) ([]data.QueryIncludedTransactionsRow, *error.Http) {
 	txLimit, err := strconv.Atoi(txLimitStringified)
 	if err != nil {
 		log.Err(err).Msg("err encountered while querying DB")
@@ -200,8 +130,7 @@ func (uc *TransactionUsecase) QueryIncludedTransactions(ctx *gin.Context) {
 			"valid txLimit query parameter is required",
 			http.StatusBadRequest,
 		)
-		ctx.Error(err)
-		return
+		return nil, &err
 	}
 
 	txs, err := uc.observerDBQuery.QueryIncludedTransactions(ctx, int32(txLimit))
@@ -212,11 +141,7 @@ func (uc *TransactionUsecase) QueryIncludedTransactions(ctx *gin.Context) {
 			"",
 			http.StatusInternalServerError,
 		)
-		ctx.Error(err)
-		return
+		return nil, &err
 	}
-
-	ctx.JSON(http.StatusOK, gin.H{
-		"message": txs,
-	})
+	return txs, nil
 }
