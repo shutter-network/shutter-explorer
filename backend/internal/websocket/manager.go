@@ -87,11 +87,11 @@ func (manager *ClientManager) HandleWebSocket(c *gin.Context) {
 	}
 }
 
-// sendPeriodicMessages sends a JSON object to all clients every 5 seconds
-func (manager *ClientManager) sendPeriodicMessages(d time.Duration, message interface{}) {
+// sendPeriodicMessages sends a JSON object to all clients every d seconds
+func (manager *ClientManager) sendPeriodicMessages(d time.Duration, callback func() interface{}) {
 	for {
 		time.Sleep(d)
-
+		message := callback()
 		messageJSON, err := json.Marshal(message)
 		if err != nil {
 			log.Println("Error marshalling JSON:", err)

@@ -14,7 +14,7 @@ func NewRouter(usecases *usecase.Usecases) *gin.Engine {
 	router.Use(gin.Recovery())
 
 	router.Use(middleware.ErrorHandler())
-	manager := websocket.NewClientManager()
+	manager := websocket.NewClientManager(usecases)
 	// Start the WebSocket manager
 	go manager.Run()
 
