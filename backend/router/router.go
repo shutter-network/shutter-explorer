@@ -22,6 +22,8 @@ func NewRouter(ctx context.Context, usecases *usecase.Usecases) *gin.Engine {
 
 	router.GET("/ws", manager.HandleWebSocket)
 	transactionService := service.NewTransactionService(usecases.TransactionUsecase)
+	validatorService := service.NewValidatorService(usecases.ValidatorUsecase)
+
 	api := router.Group("/api")
 	{
 		transaction := api.Group("/transaction")
@@ -30,6 +32,10 @@ func NewRouter(ctx context.Context, usecases *usecase.Usecases) *gin.Engine {
 		transaction.GET("/included-txs", transactionService.QueryIncludedTransactions)
 		transaction.GET("/total-successful-txs", transactionService.QueryTotalExecutedTXsForEachTXStatus)
 		transaction.GET("/total-txs-month", transactionService.QueryTotalExecutedTXsForEachTXStatusPerMonth)
+	}
+	{
+		validator := api.Group("/validator")
+		validator.GET("/total-registered-validators", validatorService.QueryTotalRegisteredValidators)
 	}
 
 	return router
