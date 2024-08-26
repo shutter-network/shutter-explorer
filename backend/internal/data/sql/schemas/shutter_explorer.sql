@@ -100,4 +100,38 @@ CREATE TABLE IF NOT EXISTS transaction_details
     retries                 BIGINT,
     is_cancelled            BOOLEAN,
     PRIMARY KEY (address, nonce, tx_hash, encrypted_tx_hash)
-)
+);
+
+CREATE TYPE validator_registration_validity AS ENUM 
+(
+    'valid', 
+    'invalid message',
+    'invalid signature'
+);
+
+CREATE TABLE IF NOT EXISTS validator_registration_message
+(
+    id                          SERIAL PRIMARY KEY,
+    version                     BIGINT,
+    chain_id                    BIGINT,
+    validator_registry_address  BYTEA,
+    validator_index             BIGINT,
+    nonce                       BIGINT,
+    is_registeration            BOOLEAN,
+    signature                   BYTEA NOT NULL,
+    event_block_number          BIGINT NOT NULL,
+    event_tx_index              BIGINT NOT NULL,
+    event_log_index             BIGINT NOT NULL,
+    validity                    validator_registration_validity NOT NULL,
+    created_at                  TIMESTAMP WITH TIME ZONE DEFAULT NOW()  NOT NULL,
+    updated_at                  TIMESTAMP WITH TIME ZONE DEFAULT NOW()  NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS validator_status
+(
+    id                          SERIAL PRIMARY KEY,
+    validator_index             BIGINT UNIQUE,
+    status                      TEXT NOT NULL,
+    created_at                  TIMESTAMP WITH TIME ZONE DEFAULT NOW()  NOT NULL,
+    updated_at                  TIMESTAMP WITH TIME ZONE DEFAULT NOW()  NOT NULL
+);
