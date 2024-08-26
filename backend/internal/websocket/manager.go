@@ -1,14 +1,17 @@
 package websocket
 
 import (
+	"context"
 	"encoding/json"
-	"log"
 	"net/http"
 	"sync"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
+	"github.com/pkg/errors"
+	"github.com/rs/zerolog/log"
+	"github.com/shutter-network/shutter-explorer/backend/internal/error"
 	"github.com/shutter-network/shutter-explorer/backend/internal/usecase"
 )
 
@@ -34,8 +37,9 @@ func NewClientManager(usecases *usecase.Usecases) *ClientManager {
 }
 
 // Run starts the manager to handle register/unregister clients and broadcasting messages
-func (manager *ClientManager) Run() {
+func (manager *ClientManager) Run(ctx context.Context) {
 	// Start the periodic message sender and query the db via usecases
+	go manager.sendTotalExecutedTXs(ctx, 5*time.Second, "included")
 	for {
 		select {
 		case conn := <-manager.register:
@@ -88,16 +92,20 @@ func (manager *ClientManager) HandleWebSocket(c *gin.Context) {
 }
 
 // sendPeriodicMessages sends a JSON object to all clients every d seconds
-func (manager *ClientManager) sendPeriodicMessages(d time.Duration, callback func() interface{}) {
+func (manager *ClientManager) sendPeriodicMessages(ctx context.Context, d time.Duration, callback func(ctx context.Context) (interface{}, *error.Http)) {
 	for {
 		time.Sleep(d)
-		message := callback()
-		messageJSON, err := json.Marshal(message)
-		if err != nil {
-			log.Println("Error marshalling JSON:", err)
+		message, httpError := callback(ctx)
+		if httpError != nil {
+			log.Err(errors.Wrapf(httpError, "error returned from callback"))
 			continue
 		}
-
+		log.Debug().Interface("message", message).Msg("websocket periodic message")
+		messageJSON, err := json.Marshal(message)
+		if err != nil {
+			log.Err(errors.Wrapf(err, "errors while marshalling JSON"))
+			continue
+		}
 		manager.broadcast <- messageJSON
 	}
 }
