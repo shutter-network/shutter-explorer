@@ -1,11 +1,10 @@
-// @ts-ignore
 import React from "react";
 import { Paper, Typography, Tooltip } from '@mui/material';
 
 interface InfoBoxProps {
     title: string;
     tooltip: string;
-    value: string | number;
+    value: string | number | string[];
 }
 
 const InfoBox: React.FC<InfoBoxProps> = ({ title, tooltip, value }) => {
@@ -14,7 +13,17 @@ const InfoBox: React.FC<InfoBoxProps> = ({ title, tooltip, value }) => {
             <Tooltip title={tooltip}>
                 <Typography variant="h6">{title}</Typography>
             </Tooltip>
-            <Typography variant="body1">{value}</Typography>
+            <Typography variant="body1">
+                {Array.isArray(value) ? (
+                    <ul style={{ listStyleType: "none", padding: 0 }}>
+                        {value.map((item, index) => (
+                            <li key={index}>{item}</li>
+                        ))}
+                    </ul>
+                ) : (
+                    value
+                )}
+            </Typography>
         </Paper>
     );
 };
