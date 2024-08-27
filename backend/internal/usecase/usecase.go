@@ -3,12 +3,15 @@ package usecase
 import "github.com/jackc/pgx/v5/pgxpool"
 
 type Usecases struct {
-	Greeter *GreeterUsecase
+	TransactionUsecase *TransactionUsecase
 	// Add more usecases as needed
 }
 
-func NewUsecases(db *pgxpool.Pool) *Usecases {
+func NewUsecases(
+	observerDB *pgxpool.Pool,
+	erpcDB *pgxpool.Pool,
+) *Usecases {
 	return &Usecases{
-		Greeter: NewGreeterUsecase(db),
+		TransactionUsecase: NewTransactionUsecase(observerDB, erpcDB),
 	}
 }
