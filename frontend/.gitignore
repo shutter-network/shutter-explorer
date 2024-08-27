@@ -18,6 +18,13 @@
 .env.test.local
 .env.production.local
 
+# JetBrains IDEs
+.idea/
+*.iml
+*.iws
+*.ipr
+
+
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
