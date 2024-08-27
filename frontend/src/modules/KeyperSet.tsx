@@ -1,14 +1,13 @@
 import React from 'react';
 import { Grid, Box, Typography } from '@mui/material';
 import InfoBox from "../components/InfoBox";
-import AddressList from "../components/AddressList";
 
 const KeyperSet: React.FC = () => {
     return (
         <Box sx={{ flexGrow: 1, marginTop: 4 }}>
             {/* Section Title */}
             <Typography variant="h5" align="left">
-                Keyperset Overview
+                Keyper Set Overview
             </Typography>
             <Grid container spacing={3}>
                 <Grid item xs={12} sm={6} md={3}>
@@ -33,17 +32,17 @@ const KeyperSet: React.FC = () => {
                     />
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                    <AddressList
+                    <InfoBox
                         title="Keyper Addresses"
                         tooltip="TBD"
-                        addresses={["0x7D04d2EdC058a1afc761d9C99aE4fc5C85d4c8a6", "0x7D04d2EdC058a1afc761d9C99aE4fc5C85d4c8a6"]}
+                        value={["0x7D04d2EdC058a1afc761d9C99aE4fc5C85d4c8a6", "0x7D04d2EdC058a1afc761d9C99aE4fc5C85d4c8a6"]}
                     />
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                    <AddressList
+                    <InfoBox
                         title="Keyper Contract Addresses"
                         tooltip="TBD"
-                        addresses={["0x7D04d2EdC058a1afc761d9C99aE4fc5C85d4c8a6", "0x7D04d2EdC058a1afc761d9C99aE4fc5C85d4c8a6"]}
+                        value={["0x7D04d2EdC058a1afc761d9C99aE4fc5C85d4c8a6", "0x7D04d2EdC058a1afc761d9C99aE4fc5C85d4c8a6"]}
                     />
                 </Grid>
             </Grid>
