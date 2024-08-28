@@ -1,4 +1,4 @@
-import * as React from 'react';
+import {useEffect, useState} from "react";
 import {Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@mui/material";
 
 interface Transaction {
@@ -6,10 +6,10 @@ interface Transaction {
 }
 
 export default function BasicTable() {
-    const [rows, setRows] = React.useState<Transaction[]>([]);
-    const [error, setError] = React.useState<Error | null>(null);
+    const [rows, setRows] = useState<Transaction[]>([]);
+    const [error, setError] = useState<Error | null>(null);
 
-    React.useEffect(() => {
+    useEffect(() => {
         fetch('/data/transaction.json')
             .then((response) => {
                 if (!response.ok) {

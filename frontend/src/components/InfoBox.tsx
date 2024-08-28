@@ -1,5 +1,5 @@
-import React from "react";
-import { Paper, Typography, Tooltip } from '@mui/material';
+import React, {FC} from "react";
+import {Paper, Tooltip, Typography} from '@mui/material';
 
 interface InfoBoxProps {
     title: string;
@@ -7,7 +7,7 @@ interface InfoBoxProps {
     value: string | number | string[];
 }
 
-const InfoBox: React.FC<InfoBoxProps> = ({ title, tooltip, value }) => {
+const InfoBox: FC<InfoBoxProps> = ({ title, tooltip, value }) => {
     return (
         <Paper elevation={3} sx={{ padding: 2, textAlign: 'center' }}>
             <Tooltip title={tooltip}>

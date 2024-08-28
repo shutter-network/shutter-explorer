@@ -1,4 +1,3 @@
-import React from 'react';
 import Validator from '../modules/Validator';
 import KeyperSet from '../modules/KeyperSet';
 import Transaction from '../modules/Transaction';

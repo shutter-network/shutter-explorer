@@ -1,4 +1,3 @@
-import React from 'react';
 import ResponsiveLayout from "../layouts/ResponsiveLayout";
 import BasicTable from "../components/BasicTable";
 

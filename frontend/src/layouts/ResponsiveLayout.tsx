@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react';
+import {FC, ReactNode} from 'react';
 import { Box, AppBar, Toolbar, Typography, Drawer, List, ListItem, ListItemText, CssBaseline } from '@mui/material';
 import { Link } from "react-router-dom";
 
@@ -8,7 +8,7 @@ interface ResponsiveLayoutProps {
     children: ReactNode;
 }
 
-const ResponsiveLayout: React.FC<ResponsiveLayoutProps> = ({ children }) => {
+const ResponsiveLayout: FC<ResponsiveLayoutProps> = ({ children }) => {
     return (
         <Box sx={{ display: 'flex' }}>
             <CssBaseline />
