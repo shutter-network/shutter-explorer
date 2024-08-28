@@ -1,11 +1,11 @@
-import React from 'react';
-import { Grid, Box, Typography } from '@mui/material';
+import {Box, Grid, Typography} from '@mui/material';
 import InfoBox from '../components/InfoBox';
 import BasicGauges from '../components/Gauge';
 import HistogramChart from '../components/HistogramChart';
 import CustomLineChart from '../components/CustomLineChart';
+import {FC} from "react";
 
-const InclusionTime: React.FC = () => {
+const InclusionTime: FC = () => {
     return (
         <Box sx={{ flexGrow: 1, marginTop: 4 }}>
             <Typography variant="h5" align="left">

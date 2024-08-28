@@ -1,8 +1,8 @@
-import React from 'react';
+import {FC} from 'react';
 import {Grid, Box, Typography} from '@mui/material';
 import InfoBox from "../components/InfoBox";
 
-const Keyper : React.FC = () => {
+const Keyper : FC = () => {
     return (
         <Box sx={{ flexGrow: 1, marginTop: 4 }}>
             <Typography variant="h5" align="left">

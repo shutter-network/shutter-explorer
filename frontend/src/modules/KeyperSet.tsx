@@ -1,8 +1,8 @@
-import React from 'react';
-import { Grid, Box, Typography } from '@mui/material';
+import {FC} from 'react';
+import {Box, Grid, Typography} from '@mui/material';
 import InfoBox from "../components/InfoBox";
 
-const KeyperSet: React.FC = () => {
+const KeyperSet: FC = () => {
     return (
         <Box sx={{ flexGrow: 1, marginTop: 4 }}>
             {/* Section Title */}

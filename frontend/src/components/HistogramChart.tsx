@@ -1,5 +1,5 @@
-import React from 'react';
-import { BarChart } from '@mui/x-charts/BarChart';
+import React, {FC} from 'react';
+import {BarChart} from '@mui/x-charts/BarChart';
 
 interface HistogramData {
     xAxis: {
@@ -11,7 +11,7 @@ interface HistogramData {
     }[];
 }
 
-const HistogramChart: React.FC = () => {
+const HistogramChart: FC = () => {
     // Example data for the histogram
     const data: HistogramData = {
         xAxis: {

@@ -1,4 +1,3 @@
-import React from 'react';
 import { Grid, Box, Typography } from '@mui/material';
 import InfoBox from "../components/InfoBox";
 
