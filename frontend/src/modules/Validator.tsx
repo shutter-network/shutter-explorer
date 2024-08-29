@@ -8,7 +8,6 @@ const Validator = () => {
     const { data: validatorPercentageData, loading: loadingPercentage, error: errorPercentage } = useFetch('/api/validatorPercentage', 10000);
     const { data: totalValidatorsData, loading: loadingTotal, error: errorTotal } = useFetch('/api/totalValidators', 10000);
 
-
     return (
         <Box sx={{ flexGrow: 1, marginTop: 4 }}>
             <Typography variant="h5" align="left">

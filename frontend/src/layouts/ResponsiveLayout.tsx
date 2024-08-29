@@ -11,7 +11,6 @@ import {
     Toolbar,
     Typography
 } from '@mui/material';
-import {useNavigate} from "react-router-dom";
 import { Link as RouterLink } from 'react-router-dom';
 import SearchBar from '../components/SearchBar';
 
