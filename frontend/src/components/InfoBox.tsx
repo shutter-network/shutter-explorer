@@ -1,4 +1,4 @@
-import React, {FC} from "react";
+import {FC} from "react";
 import {Paper, Tooltip, Typography} from '@mui/material';
 
 interface InfoBoxProps {

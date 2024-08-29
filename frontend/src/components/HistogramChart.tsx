@@ -1,4 +1,4 @@
-import React, {FC} from 'react';
+import {FC} from 'react';
 import {BarChart} from '@mui/x-charts/BarChart';
 
 interface HistogramData {
