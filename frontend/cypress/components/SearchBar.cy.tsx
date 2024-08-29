@@ -26,7 +26,6 @@ describe('<SearchBar />', () => {
                                     placeholder="Search by Txn Hash"
                                     value={searchQuery}
                                     onChange={handleSearchChange}
-                                    onSubmit={() => {}}
                                 />
                             }
                         />
