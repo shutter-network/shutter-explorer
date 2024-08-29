@@ -1,5 +1,5 @@
-import {Alert, Box, Typography} from '@mui/material';
-import Grid from '@mui/material/Grid';
+import { Alert, Box, Typography } from '@mui/material';
+import Grid2 from '@mui/material/Grid2';
 import InfoBox from "../components/InfoBox";
 import useFetch from "../hooks/useFetch";
 
@@ -13,8 +13,8 @@ const Validator = () => {
             <Typography variant="h5" align="left">
                 Validator Overview
             </Typography>
-            <Grid container spacing={3}>
-                <Grid item xs={12} sm={6}>
+            <Grid2 container spacing={3}>
+                <Grid2 size={{ xs: 12, sm: 6 }}>
                     {errorShutterized ? (
                         <Alert severity="error">Error fetching shutterized validators: {errorShutterized.message}</Alert>
                     ) : (
@@ -24,8 +24,8 @@ const Validator = () => {
                             value={loadingShutterized ? 'Loading...' : shutterizedValidatorsData?.count || 'N/A'}
                         />
                     )}
-                </Grid>
-                <Grid item xs={12} sm={6}>
+                </Grid2>
+                <Grid2 size={{ xs: 12, sm: 6 }}>
                     {errorPercentage ? (
                         <Alert severity="error">Error fetching validator percentage: {errorPercentage.message}</Alert>
                     ) : (
@@ -35,8 +35,8 @@ const Validator = () => {
                             value={loadingPercentage ? 'Loading...' : `${validatorPercentageData?.percentage || 'N/A'}%`}
                         />
                     )}
-                </Grid>
-                <Grid item xs={12} sm={6}>
+                </Grid2>
+                <Grid2 size={{ xs: 12, sm: 6 }}>
                     {errorTotal ? (
                         <Alert severity="error">Error fetching total validators: {errorTotal.message}</Alert>
                     ) : (
@@ -46,8 +46,8 @@ const Validator = () => {
                             value={loadingTotal ? 'Loading...' : totalValidatorsData?.total || 'N/A'}
                         />
                     )}
-                </Grid>
-            </Grid>
+                </Grid2>
+            </Grid2>
         </Box>
     );
 };
