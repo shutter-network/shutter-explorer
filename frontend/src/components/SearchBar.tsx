@@ -1,24 +1,59 @@
-import {ChangeEvent, FC} from 'react';
-import { TextField, Box } from '@mui/material';
+import React, { FC, ChangeEvent } from 'react';
+import { TextField, InputAdornment, IconButton } from '@mui/material';
+import SearchIcon from '@mui/icons-material/Search';
+import { useNavigate } from 'react-router-dom';
 
 interface SearchBarProps {
-    placeholder?: string;
-    onChange: (event: ChangeEvent<HTMLInputElement>) => void;
+    placeholder: string;
     value: string;
+    onChange: (event: ChangeEvent<HTMLInputElement>) => void;
+    onSubmit: () => void;
 }
 
-const SearchBar: FC<SearchBarProps> = ({ placeholder = 'Search...', onChange, value }) => {
+const SearchBar: FC<SearchBarProps> = ({ placeholder, value, onChange, onSubmit }) => {
+    const navigate = useNavigate();
+
+    const handleSearchSubmit = async () => {
+        if (!value) return;
+
+        try {
+            const response = await fetch(`/api/txHash?hash=${value}`);
+            if (response.ok) {
+                const transactionData = await response.json();
+                navigate('/transaction-detail', { state: transactionData });
+            } else {
+                console.error('Transaction not found');
+            }
+        } catch (error) {
+            console.error('Error fetching transaction data:', error);
+        }
+    };
+
+    const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+        if (event.key === 'Enter') {
+            handleSearchSubmit();
+        }
+    };
+
     return (
-        <Box sx={{ flexGrow: 1 }}>
-            <TextField
-                id="search-bar"
-                label={placeholder}
-                variant="outlined"
-                value={value}
-                onChange={onChange}
-                sx={{ width: '100%' }}
-            />
-        </Box>
+        <TextField
+            fullWidth
+            placeholder={placeholder}
+            value={value}
+            onChange={onChange}
+            onKeyDown={handleKeyDown}
+            slotProps={{
+                input: {
+                    endAdornment: (
+                        <InputAdornment position="end">
+                            <IconButton onClick={handleSearchSubmit}>
+                                <SearchIcon />
+                            </IconButton>
+                        </InputAdornment>
+                    ),
+                },
+            }}
+        />
     );
 };
 

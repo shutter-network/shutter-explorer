@@ -1,4 +1,4 @@
-import {ChangeEvent, FC, ReactNode, useState} from 'react';
+import {ChangeEvent, ElementType, FC, ReactNode, useState} from 'react';
 import {
     AppBar,
     Box,
@@ -11,7 +11,8 @@ import {
     Toolbar,
     Typography
 } from '@mui/material';
-import {Link} from "react-router-dom";
+import {useNavigate} from "react-router-dom";
+import { Link as RouterLink } from 'react-router-dom';
 import SearchBar from '../components/SearchBar';
 
 const drawerWidth = 240;
@@ -22,11 +23,14 @@ interface ResponsiveLayoutProps {
 
 const ResponsiveLayout: FC<ResponsiveLayoutProps> = ({children}) => {
     const [searchQuery, setSearchQuery] = useState('');
-
     const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
         setSearchQuery(event.target.value);
-        // Implement search logic
     };
+
+    const handleSearchSubmit = () => {
+        console.log("Search submitted:", searchQuery);
+    };
+
 
     return (
         <Box sx={{display: 'flex'}}>
@@ -47,14 +51,17 @@ const ResponsiveLayout: FC<ResponsiveLayoutProps> = ({children}) => {
                 }}
             >
                 <Toolbar/>
-                <Box sx={{overflow: 'auto'}}>
+                <Box sx={{ overflow: 'auto' }}>
                     <List>
                         {['System Overview', 'Slot Overview', 'Transaction Detail'].map((text, index) => (
-                            <Link to={"/" + text.toLowerCase().replace(' ', '-')} key={index}>
-                                <ListItem button>
-                                    <ListItemText primary={text}/>
-                                </ListItem>
-                            </Link>
+                            <ListItem
+                                button
+                                component={RouterLink as ElementType}
+                                to={"/" + text.toLowerCase().replace(' ', '-')}
+                                key={index}
+                            >
+                                <ListItemText primary={text} />
+                            </ListItem>
                         ))}
                     </List>
                 </Box>
@@ -66,6 +73,7 @@ const ResponsiveLayout: FC<ResponsiveLayoutProps> = ({children}) => {
                         placeholder="Search by Txn Hash"
                         value={searchQuery}
                         onChange={handleSearchChange}
+                        onSubmit={handleSearchSubmit}
                     />
                 </Container>
                 {children}

@@ -19,7 +19,7 @@ const Transaction: FC = () => {
 
     if (!transaction) {
         return <ResponsiveLayout>
-            <Typography variant="h6">No transaction data found. Explorer Url = {explorerUrl}</Typography>
+            <Typography variant="h6">No transaction data found.</Typography>
         </ResponsiveLayout>;
     }
 
