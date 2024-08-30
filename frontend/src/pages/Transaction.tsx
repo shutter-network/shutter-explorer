@@ -4,7 +4,7 @@ import Grid from '@mui/material/Grid2';
 import ResponsiveLayout from "../layouts/ResponsiveLayout";
 import { FC } from "react";
 
-interface TransactionDetail {
+interface TransactionDetails {
     status: string;
     estimatedInclusionTime: string;
     effectiveInclusionTime: string;
@@ -15,7 +15,7 @@ interface TransactionDetail {
 
 const Transaction: FC = () => {
     const location = useLocation();
-    const transaction = location.state as TransactionDetail;
+    const transaction = location.state as TransactionDetails;
     const explorerUrl = process.env.REACT_APP_EXPLORER_URL;
 
     if (!transaction) {
