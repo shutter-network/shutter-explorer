@@ -27,7 +27,12 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "check-versions": "node -v && npm -v"
+  },
+  "engines": {
+    "node": ">=18.0.0 <23.0.0",
+    "npm": ">=8.0.0"
   },
   "eslintConfig": {
     "extends": [
