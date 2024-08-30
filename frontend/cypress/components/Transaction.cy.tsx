@@ -7,9 +7,9 @@ import { transactionData, verifyTransactionDetails } from '../utils/transactionU
 describe('<Transaction />', () => {
     it('renders the transaction details correctly', () => {
         mount(
-            <MemoryRouter initialEntries={[{ pathname: '/transaction-detail', state: transactionData }]}>
+            <MemoryRouter initialEntries={[{ pathname: '/transaction-details', state: transactionData }]}>
                 <Routes>
-                    <Route path="/transaction-detail" element={<Transaction />} />
+                    <Route path="/transaction-details" element={<Transaction />} />
                 </Routes>
             </MemoryRouter>
         );
@@ -20,9 +20,9 @@ describe('<Transaction />', () => {
 
     it('renders a message when no transaction data is found', () => {
         mount(
-            <MemoryRouter initialEntries={['/transaction-detail']}>
+            <MemoryRouter initialEntries={['/transaction-details']}>
                 <Routes>
-                    <Route path="/transaction-detail" element={<Transaction />} />
+                    <Route path="/transaction-details" element={<Transaction />} />
                 </Routes>
             </MemoryRouter>
         );

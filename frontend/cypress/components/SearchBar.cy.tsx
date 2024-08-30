@@ -30,7 +30,7 @@ describe('<SearchBar />', () => {
                             }
                         />
                         <Route
-                            path="/transaction-detail"
+                            path="/transaction-details"
                             element={<Transaction />}
                         />
                     </Routes>
