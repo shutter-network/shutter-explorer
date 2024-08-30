@@ -2,7 +2,8 @@ import { useLocation } from 'react-router-dom';
 import { Box, Typography, Link } from '@mui/material';
 import Grid from '@mui/material/Grid2';
 import ResponsiveLayout from "../layouts/ResponsiveLayout";
-import { FC } from "react";
+import { FC, useState, useEffect } from "react";
+import useFetch from '../hooks/useFetch';
 
 interface TransactionDetails {
     status: string;
@@ -15,13 +16,42 @@ interface TransactionDetails {
 
 const Transaction: FC = () => {
     const location = useLocation();
-    const transaction = location.state as TransactionDetails;
+    const initialTransaction = location.state as TransactionDetails | undefined;
     const explorerUrl = process.env.REACT_APP_EXPLORER_URL;
+
+    const [transaction, setTransaction] = useState<TransactionDetails | null>(initialTransaction || null);
+
+    const { data: updatedData, loading, error } = useFetch(
+        initialTransaction ? `/api/transaction?hash=${initialTransaction.userTransactionHash}` : '',
+        10000
+    );
+
+    useEffect(() => {
+        if (updatedData && transaction) {
+            setTransaction(updatedData as TransactionDetails);
+        }
+    }, [updatedData]);
 
     if (!transaction) {
         return (
             <ResponsiveLayout>
                 <Typography variant="h6">No transaction data found.</Typography>
+            </ResponsiveLayout>
+        );
+    }
+
+    if (loading && !updatedData) {
+        return (
+            <ResponsiveLayout>
+                <Typography variant="h6">Loading transaction data...</Typography>
+            </ResponsiveLayout>
+        );
+    }
+
+    if (error) {
+        return (
+            <ResponsiveLayout>
+                <Typography variant="h6" color="error">Error loading transaction data.</Typography>
             </ResponsiveLayout>
         );
     }

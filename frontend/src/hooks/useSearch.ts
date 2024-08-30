@@ -13,10 +13,10 @@ const useSearch = (value: string) => {
         setError(null);
 
         try {
-            const response = await fetch(`/api/txHash?hash=${value}`);
+            const response = await fetch(`/api/transaction?hash=${value}`);
             if (response.ok) {
                 const transactionData = await response.json();
-                navigate('/transaction-detail', { state: transactionData });
+                navigate('/transaction-details', { state: transactionData });
             } else {
                 setError(new Error('Transaction not found'));
             }

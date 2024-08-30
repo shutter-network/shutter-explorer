@@ -6,6 +6,11 @@ import { transactionData, verifyTransactionDetails } from '../utils/transactionU
 
 describe('<Transaction />', () => {
     it('renders the transaction details correctly', () => {
+        cy.intercept('GET', '/api/transaction?hash=*', {
+            statusCode: 200,
+            body: transactionData,
+        }).as('getTransaction');
+
         mount(
             <MemoryRouter initialEntries={[{ pathname: '/transaction-details', state: transactionData }]}>
                 <Routes>
@@ -14,7 +19,6 @@ describe('<Transaction />', () => {
             </MemoryRouter>
         );
 
-        // Check that each field is rendered correctly
         verifyTransactionDetails();
     });
 

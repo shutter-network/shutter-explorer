@@ -3,10 +3,12 @@ import axios from 'axios';
 
 const useFetch = (url: string, interval: number) => {
     const [data, setData] = useState<any>(null);
-    const [loading, setLoading] = useState<boolean>(true);
+    const [loading, setLoading] = useState<boolean>(false); // Change initial loading state
     const [error, setError] = useState<Error | null>(null);
 
     useEffect(() => {
+        if (!url) return;
+
         const fetchData = async () => {
             try {
                 setLoading(true);
@@ -23,7 +25,7 @@ const useFetch = (url: string, interval: number) => {
 
         const intervalId = setInterval(fetchData, interval);
 
-        return () => clearInterval(intervalId); // Cleanup interval on component unmount
+        return () => clearInterval(intervalId);
     }, [url, interval]);
 
     return { data, loading, error };
