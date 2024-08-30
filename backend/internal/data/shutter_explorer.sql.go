@@ -229,6 +229,37 @@ func (q *Queries) QueryLatestTXsWhichArentIncluded(ctx context.Context, limit in
 	return items, nil
 }
 
+const queryTotalRegisteredValidators = `-- name: QueryTotalRegisteredValidators :one
+SELECT COUNT(*)
+FROM (
+    SELECT DISTINCT ON (vrm.validator_index)
+        vrm.validator_index, 
+        vrm.is_registeration,
+        vrm.validity
+    FROM 
+        validator_registration_message vrm
+    INNER JOIN 
+        validator_status vs
+    ON 
+        vrm.validator_index = vs.validator_index
+    WHERE 
+        vrm.validity = 'valid'
+        AND vs.status = 'active_ongoing'
+    ORDER BY 
+        vrm.validator_index, 
+        vrm.created_at DESC
+) AS latest_events
+WHERE 
+    is_registeration = TRUE
+`
+
+func (q *Queries) QueryTotalRegisteredValidators(ctx context.Context) (int64, error) {
+	row := q.db.QueryRow(ctx, queryTotalRegisteredValidators)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const queryTotalTXsForEachTXStatus = `-- name: QueryTotalTXsForEachTXStatus :one
 SELECT COUNT(*) FROM public.decrypted_tx where tx_status = $1
 `
