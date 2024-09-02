@@ -5,6 +5,8 @@ import "github.com/jackc/pgx/v5/pgxpool"
 type Usecases struct {
 	TransactionUsecase *TransactionUsecase
 	ValidatorUsecase   *ValidatorUsecase
+	SlotUsecase        *SlotUsecase
+
 	// Add more usecases as needed
 }
 
@@ -15,5 +17,6 @@ func NewUsecases(
 	return &Usecases{
 		TransactionUsecase: NewTransactionUsecase(observerDB, erpcDB),
 		ValidatorUsecase:   NewValidatorUsecase(observerDB),
+		SlotUsecase:        NewSlotUsecase(observerDB),
 	}
 }
