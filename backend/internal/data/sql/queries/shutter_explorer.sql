@@ -119,3 +119,37 @@ FROM (
 ) AS latest_events
 WHERE 
     is_registeration = TRUE;
+
+-- name: QuerySlotAndValidatorDataByEpoch :many
+SELECT 
+    pd.public_key, 
+    pd.validator_index, 
+    pd.slot,
+	pd.epoch,
+    le.is_registeration
+FROM 
+    proposer_duties pd
+LEFT JOIN (
+    SELECT DISTINCT ON (vrm.validator_index)
+        vrm.validator_index, 
+        vrm.is_registeration,
+        vrm.validity
+    FROM 
+        validator_registration_message vrm
+    INNER JOIN 
+        validator_status vs
+    ON 
+        vrm.validator_index = vs.validator_index
+    WHERE 
+        vrm.validity = 'valid'
+        AND vs.status = 'active_ongoing'
+    ORDER BY 
+        vrm.validator_index, 
+        vrm.created_at DESC
+) AS le
+ON 
+    pd.validator_index = le.validator_index
+WHERE 
+    pd.epoch IN (SELECT UNNEST($1::BIGINT[]))
+ORDER BY 
+    pd.slot DESC;

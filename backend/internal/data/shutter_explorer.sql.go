@@ -229,6 +229,75 @@ func (q *Queries) QueryLatestTXsWhichArentIncluded(ctx context.Context, limit in
 	return items, nil
 }
 
+const querySlotAndValidatorDataByEpoch = `-- name: QuerySlotAndValidatorDataByEpoch :many
+SELECT 
+    pd.public_key, 
+    pd.validator_index, 
+    pd.slot,
+	pd.epoch,
+    le.is_registeration
+FROM 
+    proposer_duties pd
+LEFT JOIN (
+    SELECT DISTINCT ON (vrm.validator_index)
+        vrm.validator_index, 
+        vrm.is_registeration,
+        vrm.validity
+    FROM 
+        validator_registration_message vrm
+    INNER JOIN 
+        validator_status vs
+    ON 
+        vrm.validator_index = vs.validator_index
+    WHERE 
+        vrm.validity = 'valid'
+        AND vs.status = 'active_ongoing'
+    ORDER BY 
+        vrm.validator_index, 
+        vrm.created_at DESC
+) AS le
+ON 
+    pd.validator_index = le.validator_index
+WHERE 
+    pd.epoch IN (SELECT UNNEST($1::BIGINT[]))
+ORDER BY 
+    pd.slot DESC
+`
+
+type QuerySlotAndValidatorDataByEpochRow struct {
+	PublicKey       string
+	ValidatorIndex  int64
+	Slot            int64
+	Epoch           int64
+	IsRegisteration pgtype.Bool
+}
+
+func (q *Queries) QuerySlotAndValidatorDataByEpoch(ctx context.Context, dollar_1 []int64) ([]QuerySlotAndValidatorDataByEpochRow, error) {
+	rows, err := q.db.Query(ctx, querySlotAndValidatorDataByEpoch, dollar_1)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []QuerySlotAndValidatorDataByEpochRow
+	for rows.Next() {
+		var i QuerySlotAndValidatorDataByEpochRow
+		if err := rows.Scan(
+			&i.PublicKey,
+			&i.ValidatorIndex,
+			&i.Slot,
+			&i.Epoch,
+			&i.IsRegisteration,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const queryTotalRegisteredValidators = `-- name: QueryTotalRegisteredValidators :one
 SELECT COUNT(*)
 FROM (

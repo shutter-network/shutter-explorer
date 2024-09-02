@@ -135,3 +135,14 @@ CREATE TABLE IF NOT EXISTS validator_status
     created_at                  TIMESTAMP WITH TIME ZONE DEFAULT NOW()  NOT NULL,
     updated_at                  TIMESTAMP WITH TIME ZONE DEFAULT NOW()  NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS proposer_duties
+(
+    id                          SERIAL PRIMARY KEY,
+    public_key                  TEXT NOT NULL,
+    validator_index             BIGINT NOT NULL,
+    slot                        BIGINT UNIQUE NOT NULL,
+    epoch                       BIGINT NOT NULL,
+    created_at                  TIMESTAMP WITH TIME ZONE DEFAULT NOW()  NOT NULL,
+    updated_at                  TIMESTAMP WITH TIME ZONE DEFAULT NOW()  NOT NULL
+);
