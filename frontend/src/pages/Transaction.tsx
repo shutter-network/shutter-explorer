@@ -3,7 +3,7 @@ import { Box, Typography, Link } from '@mui/material';
 import Grid from '@mui/material/Grid2';
 import ResponsiveLayout from "../layouts/ResponsiveLayout";
 import { FC, useState, useEffect } from "react";
-import useFetch from '../hooks/useFetch';
+import useFetchWithPolling from '../hooks/useFetchWithPolling';
 
 interface TransactionDetails {
     status: string;
@@ -21,7 +21,7 @@ const Transaction: FC = () => {
 
     const [transaction, setTransaction] = useState<TransactionDetails | null>(initialTransaction || null);
 
-    const { data: updatedData, loading, error } = useFetch(
+    const { data: updatedData, loading, error } = useFetchWithPolling(
         initialTransaction ? `/api/transaction?hash=${initialTransaction.userTransactionHash}` : '',
         10000
     );
