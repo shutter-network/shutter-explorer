@@ -10,7 +10,7 @@ interface TransactionDetails {
     estimatedInclusionTime: string;
     effectiveInclusionTime: string;
     userTransactionHash: string;
-    encryptedTransactionHash: string;
+    sequencerTransactionHash: string;
     inclusionSlot: number;
 }
 
@@ -86,8 +86,8 @@ const Transaction: FC = () => {
                         <Typography variant="body1" fontWeight="bold">Sequencer Transaction</Typography>
                     </Grid>
                     <Grid size={8}>
-                        <Link href={`${explorerUrl}/tx/${transaction.encryptedTransactionHash}`} target="_blank" rel="noopener noreferrer">
-                            {transaction.encryptedTransactionHash}
+                        <Link href={`${explorerUrl}/tx/${transaction.sequencerTransactionHash}`} target="_blank" rel="noopener noreferrer">
+                            {transaction.sequencerTransactionHash}
                         </Link>
                     </Grid>
 

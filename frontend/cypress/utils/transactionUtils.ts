@@ -3,7 +3,7 @@ export interface TransactionData {
     estimatedInclusionTime: string;
     effectiveInclusionTime: string;
     userTransactionHash: string;
-    encryptedTransactionHash: string;
+    sequencerTransactionHash: string;
     inclusionSlot: number;
 }
 
@@ -12,7 +12,7 @@ export const transactionData: TransactionData = {
     estimatedInclusionTime: '1725020096',
     effectiveInclusionTime: '1725020096',
     userTransactionHash: '0xf715b42e677aa376fd61b0337854315ab230ddc68bb88adbc1c14caa108e1e08',
-    encryptedTransactionHash: '0xdc677e4e7da47ee0b67e1e059148627ac71195b36cfd987dd5e2ece9b58c2f94',
+    sequencerTransactionHash: '0xdc677e4e7da47ee0b67e1e059148627ac71195b36cfd987dd5e2ece9b58c2f94',
     inclusionSlot: 1001,
 };
 
@@ -21,7 +21,7 @@ export const updatedTransactionData: TransactionData = {
     estimatedInclusionTime: '1725020101',
     effectiveInclusionTime: '1725020101',
     userTransactionHash: '0xf715b42e677aa376fd61b0337854315ab230ddc68bb88adbc1c14caa108e1e08',
-    encryptedTransactionHash: '0xdc677e4e7da47ee0b67e1e059148627ac71195b36cfd987dd5e2ece9b58c2f94',
+    sequencerTransactionHash: '0xdc677e4e7da47ee0b67e1e059148627ac71195b36cfd987dd5e2ece9b58c2f94',
     inclusionSlot: 1002,
 };
 
@@ -38,7 +38,7 @@ export const verifyTransactionDetails = (data: TransactionData): void => {
     cy.contains('Transaction').should('be.visible');
     cy.get(`a[href*="${explorerUrl}/tx/${data.userTransactionHash}"]`).should('be.visible');
     cy.contains('Sequencer Transaction').should('be.visible');
-    cy.get(`a[href*="${explorerUrl}/tx/${data.encryptedTransactionHash}"]`).should('be.visible');
+    cy.get(`a[href*="${explorerUrl}/tx/${data.sequencerTransactionHash}"]`).should('be.visible');
     cy.contains('Inclusion Slot').should('be.visible');
     cy.contains(data.inclusionSlot.toString()).should('be.visible');
 };
