@@ -48,6 +48,6 @@ describe('<SearchBar />', () => {
         cy.wait('@getTransaction');
 
         // Verify the transaction details are displayed correctly
-        verifyTransactionDetails();
+        verifyTransactionDetails(transactionData);
     });
 });

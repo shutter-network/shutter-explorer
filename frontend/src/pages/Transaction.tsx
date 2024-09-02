@@ -27,7 +27,7 @@ const Transaction: FC = () => {
     );
 
     useEffect(() => {
-        if (updatedData && transaction) {
+        if (updatedData) {
             setTransaction(updatedData as TransactionDetails);
         }
     }, [updatedData]);
@@ -36,22 +36,6 @@ const Transaction: FC = () => {
         return (
             <ResponsiveLayout>
                 <Typography variant="h6">No transaction data found.</Typography>
-            </ResponsiveLayout>
-        );
-    }
-
-    if (loading && !updatedData) {
-        return (
-            <ResponsiveLayout>
-                <Typography variant="h6">Loading transaction data...</Typography>
-            </ResponsiveLayout>
-        );
-    }
-
-    if (error) {
-        return (
-            <ResponsiveLayout>
-                <Typography variant="h6" color="error">Error loading transaction data.</Typography>
             </ResponsiveLayout>
         );
     }
@@ -115,6 +99,17 @@ const Transaction: FC = () => {
                         <Typography variant="body1">{transaction.inclusionSlot}</Typography>
                     </Grid>
                 </Grid>
+
+                {error && (
+                    <Typography variant="body2" color="error">
+                        Error fetching latest data, displaying last known data.
+                    </Typography>
+                )}
+                {loading && (
+                    <Typography variant="body2" color="textSecondary">
+                        Fetching latest data...
+                    </Typography>
+                )}
             </Box>
         </ResponsiveLayout>
     );
