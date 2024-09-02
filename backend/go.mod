@@ -2,7 +2,10 @@ module github.com/shutter-network/shutter-explorer/backend
 
 go 1.22.0
 
-require github.com/gin-gonic/gin v1.10.0
+require (
+	github.com/gin-gonic/gin v1.10.0
+	github.com/shutter-network/gnosh-metrics v0.0.0-20240903073440-3e2e2042775f
+)
 
 require (
 	github.com/jackc/pgpassfile v1.0.0 // indirect

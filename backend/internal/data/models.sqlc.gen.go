@@ -115,6 +115,15 @@ type Greeter struct {
 	Hello string
 }
 
+type ProposerDuty struct {
+	ID             int32
+	PublicKey      string
+	ValidatorIndex int64
+	Slot           int64
+	CreatedAt      pgtype.Timestamptz
+	UpdatedAt      pgtype.Timestamptz
+}
+
 type TransactionDetail struct {
 	Address         string
 	Nonce           int64
