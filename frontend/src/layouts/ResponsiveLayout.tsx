@@ -1,6 +1,7 @@
-import {FC, ReactNode} from 'react';
-import { Box, AppBar, Toolbar, Typography, Drawer, List, ListItem, ListItemText, CssBaseline } from '@mui/material';
-import { Link } from "react-router-dom";
+import {ChangeEvent, ElementType, FC, ReactNode, useState} from 'react';
+import { AppBar, Box, Container, CssBaseline, Drawer, List, ListItem, ListItemText, Toolbar, Typography } from '@mui/material';
+import { Link as RouterLink } from 'react-router-dom';
+import SearchBar from '../components/SearchBar';
 
 const drawerWidth = 240;
 
@@ -9,11 +10,17 @@ interface ResponsiveLayoutProps {
 }
 
 const ResponsiveLayout: FC<ResponsiveLayoutProps> = ({ children }) => {
+    const [searchQuery, setSearchQuery] = useState('');
+
+    const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
+        setSearchQuery(event.target.value);
+    };
+
     return (
         <Box sx={{ display: 'flex' }}>
             <CssBaseline />
             <AppBar position="fixed" sx={{ width: `calc(100% - ${drawerWidth}px)`, ml: `${drawerWidth}px` }}>
-                <Toolbar>
+                <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
                     <Typography variant="h6" noWrap component="div">
                         Responsive Header
                     </Typography>
@@ -31,17 +38,27 @@ const ResponsiveLayout: FC<ResponsiveLayoutProps> = ({ children }) => {
                 <Box sx={{ overflow: 'auto' }}>
                     <List>
                         {['System Overview', 'Slot Overview', 'Transaction Detail'].map((text, index) => (
-                            <Link to={"/" + text.toLowerCase().replace(' ', '-')} key={index}>
-                                <ListItem button>
-                                    <ListItemText primary={text} />
-                                </ListItem>
-                            </Link>
+                            <ListItem
+                                button
+                                component={RouterLink as ElementType}
+                                to={"/" + text.toLowerCase().replace(' ', '-')}
+                                key={index}
+                            >
+                                <ListItemText primary={text} />
+                            </ListItem>
                         ))}
                     </List>
                 </Box>
             </Drawer>
             <Box component="main" sx={{ flexGrow: 1, bgcolor: 'background.default', p: 3 }}>
                 <Toolbar />
+                <Container sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
+                    <SearchBar
+                        placeholder="Search by Txn Hash"
+                        value={searchQuery}
+                        onChange={handleSearchChange}
+                    />
+                </Container>
                 {children}
             </Box>
         </Box>
