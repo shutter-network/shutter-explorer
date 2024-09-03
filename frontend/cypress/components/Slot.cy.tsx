@@ -1,6 +1,8 @@
 import { MemoryRouter } from 'react-router-dom';
 import Slot from '../../src/pages/Slot';
 import { mount } from "cypress/react18";
+import React from 'react';
+import { WebSocketContext } from '../../src/context/WebSocketContext';
 
 describe('<Slot />', () => {
     const sequencerTransactions = [
@@ -16,6 +18,7 @@ describe('<Slot />', () => {
         { hash: '0xd719f5b9671a8e334e1366e9f41d5f05dbe213440a19d2d37ea1c670a0b2773f', status: 'submitted' },
         { hash: '0xcb30dd4ab702aa72694ec9fa1ff636c9627110ab9ec9570eb06755afd277f750', status: 'included' },
     ];
+
 
     beforeEach(() => {
         cy.intercept('GET', '/api/transaction/latest_sequencer_transactions', {
@@ -34,20 +37,38 @@ describe('<Slot />', () => {
     });
 
     it('displays loading states initially', () => {
+        const mockSocket = {
+            onopen: cy.stub(),
+            onmessage: cy.stub(),
+            onclose: cy.stub(),
+            onerror: cy.stub(),
+        };
+
         mount(
-            <MemoryRouter>
-                <Slot />
-            </MemoryRouter>
+            <WebSocketContext.Provider value={{ socket: mockSocket as unknown as WebSocket }}>
+                <MemoryRouter>
+                    <Slot />
+                </MemoryRouter>
+            </WebSocketContext.Provider>
         );
 
         cy.contains('Loading...').should('exist');
     });
 
     it('displays sequencer transactions after loading', () => {
+        const mockSocket = {
+            onopen: cy.stub(),
+            onmessage: cy.stub(),
+            onclose: cy.stub(),
+            onerror: cy.stub(),
+        };
+
         mount(
-            <MemoryRouter>
-                <Slot />
-            </MemoryRouter>
+            <WebSocketContext.Provider value={{ socket: mockSocket as unknown as WebSocket }}>
+                <MemoryRouter>
+                    <Slot />
+                </MemoryRouter>
+            </WebSocketContext.Provider>
         );
         cy.wait('@getSequencerTransactions');
 
@@ -58,10 +79,19 @@ describe('<Slot />', () => {
     });
 
     it('displays user transactions after loading', () => {
+        const mockSocket = {
+            onopen: cy.stub(),
+            onmessage: cy.stub(),
+            onclose: cy.stub(),
+            onerror: cy.stub(),
+        };
+
         mount(
-            <MemoryRouter>
-                <Slot />
-            </MemoryRouter>
+            <WebSocketContext.Provider value={{ socket: mockSocket as unknown as WebSocket }}>
+                <MemoryRouter>
+                    <Slot />
+                </MemoryRouter>
+            </WebSocketContext.Provider>
         );
         cy.wait('@getUserTransactions');
 
@@ -73,7 +103,13 @@ describe('<Slot />', () => {
     });
 
     it('displays error messages if API call fails', () => {
-        // Mock an error response for the sequencer transactions
+        const mockSocket = {
+            onopen: cy.stub(),
+            onmessage: cy.stub(),
+            onclose: cy.stub(),
+            onerror: cy.stub(),
+        };
+
         cy.intercept('GET', '/api/transaction/latest_sequencer_transactions', {
             statusCode: 500,
             body: {},
@@ -85,14 +121,49 @@ describe('<Slot />', () => {
         }).as('getUserTransactionsError');
 
         mount(
-            <MemoryRouter>
-                <Slot />
-            </MemoryRouter>
+            <WebSocketContext.Provider value={{ socket: mockSocket as unknown as WebSocket }}>
+                <MemoryRouter>
+                    <Slot />
+                </MemoryRouter>
+            </WebSocketContext.Provider>
         );
         cy.wait('@getSequencerTransactionsError');
         cy.wait('@getUserTransactionsError');
 
         cy.get('div').contains('Error fetching sequencer transactions').should('be.visible');
         cy.get('div').contains('Error fetching user transactions').should('be.visible');
+    });
+
+    it('receives a new transaction via WebSocket and updates the table', () => {
+        const mockSocket = {
+            onopen: cy.stub(),
+            onmessage: cy.stub(),
+            onclose: cy.stub(),
+            onerror: cy.stub(),
+        };
+
+        mount(
+            <WebSocketContext.Provider value={{ socket: mockSocket as unknown as WebSocket }}>
+                <MemoryRouter>
+                    <Slot />
+                </MemoryRouter>
+            </WebSocketContext.Provider>
+        );
+
+        cy.wait('@getSequencerTransactions');
+        cy.wait('@getUserTransactions');
+
+        cy.wrap(mockSocket).invoke('onmessage', {
+            data: JSON.stringify({ type: 'new-sequencer-transaction', transaction: { hash: '0xnewSequencerTransactionHash' } }),
+        } as MessageEvent);
+
+        cy.get('td').contains('0xnewSequencerTransactionHash', { timeout: 10000 }).should('be.visible');
+
+        cy.wrap(mockSocket).invoke('onmessage', {
+            data: JSON.stringify({ type: 'new-user-transaction', transaction: { hash: '0xnewUserTransactionHash', status: 'included' } }),
+        } as MessageEvent);
+
+        cy.get('td').contains('0xnewUserTransactionHash', { timeout: 10000 }).should('be.visible');
+        cy.get('td').contains('included', { timeout: 10000 }).should('be.visible');
     });
 });
