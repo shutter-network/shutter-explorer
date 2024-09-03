@@ -5,6 +5,7 @@ import ResponsiveLayout from "../layouts/ResponsiveLayout";
 import useFetch from "../hooks/useFetch";
 import { useEffect, useState } from 'react';
 import { useWebSocket } from '../context/WebSocketContext';
+import {WebsocketEvent} from "../types/WebsocketEvent";
 
 const Slot = () => {
     const { data: sequencerTransactionsData, loading: loadingSequencer, error: errorSequencer } = useFetch('/api/transaction/latest_sequencer_transactions');
@@ -35,15 +36,24 @@ const Slot = () => {
 
     useEffect(() => {
         if (socket) {
-            socket.onmessage = (event) => {
-                const data = JSON.parse(event.data);
+            socket.onmessage = (event: MessageEvent) => {
+                const websocketEvent = JSON.parse(event.data) as WebsocketEvent;
 
-                if (data.type === 'new-sequencer-transaction') {
-                    setSequencerTransactions((prev: string[]) => [data.transaction, ...prev.slice(0, prev.length)]);
-                }
+                if (websocketEvent.data) {
+                    switch (websocketEvent.type) {
+                        case 'sequencer_transactions_updated':
+                            setSequencerTransactions(websocketEvent.data);
+                            break;
 
-                if (data.type === 'new-user-transaction') {
-                    setUserTransactions((prev: string[]) => [data.transaction, ...prev.slice(0, prev.length)]);
+                        case 'user_transactions_updated':
+                            setUserTransactions(websocketEvent.data);
+                            break;
+
+                        default:
+                            console.warn('Unhandled WebSocket event type:', websocketEvent.type);
+                    }
+                } else {
+                    console.warn('Received null data for event type:', websocketEvent.type);
                 }
             };
         }

@@ -19,7 +19,6 @@ describe('<Slot />', () => {
         { hash: '0xcb30dd4ab702aa72694ec9fa1ff636c9627110ab9ec9570eb06755afd277f750', status: 'included' },
     ];
 
-
     beforeEach(() => {
         cy.intercept('GET', '/api/transaction/latest_sequencer_transactions', {
             statusCode: 200,
@@ -134,7 +133,7 @@ describe('<Slot />', () => {
         cy.get('div').contains('Error fetching user transactions').should('be.visible');
     });
 
-    it('receives a new transaction via WebSocket and updates the table', () => {
+    it('receives a new array of transactions via WebSocket and updates the table', () => {
         const mockSocket = {
             onopen: cy.stub(),
             onmessage: cy.stub(),
@@ -154,16 +153,31 @@ describe('<Slot />', () => {
         cy.wait('@getUserTransactions');
 
         cy.wrap(mockSocket).invoke('onmessage', {
-            data: JSON.stringify({ type: 'new-sequencer-transaction', transaction: { hash: '0xnewSequencerTransactionHash' } }),
+            data: JSON.stringify({
+                type: 'sequencer_transactions_updated',
+                data: [
+                    { hash: '0xnewSequencerTransactionHash1' },
+                    { hash: '0xnewSequencerTransactionHash2' },
+                ],
+            }),
         } as MessageEvent);
 
-        cy.get('td').contains('0xnewSequencerTransactionHash', { timeout: 10000 }).should('be.visible');
+        cy.get('td').contains('0xnewSequencerTransactionHash1', { timeout: 10000 }).should('be.visible');
+        cy.get('td').contains('0xnewSequencerTransactionHash2', { timeout: 10000 }).should('be.visible');
 
         cy.wrap(mockSocket).invoke('onmessage', {
-            data: JSON.stringify({ type: 'new-user-transaction', transaction: { hash: '0xnewUserTransactionHash', status: 'included' } }),
+            data: JSON.stringify({
+                type: 'user_transactions_updated',
+                data: [
+                    { hash: '0xnewUserTransactionHash1', status: 'included' },
+                    { hash: '0xnewUserTransactionHash2', status: 'pending' },
+                ],
+            }),
         } as MessageEvent);
 
-        cy.get('td').contains('0xnewUserTransactionHash', { timeout: 10000 }).should('be.visible');
+        cy.get('td').contains('0xnewUserTransactionHash1', { timeout: 10000 }).should('be.visible');
         cy.get('td').contains('included', { timeout: 10000 }).should('be.visible');
+        cy.get('td').contains('0xnewUserTransactionHash2', { timeout: 10000 }).should('be.visible');
+        cy.get('td').contains('pending', { timeout: 10000 }).should('be.visible');
     });
 });
