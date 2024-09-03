@@ -180,4 +180,60 @@ describe('<Slot />', () => {
         cy.get('td').contains('0xnewUserTransactionHash2', { timeout: 10000 }).should('be.visible');
         cy.get('td').contains('pending', { timeout: 10000 }).should('be.visible');
     });
+
+    it('displays a WebSocket error message if a WebSocket error occurs', () => {
+        const mockSocket = {
+            onopen: cy.stub(),
+            onmessage: cy.stub(),
+            onclose: cy.stub(),
+            onerror: cy.stub(),
+        };
+
+        mount(
+            <WebSocketContext.Provider value={{ socket: mockSocket as unknown as WebSocket }}>
+                <MemoryRouter>
+                    <Slot />
+                </MemoryRouter>
+            </WebSocketContext.Provider>
+        );
+
+        cy.wait('@getSequencerTransactions');
+        cy.wait('@getUserTransactions');
+
+        cy.wrap(mockSocket).invoke('onerror', {
+            message: 'WebSocket connection failed',
+        });
+
+        cy.get('div').contains('WebSocket error: A connection error occurred').should('be.visible');
+    });
+
+    it('displays an error message if WebSocket event contains an error', () => {
+        const mockSocket = {
+            onopen: cy.stub(),
+            onmessage: cy.stub(),
+            onclose: cy.stub(),
+            onerror: cy.stub(),
+        };
+
+        mount(
+            <WebSocketContext.Provider value={{ socket: mockSocket as unknown as WebSocket }}>
+                <MemoryRouter>
+                    <Slot />
+                </MemoryRouter>
+            </WebSocketContext.Provider>
+        );
+
+        cy.wait('@getSequencerTransactions');
+        cy.wait('@getUserTransactions');
+
+        cy.wrap(mockSocket).invoke('onmessage', {
+            data: JSON.stringify({
+                type: 'sequencer_transactions_updated',
+                data: null,
+                error: { message: 'Invalid data received', code: 400 },
+            }),
+        } as MessageEvent);
+
+        cy.get('div').contains('Error: Invalid data received (Code: 400)').should('be.visible');
+    });
 });

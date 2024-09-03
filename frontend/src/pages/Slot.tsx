@@ -5,7 +5,7 @@ import ResponsiveLayout from "../layouts/ResponsiveLayout";
 import useFetch from "../hooks/useFetch";
 import { useEffect, useState } from 'react';
 import { useWebSocket } from '../context/WebSocketContext';
-import {WebsocketEvent} from "../types/WebsocketEvent";
+import { WebsocketEvent } from "../types/WebsocketEvent";
 
 const Slot = () => {
     const { data: sequencerTransactionsData, loading: loadingSequencer, error: errorSequencer } = useFetch('/api/transaction/latest_sequencer_transactions');
@@ -22,6 +22,7 @@ const Slot = () => {
 
     const [sequencerTransactions, setSequencerTransactions] = useState(sequencerTransactionsData?.transactions || []);
     const [userTransactions, setUserTransactions] = useState(userTransactionsData?.transactions || []);
+    const [webSocketError, setWebSocketError] = useState<string | null>(null); // State to store WebSocket errors
 
     const { socket } = useWebSocket()!;
 
@@ -39,7 +40,10 @@ const Slot = () => {
             socket.onmessage = (event: MessageEvent) => {
                 const websocketEvent = JSON.parse(event.data) as WebsocketEvent;
 
-                if (websocketEvent.data) {
+                if (websocketEvent.error) {
+                    setWebSocketError(`Error: ${websocketEvent.error.message} (Code: ${websocketEvent.error.code})`);
+                } else if (websocketEvent.data) {
+                    setWebSocketError(null);
                     switch (websocketEvent.type) {
                         case 'sequencer_transactions_updated':
                             setSequencerTransactions(websocketEvent.data);
@@ -53,8 +57,14 @@ const Slot = () => {
                             console.warn('Unhandled WebSocket event type:', websocketEvent.type);
                     }
                 } else {
+                    setWebSocketError(`Received null data for event type: ${websocketEvent.type}`);
                     console.warn('Received null data for event type:', websocketEvent.type);
                 }
+            };
+
+            socket.onerror = () => {
+                setWebSocketError('WebSocket error: A connection error occurred');
+                console.error('WebSocket error: A connection error occurred');
             };
         }
     }, [socket]);
@@ -65,6 +75,7 @@ const Slot = () => {
                 <Typography variant="h5" align="left">
                     Slot Overview
                 </Typography>
+                {webSocketError && <Alert severity="error">{webSocketError}</Alert>}
                 <Grid container spacing={3}>
                     <Grid size={12}>
                         {errorSequencer ? (
