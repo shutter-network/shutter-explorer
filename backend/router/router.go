@@ -23,6 +23,7 @@ func NewRouter(ctx context.Context, usecases *usecase.Usecases) *gin.Engine {
 	router.GET("/ws", manager.HandleWebSocket)
 	transactionService := service.NewTransactionService(usecases.TransactionUsecase)
 	validatorService := service.NewValidatorService(usecases.ValidatorUsecase)
+	slotService := service.NewSlotService(usecases.SlotUsecase)
 
 	api := router.Group("/api")
 	{
@@ -37,6 +38,9 @@ func NewRouter(ctx context.Context, usecases *usecase.Usecases) *gin.Engine {
 		validator := api.Group("/validator")
 		validator.GET("/total-registered-validators", validatorService.QueryTotalRegisteredValidators)
 	}
-
+	{
+		slot := api.Group("slot")
+		slot.GET("/top-5-epochs", slotService.QueryTop5Epochs)
+	}
 	return router
 }
