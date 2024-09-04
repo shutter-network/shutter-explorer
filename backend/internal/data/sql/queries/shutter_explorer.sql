@@ -152,3 +152,8 @@ WHERE
     pd.slot BETWEEN $1 AND $2
 ORDER BY 
     pd.slot DESC;
+
+-- name: QueryIncludedTxsInSlot :many
+SELECT tx_hash, EXTRACT(EPOCH FROM created_at)::BIGINT AS included_timestamp  
+FROM decrypted_tx 
+WHERE slot = $1 AND tx_status = 'included';

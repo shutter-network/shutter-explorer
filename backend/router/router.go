@@ -41,6 +41,7 @@ func NewRouter(ctx context.Context, usecases *usecase.Usecases) *gin.Engine {
 	{
 		slot := api.Group("slot")
 		slot.GET("/top-5-epochs", slotService.QueryTop5Epochs)
+		slot.GET("/included-txs", slotService.QueryIncludedTXsInSlot)
 	}
 	return router
 }
