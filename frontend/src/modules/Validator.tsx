@@ -4,9 +4,9 @@ import InfoBox from "../components/InfoBox";
 import useFetchWithPolling from "../hooks/useFetchWithPolling";
 
 const Validator = () => {
-    const { data: shutterizedValidatorsData, loading: loadingShutterized, error: errorShutterized } = useFetchWithPolling('/api/shutterizedValidators', 10000);
-    const { data: validatorPercentageData, loading: loadingPercentage, error: errorPercentage } = useFetchWithPolling('/api/validatorPercentage', 10000);
-    const { data: totalValidatorsData, loading: loadingTotal, error: errorTotal } = useFetchWithPolling('/api/totalValidators', 10000);
+    const { data: shutterizedValidatorsData, loading: loadingShutterized, error: errorShutterized } = useFetchWithPolling('/api/validator/shutterized_validators', 10000);
+    const { data: validatorPercentageData, loading: loadingPercentage, error: errorPercentage } = useFetchWithPolling('/api/validator/validator_percentage', 10000);
+    const { data: totalValidatorsData, loading: loadingTotal, error: errorTotal } = useFetchWithPolling('/api/validator/total_validators', 10000);
 
     return (
         <Box sx={{ flexGrow: 1, marginTop: 4 }}>

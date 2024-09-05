@@ -14,12 +14,12 @@ const Slot = () => {
 
     const sequencerTransactionColumns = [
         { id: 'hash', label: 'Sequencer Transaction Hash', minWidth: 170 },
-        { id: 'timestamp', label: 'Submission time (Age)', minWidth: 170 },  // Updated label
+        { id: 'timestamp', label: 'Submission time (Age)', minWidth: 170 },
     ];
 
     const userTransactionColumns = [
         { id: 'hash', label: 'User Transaction Hash', minWidth: 170 },
-        { id: 'timestamp', label: 'Inclusion time (Age)', minWidth: 170 },  // Updated label
+        { id: 'timestamp', label: 'Inclusion time (Age)', minWidth: 170 },
     ];
 
     const [sequencerTransactions, setSequencerTransactions] = useState(sequencerTransactionsData?.transactions || []);

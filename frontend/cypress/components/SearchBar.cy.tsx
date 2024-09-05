@@ -7,7 +7,7 @@ import { transactionData, verifyTransactionDetails } from '../utils/transactionU
 
 describe('<SearchBar />', () => {
     it('submits a search query and navigates to the transaction detail page', () => {
-        cy.intercept('GET', `/api/transaction?hash=${transactionData.userTransactionHash}`, {
+        cy.intercept('GET', `/api/transaction/${transactionData.userTransactionHash}`, {
             statusCode: 200,
             body: transactionData,
         }).as('getTransaction');

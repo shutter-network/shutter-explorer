@@ -3,9 +3,9 @@ import { mount } from '@cypress/react18';
 
 describe('<Validator />', () => {
   beforeEach(() => {
-    cy.intercept('GET', '/api/shutterizedValidators', { count: 123 }).as('getShutterizedValidators');
-    cy.intercept('GET', '/api/validatorPercentage', { percentage: 25 }).as('getValidatorPercentage');
-    cy.intercept('GET', '/api/totalValidators', { total: 456 }).as('getTotalValidators');
+    cy.intercept('GET', '/api/validator/shutterized_validators', { count: 123 }).as('getShutterizedValidators');
+    cy.intercept('GET', '/api/validator/validator_percentage', { percentage: 25 }).as('getValidatorPercentage');
+    cy.intercept('GET', '/api/validator/total_validators', { total: 456 }).as('getTotalValidators');
   });
 
   it('renders', () => {

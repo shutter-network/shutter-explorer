@@ -13,7 +13,7 @@ const useSearch = (value: string) => {
         setError(null);
 
         try {
-            const response = await fetch(`/api/transaction?hash=${value}`);
+            const response = await fetch(`/api/transaction/${value}`);
             if (response.ok) {
                 const transactionData = await response.json();
                 navigate('/transaction-details', { state: transactionData });
