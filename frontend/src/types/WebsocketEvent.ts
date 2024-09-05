@@ -10,26 +10,28 @@ interface PreviousShutterizedSlotDetails {
 }
 
 interface SlotProgression {
-    epochs: any // todo
+    epochs: any; // todo
 }
 
-interface Transaction {
+export interface Transaction {
+    hash: string;
+    timestamp: number;
+}
+
+interface TransactionDetails {
     user_transaction_hash: string;
     sequencer_transaction_hash?: string;
     status: string;
-    inclusion_time?: string;
-    slot?: string;
+    inclusion_time?: number;
+    slot?: number;
 }
 
 interface SequencerTransactions {
-    transactions: string[];
+    transactions: Array<Transaction>;
 }
 
 interface UserTransactions {
-    transactions: Array<{
-        hash: string;
-        status: string;
-    }>;
+    transactions: Array<Transaction>;
 }
 
 interface TransactionsProtected {
@@ -37,11 +39,11 @@ interface TransactionsProtected {
 }
 
 interface ValueProtected {
-    value: string;
+    value: number;
 }
 
 interface SuccessRate {
-    rate: string;
+    rate: number;
 }
 
 interface ShutterizedValidators {
@@ -49,7 +51,7 @@ interface ShutterizedValidators {
 }
 
 interface ValidatorPercentage {
-    percentage: string;
+    percentage: number;
 }
 
 interface TotalValidators {
@@ -77,7 +79,7 @@ interface ShutterizedTransactionPercentage {
 }
 
 interface EstimatedInclusionTime {
-    time: string;
+    time: number;
 }
 
 interface ExecutedTransactionStats {
@@ -86,7 +88,7 @@ interface ExecutedTransactionStats {
 }
 
 interface HistoricalInclusionTime {
-    times: string[];
+    times: number[];
 }
 
 interface CurrentEpoch {

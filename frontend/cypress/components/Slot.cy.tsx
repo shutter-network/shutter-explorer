@@ -3,20 +3,21 @@ import Slot from '../../src/pages/Slot';
 import { mount } from "cypress/react18";
 import React from 'react';
 import { WebSocketContext } from '../../src/context/WebSocketContext';
+import { getTimeAgo } from '../../src/utils/utils';
 
 describe('<Slot />', () => {
     const sequencerTransactions = [
-        { hash: '0xb93d868f83d56a44d28728e37dfa2fd4866af4acb114c11a04c1d8d264b91508', timestamp: '2024-09-01T12:00:00Z' },
-        { hash: '0x140626ddb8cb9c9ac86572c2eb7a57d60a19ae70d3e1853eacb09964c8e4dad2', timestamp: '2024-09-01T12:05:00Z' },
-        { hash: '0xd719f5b9671a8e334e1366e9f41d5f05dbe213440a19d2d37ea1c670a0b2773f', timestamp: '2024-09-01T12:10:00Z' },
-        { hash: '0xcb30dd4ab702aa72694ec9fa1ff636c9627110ab9ec9570eb06755afd277f750', timestamp: '2024-09-01T12:15:00Z' },
+        { hash: '0xb93d868f83d56a44d28728e37dfa2fd4866af4acb114c11a04c1d8d264b91508', timestamp: 1725201600 },
+        { hash: '0x140626ddb8cb9c9ac86572c2eb7a57d60a19ae70d3e1853eacb09964c8e4dad2', timestamp: 1725201900 },
+        { hash: '0xd719f5b9671a8e334e1366e9f41d5f05dbe213440a19d2d37ea1c670a0b2773f', timestamp: 1725202200 },
+        { hash: '0xcb30dd4ab702aa72694ec9fa1ff636c9627110ab9ec9570eb06755afd277f750', timestamp: 1725202500 },
     ];
 
     const userTransactions = [
-        { hash: '0xb93d868f83d56a44d28728e37dfa2fd4866af4acb114c11a04c1d8d264b91508', timestamp: '2024-09-01T12:20:00Z' },
-        { hash: '0x140626ddb8cb9c9ac86572c2eb7a57d60a19ae70d3e1853eacb09964c8e4dad2', timestamp: '2024-09-01T12:25:00Z' },
-        { hash: '0xd719f5b9671a8e334e1366e9f41d5f05dbe213440a19d2d37ea1c670a0b2773f', timestamp: '2024-09-01T12:30:00Z' },
-        { hash: '0xcb30dd4ab702aa72694ec9fa1ff636c9627110ab9ec9570eb06755afd277f750', timestamp: '2024-09-01T12:35:00Z' },
+        { hash: '0xb93d868f83d56a44d28728e37dfa2fd4866af4acb114c11a04c1d8d264b91508', timestamp: 1725202800 },
+        { hash: '0x140626ddb8cb9c9ac86572c2eb7a57d60a19ae70d3e1853eacb09964c8e4dad2', timestamp: 1725203100 },
+        { hash: '0xd719f5b9671a8e334e1366e9f41d5f05dbe213440a19d2d37ea1c670a0b2773f', timestamp: 1725203400 },
+        { hash: '0xcb30dd4ab702aa72694ec9fa1ff636c9627110ab9ec9570eb06755afd277f750', timestamp: 1725203700 },
     ];
 
     beforeEach(() => {
@@ -74,7 +75,8 @@ describe('<Slot />', () => {
         cy.get('h6').contains('Sequencer Transactions').should('be.visible');
         sequencerTransactions.forEach(tx => {
             cy.get('td').contains(tx.hash, { timeout: 10000 }).should('be.visible');
-            cy.get('td').contains(tx.timestamp, { timeout: 10000 }).should('be.visible');
+            const expectedTimeAgo = getTimeAgo(tx.timestamp);
+            cy.get('td').contains(expectedTimeAgo, { timeout: 10000 }).should('be.visible');
         });
     });
 
@@ -98,7 +100,8 @@ describe('<Slot />', () => {
         cy.get('h6').contains('User Transactions').should('be.visible');
         userTransactions.forEach(tx => {
             cy.get('td').contains(tx.hash, { timeout: 10000 }).should('be.visible');
-            cy.get('td').contains(tx.timestamp, { timeout: 10000 }).should('be.visible');
+            const expectedTimeAgo = getTimeAgo(tx.timestamp);
+            cy.get('td').contains(expectedTimeAgo, { timeout: 10000 }).should('be.visible');
         });
     });
 
@@ -157,31 +160,31 @@ describe('<Slot />', () => {
             data: JSON.stringify({
                 type: 'sequencer_transactions_updated',
                 data: [
-                    { hash: '0xnewSequencerTransactionHash1', timestamp: '2024-09-01T12:40:00Z' },
-                    { hash: '0xnewSequencerTransactionHash2', timestamp: '2024-09-01T12:45:00Z' },
+                    { hash: '0xnewSequencerTransactionHash1', timestamp: 1725204000 },
+                    { hash: '0xnewSequencerTransactionHash2', timestamp: 1725204300 },
                 ],
             }),
         } as MessageEvent);
 
         cy.get('td').contains('0xnewSequencerTransactionHash1', { timeout: 10000 }).should('be.visible');
-        cy.get('td').contains('2024-09-01T12:40:00Z', { timeout: 10000 }).should('be.visible');
+        cy.get('td').contains(getTimeAgo(1725204000), { timeout: 10000 }).should('be.visible');
         cy.get('td').contains('0xnewSequencerTransactionHash2', { timeout: 10000 }).should('be.visible');
-        cy.get('td').contains('2024-09-01T12:45:00Z', { timeout: 10000 }).should('be.visible');
+        cy.get('td').contains(getTimeAgo(1725204300), { timeout: 10000 }).should('be.visible');
 
         cy.wrap(mockSocket).invoke('onmessage', {
             data: JSON.stringify({
                 type: 'user_transactions_updated',
                 data: [
-                    { hash: '0xnewUserTransactionHash1', timestamp: '2024-09-01T12:50:00Z' },
-                    { hash: '0xnewUserTransactionHash2', timestamp: '2024-09-01T12:55:00Z' },
+                    { hash: '0xnewUserTransactionHash1', timestamp: 1725204600 },
+                    { hash: '0xnewUserTransactionHash2', timestamp: 1725204900 },
                 ],
             }),
         } as MessageEvent);
 
         cy.get('td').contains('0xnewUserTransactionHash1', { timeout: 10000 }).should('be.visible');
-        cy.get('td').contains('2024-09-01T12:50:00Z', { timeout: 10000 }).should('be.visible');
+        cy.get('td').contains(getTimeAgo(1725204600), { timeout: 10000 }).should('be.visible');
         cy.get('td').contains('0xnewUserTransactionHash2', { timeout: 10000 }).should('be.visible');
-        cy.get('td').contains('2024-09-01T12:55:00Z', { timeout: 10000 }).should('be.visible');
+        cy.get('td').contains(getTimeAgo(1725204900), { timeout: 10000 }).should('be.visible');
     });
 
     it('displays a WebSocket error message if a WebSocket error occurs', () => {

@@ -5,7 +5,8 @@ import ResponsiveLayout from "../layouts/ResponsiveLayout";
 import useFetch from "../hooks/useFetch";
 import { useEffect, useState } from 'react';
 import { useWebSocket } from '../context/WebSocketContext';
-import { WebsocketEvent } from "../types/WebsocketEvent";
+import {Transaction, WebsocketEvent} from "../types/WebsocketEvent";
+import {getTimeAgo} from "../utils/utils";
 
 const Slot = () => {
     const { data: sequencerTransactionsData, loading: loadingSequencer, error: errorSequencer } = useFetch('/api/transaction/latest_sequencer_transactions');
@@ -13,12 +14,12 @@ const Slot = () => {
 
     const sequencerTransactionColumns = [
         { id: 'hash', label: 'Sequencer Transaction Hash', minWidth: 170 },
-        { id: 'timestamp', label: 'Submission time', minWidth: 170 },
+        { id: 'timestamp', label: 'Submission time (Age)', minWidth: 170 },  // Updated label
     ];
 
     const userTransactionColumns = [
         { id: 'hash', label: 'User Transaction Hash', minWidth: 170 },
-        { id: 'timestamp', label: 'Inclusion time', minWidth: 170 },
+        { id: 'timestamp', label: 'Inclusion time (Age)', minWidth: 170 },  // Updated label
     ];
 
     const [sequencerTransactions, setSequencerTransactions] = useState(sequencerTransactionsData?.transactions || []);
@@ -70,6 +71,16 @@ const Slot = () => {
         }
     }, [socket]);
 
+    const sequencerTransactionsWithAge = sequencerTransactions.map((transaction: Transaction) => ({
+        ...transaction,
+        timestamp: getTimeAgo(transaction.timestamp),
+    }));
+
+    const userTransactionsWithAge = userTransactions.map((transaction: Transaction) => ({
+        ...transaction,
+        timestamp: getTimeAgo(transaction.timestamp),
+    }));
+
     return (
         <ResponsiveLayout>
             <Box sx={{ flexGrow: 1, marginTop: 4 }}>
@@ -87,7 +98,7 @@ const Slot = () => {
                                 {loadingSequencer ? (
                                     <Typography>Loading...</Typography>
                                 ) : (
-                                    <BasicTable columns={sequencerTransactionColumns} rows={sequencerTransactions} />
+                                    <BasicTable columns={sequencerTransactionColumns} rows={sequencerTransactionsWithAge} />
                                 )}
                             </>
                         )}
@@ -101,7 +112,7 @@ const Slot = () => {
                                 {loadingUser ? (
                                     <Typography>Loading...</Typography>
                                 ) : (
-                                    <BasicTable columns={userTransactionColumns} rows={userTransactions} />
+                                    <BasicTable columns={userTransactionColumns} rows={userTransactionsWithAge} />
                                 )}
                             </>
                         )}
