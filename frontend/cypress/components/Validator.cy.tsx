@@ -3,8 +3,6 @@ import { mount } from '@cypress/react18';
 import { WebSocketContext } from '../../src/context/WebSocketContext';
 import React from "react";
 import {MemoryRouter} from "react-router-dom";
-import Slot from "../../src/pages/Slot";
-import {getTimeAgo} from "../../src/utils/utils";
 
 describe('<Validator />', () => {
   beforeEach(() => {

@@ -1,5 +1,5 @@
 import { Alert, Box, Typography } from '@mui/material';
-import Grid2 from '@mui/material/Grid2';
+import Grid from '@mui/material/Grid2';
 import InfoBox from "../components/InfoBox";
 import useFetchWithPolling from "../hooks/useFetchWithPolling";
 import { useEffect, useState } from 'react';
@@ -84,8 +84,8 @@ const Validator = () => {
                 Validator Overview
             </Typography>
             {webSocketError && <Alert severity="error">{webSocketError}</Alert>}
-            <Grid2 container spacing={3}>
-                <Grid2 size={{ xs: 12, sm: 6 }}>
+            <Grid container spacing={3}>
+                <Grid size={{ xs: 12, sm: 6 }}>
                     {errorShutterized ? (
                         <Alert severity="error">Error fetching shutterized validators: {errorShutterized.message}</Alert>
                     ) : (
@@ -95,8 +95,8 @@ const Validator = () => {
                             value={loadingShutterized ? 'Loading...' : shutterizedValidators}
                         />
                     )}
-                </Grid2>
-                <Grid2 size={{ xs: 12, sm: 6 }}>
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6 }}>
                     {errorPercentage ? (
                         <Alert severity="error">Error fetching validator percentage: {errorPercentage.message}</Alert>
                     ) : (
@@ -106,8 +106,8 @@ const Validator = () => {
                             value={loadingPercentage ? 'Loading...' : `${validatorPercentage}%`}
                         />
                     )}
-                </Grid2>
-                <Grid2 size={{ xs: 12, sm: 6 }}>
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6 }}>
                     {errorTotal ? (
                         <Alert severity="error">Error fetching total validators: {errorTotal.message}</Alert>
                     ) : (
@@ -117,8 +117,8 @@ const Validator = () => {
                             value={loadingTotal ? 'Loading...' : totalValidators}
                         />
                     )}
-                </Grid2>
-            </Grid2>
+                </Grid>
+            </Grid>
         </Box>
     );
 };
