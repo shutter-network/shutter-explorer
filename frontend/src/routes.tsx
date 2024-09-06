@@ -12,7 +12,7 @@ const AppRoutes = () => {
                 <Route path="/system-overview" element={<System />} />
                 <Route path="/slot-overview" element={<Slot />} />
                 <Route path="/transaction-details" element={<Transaction />} />
-                <Route path="*" element={<NotFound />} />
+                <Route path="/" element={<NotFound />} />
             </Routes>
         </Router>
     );

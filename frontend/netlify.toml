@@ -1,0 +1,5 @@
+[[redirects]]
+  from = "/"
+  to = "/system-overview"
+  status = 301
+  force = true
