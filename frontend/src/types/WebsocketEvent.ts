@@ -87,8 +87,11 @@ interface ExecutedTransactionStats {
     failed: number;
 }
 
-interface HistoricalInclusionTime {
-    times: number[];
+export interface HistoricalInclusionTime {
+    times: {
+        day: number;
+        averageInclusionTime: number;
+    }[];
 }
 
 interface CurrentEpoch {

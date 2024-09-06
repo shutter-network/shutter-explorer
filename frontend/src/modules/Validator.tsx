@@ -1,15 +1,15 @@
 import { Alert, Box, Typography } from '@mui/material';
 import Grid from '@mui/material/Grid2';
 import InfoBox from "../components/InfoBox";
-import useFetchWithPolling from "../hooks/useFetchWithPolling";
 import { useEffect, useState } from 'react';
 import { useWebSocket } from '../context/WebSocketContext';
 import { WebsocketEvent } from "../types/WebsocketEvent";
+import useFetch from "../hooks/useFetch";
 
 const Validator = () => {
-    const { data: shutterizedValidatorsData, loading: loadingShutterized, error: errorShutterized } = useFetchWithPolling('/api/validator/shutterized_validators', 10000);
-    const { data: validatorPercentageData, loading: loadingPercentage, error: errorPercentage } = useFetchWithPolling('/api/validator/validator_percentage', 10000);
-    const { data: totalValidatorsData, loading: loadingTotal, error: errorTotal } = useFetchWithPolling('/api/validator/total_validators', 10000);
+    const { data: shutterizedValidatorsData, loading: loadingShutterized, error: errorShutterized } = useFetch('/api/validator/shutterized_validators');
+    const { data: validatorPercentageData, loading: loadingPercentage, error: errorPercentage } = useFetch('/api/validator/validator_percentage');
+    const { data: totalValidatorsData, loading: loadingTotal, error: errorTotal } = useFetch('/api/validator/total_validators');
 
     const [shutterizedValidators, setShutterizedValidators] = useState(shutterizedValidatorsData?.count || 'N/A');
     const [validatorPercentage, setValidatorPercentage] = useState(validatorPercentageData?.percentage || 'N/A');

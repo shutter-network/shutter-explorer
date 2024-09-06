@@ -10,7 +10,6 @@ const System = () => {
         <ResponsiveLayout>
                 <Validator />
                 <Keyper />
-                <KeyperSet />
                 <Transaction />
                 <InclusionTime />
         </ResponsiveLayout>
