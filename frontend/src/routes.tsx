@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Transaction from "./pages/Transaction";
 import Slot from "./pages/Slot";
 import System from "./pages/System";
-import NotFound from "./components/NotFound";
+// import NotFound from "./components/NotFound";
 
 const AppRoutes = () => {
     return (
