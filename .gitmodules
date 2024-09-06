@@ -1,0 +1,3 @@
+[submodule "observer"]
+	path = observer
+	url = https://github.com/shutter-network/observer.git
