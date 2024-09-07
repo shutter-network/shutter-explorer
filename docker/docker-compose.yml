@@ -1,3 +1,4 @@
+name: shutter-explorer
 services:
   observer:
     build:
@@ -12,7 +13,7 @@ services:
         - DB_PORT=5432
         - DB_USER=postgres
         - DB_PASSWORD=${OBSERVER_DB_PASSWORD}
-        - DB_NAME=shutter_metrics
+        - DB_NAME=postgres
         - DB_SSL_MODE=disable
         - P2P_BOOTSTRAP_ADDRESSES=${P2P_BOOTSTRAP_ADDRESSES}
         - P2P_ENVIRONMENT=${P2P_ENVIRONMENT}
@@ -28,10 +29,11 @@ services:
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=${OBSERVER_DB_PASSWORD}
-      - POSTGRES_DB=shutter_metrics
+      - POSTGRES_DB=postgres
     volumes:
-      - pgdata:/var/lib/postgresql/data
-    ports: "5432:5432"
+      - ./pgdata:/var/lib/postgresql/data
+    ports: 
+      - "5432:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       start_interval: "2s"
@@ -40,12 +42,29 @@ services:
       timeout: "5s"
       retries: 3
 
+  migrate:
+      image: golang:1.22-alpine  # Using a Golang image to run Goose
+      depends_on:
+        - db
+      env_file: .env
+      working_dir: /migrations
+      volumes:
+        - ../observer/migrations:/migrations
+      environment:
+        DATABASE_URL: postgres://postgres:${OBSERVER_DB_PASSWORD}@db:5432/postgres?sslmode=disable
+      entrypoint: >
+        sh -c "
+        apk add --no-cache git && 
+        go install github.com/pressly/goose/v3/cmd/goose@latest && 
+        goose -dir /migrations postgres $${DATABASE_URL} up"
+
   backend:
     build: 
       context: ../backend/
       dockerfile: ../backend/Dockerfile
     restart: unless-stopped
-    depends_on: observer
+    depends_on: 
+      - observer
     env_file: .env
     environment:
       - SERVER_PORT=5000
@@ -53,7 +72,7 @@ services:
       - OBSERVER_DB_PORT=5432
       - OBSERVER_DB_USER=postgres
       - OBSERVER_DB_PASSWORD=${OBSERVER_DB_PASSWORD}
-      - OBSERVER_DB_NAME=shutter_metrics
+      - OBSERVER_DB_NAME=postgres
       - OBSERVER_DB_SSL_MODE=disable
       - ERPC_DB_HOST=${ERPC_DB_HOST}
       - ERPC_DB_PORT=${ERPC_DB_PORT}
@@ -65,13 +84,25 @@ services:
       - SLOT_DURATION=${SLOT_DURATION}
       - SLOTS_PER_EXPOCH=${SLOTS_PER_EXPOCH}
     ports:
-      - "5000:5000"
-    command: ["go run main.go"]
-  labels:
+      - "5050:5000"
+    command: ["./backend"]
+    labels:
       caddy: "${SERVICE_DOMAIN_NAME}"
       caddy.@browser: "method GET"
       caddy.redir: "@browser https://blog.shutter.network/shutterized-gnosis-chain-is-now-live/"
-      caddy.reverse_proxy: "{{ upstreams 8546 }}"
+      caddy.reverse_proxy: "{{ upstreams 5050 }}"
       caddy.header.Access-Control-Allow-Origin: "*"
       caddy.header.Access-Control-Allow-Methods: "GET, POST, OPTIONS"
       caddy.header.Access-Control-Allow-Headers: "Content-Type, Authorization"
+
+  caddy:
+    image: lucaslorentz/caddy-docker-proxy:latest
+    restart: always
+    volumes:
+      - ${DATA_DIR:-./data}/caddy:/data
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - 80:80
+      - 443:443
+    labels:
+      caddy.email: "devops@brainbot.com"

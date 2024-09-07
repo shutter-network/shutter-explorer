@@ -28,5 +28,5 @@ func main() {
 	}
 	usecases := usecase.NewUsecases(observerDB, erpcDB)
 	app := router.NewRouter(ctx, usecases)
-	app.Run("0.0.0.0" + port)
+	app.Run("0.0.0.0:" + port)
 }
