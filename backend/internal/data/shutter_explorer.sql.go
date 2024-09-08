@@ -24,7 +24,7 @@ WHERE tse.encrypted_transaction = $1
 
 type QueryDecryptedTXForEncryptedTXRow struct {
 	TxHash               []byte
-	TxStatus             interface{}
+	TxStatus             TxStatusVal
 	EncryptedTransaction []byte
 	Key                  []byte
 }
@@ -194,53 +194,38 @@ func (q *Queries) QueryLatestPendingTXsWhichCanBeDecrypted(ctx context.Context, 
 	return items, nil
 }
 
-const queryLatestTXsWhichArentIncluded = `-- name: QueryLatestTXsWhichArentIncluded :many
-WITH latest_events AS (
-    SELECT 
-        id,
-        encrypted_transaction,
-        created_at
-    FROM (
-        SELECT DISTINCT ON (encrypted_transaction)
-            id,
-            encrypted_transaction,
-            created_at
-        FROM 
-            transaction_submitted_event
-        ORDER BY 
-            encrypted_transaction, 
-            created_at DESC
-    ) subquery
-    ORDER BY 
-        created_at DESC
-    LIMIT $1
-)
+const queryLatestTXsWhichArePending = `-- name: QueryLatestTXsWhichArePending :many
 SELECT
-    le.id,
-    le.encrypted_transaction,
-    le.created_at
-FROM latest_events le
-LEFT JOIN decrypted_tx dt ON le.id = dt.transaction_submitted_event_id
-WHERE dt.tx_status = 'not included' OR dt.tx_status IS NULL
-ORDER BY le.created_at DESC
+    tse.id,
+    encode(tse.event_tx_hash, 'hex') AS sequencer_tx_hash,
+    tse.created_at
+FROM transaction_submitted_event tse
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM decrypted_tx dt
+    WHERE dt.transaction_submitted_event_id = tse.id
+      AND dt.tx_status IS NOT NULL
+)
+ORDER BY tse.created_at DESC
+LIMIT $1
 `
 
-type QueryLatestTXsWhichArentIncludedRow struct {
-	ID                   int64
-	EncryptedTransaction []byte
-	CreatedAt            pgtype.Timestamptz
+type QueryLatestTXsWhichArePendingRow struct {
+	ID              int64
+	SequencerTxHash string
+	CreatedAt       pgtype.Timestamptz
 }
 
-func (q *Queries) QueryLatestTXsWhichArentIncluded(ctx context.Context, limit int32) ([]QueryLatestTXsWhichArentIncludedRow, error) {
-	rows, err := q.db.Query(ctx, queryLatestTXsWhichArentIncluded, limit)
+func (q *Queries) QueryLatestTXsWhichArePending(ctx context.Context, limit int32) ([]QueryLatestTXsWhichArePendingRow, error) {
+	rows, err := q.db.Query(ctx, queryLatestTXsWhichArePending, limit)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []QueryLatestTXsWhichArentIncludedRow
+	var items []QueryLatestTXsWhichArePendingRow
 	for rows.Next() {
-		var i QueryLatestTXsWhichArentIncludedRow
-		if err := rows.Scan(&i.ID, &i.EncryptedTransaction, &i.CreatedAt); err != nil {
+		var i QueryLatestTXsWhichArePendingRow
+		if err := rows.Scan(&i.ID, &i.SequencerTxHash, &i.CreatedAt); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
@@ -357,7 +342,7 @@ const queryTotalTXsForEachTXStatus = `-- name: QueryTotalTXsForEachTXStatus :one
 SELECT COUNT(*) FROM public.decrypted_tx where tx_status = $1
 `
 
-func (q *Queries) QueryTotalTXsForEachTXStatus(ctx context.Context, txStatus interface{}) (int64, error) {
+func (q *Queries) QueryTotalTXsForEachTXStatus(ctx context.Context, txStatus TxStatusVal) (int64, error) {
 	row := q.db.QueryRow(ctx, queryTotalTXsForEachTXStatus, txStatus)
 	var count int64
 	err := row.Scan(&count)
@@ -379,7 +364,7 @@ type QueryTotalTXsForEachTXStatusPerMonthRow struct {
 	TotalTxs int64
 }
 
-func (q *Queries) QueryTotalTXsForEachTXStatusPerMonth(ctx context.Context, txStatus interface{}) ([]QueryTotalTXsForEachTXStatusPerMonthRow, error) {
+func (q *Queries) QueryTotalTXsForEachTXStatusPerMonth(ctx context.Context, txStatus TxStatusVal) ([]QueryTotalTXsForEachTXStatusPerMonthRow, error) {
 	rows, err := q.db.Query(ctx, queryTotalTXsForEachTXStatusPerMonth, txStatus)
 	if err != nil {
 		return nil, err

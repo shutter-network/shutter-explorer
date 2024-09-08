@@ -64,7 +64,7 @@ func (uc *TransactionUsecase) QueryPendingShutterizedTX(ctx context.Context, lim
 		)
 		return nil, &err
 	}
-	pendingObserverTxs, err := uc.observerDBQuery.QueryLatestTXsWhichArentIncluded(ctx, int32(limit))
+	pendingObserverTxs, err := uc.observerDBQuery.QueryLatestTXsWhichArePending(ctx, int32(limit))
 	if err != nil {
 		log.Err(err).Msg("err encountered while querying DB")
 		err := error.NewHttpError(
@@ -74,13 +74,13 @@ func (uc *TransactionUsecase) QueryPendingShutterizedTX(ctx context.Context, lim
 		)
 		return nil, &err
 	}
-	ecTXHashes := make([]string, len(pendingObserverTxs))
+	sqTXHashes := make([]string, len(pendingObserverTxs))
 
 	for i := 0; i < len(pendingObserverTxs); i++ {
-		ecTXHashes[i] = hex.EncodeToString(pendingObserverTxs[i].EncryptedTransaction)
+		sqTXHashes[i] = pendingObserverTxs[i].SequencerTxHash
 	}
 
-	erpcTXs, err := uc.erpcDBQuery.QueryTxHashFromTransactionDetails(ctx, ecTXHashes)
+	erpcTXs, err := uc.erpcDBQuery.QueryTxHashFromTransactionDetails(ctx, sqTXHashes)
 	if err != nil {
 		log.Err(err).Msg("err encountered while querying DB")
 		err := error.NewHttpError(
@@ -94,7 +94,7 @@ func (uc *TransactionUsecase) QueryPendingShutterizedTX(ctx context.Context, lim
 }
 
 func (uc *TransactionUsecase) QueryTotalExecutedTXsForEachTXStatus(ctx context.Context, txStatus string) (int64, *error.Http) {
-	totalTxs, err := uc.observerDBQuery.QueryTotalTXsForEachTXStatus(ctx, txStatus)
+	totalTxs, err := uc.observerDBQuery.QueryTotalTXsForEachTXStatus(ctx, data.TxStatusVal(txStatus))
 	if err != nil {
 		log.Err(err).Msg("err encountered while querying DB")
 		err := error.NewHttpError(
@@ -108,7 +108,7 @@ func (uc *TransactionUsecase) QueryTotalExecutedTXsForEachTXStatus(ctx context.C
 }
 
 func (uc *TransactionUsecase) QueryTotalExecutedTXsForEachTXStatusPerMonth(ctx context.Context, txStatus string) ([]data.QueryTotalTXsForEachTXStatusPerMonthRow, *error.Http) {
-	totalTxsPerMonth, err := uc.observerDBQuery.QueryTotalTXsForEachTXStatusPerMonth(ctx, txStatus)
+	totalTxsPerMonth, err := uc.observerDBQuery.QueryTotalTXsForEachTXStatusPerMonth(ctx, data.TxStatusVal(txStatus))
 	if err != nil {
 		log.Err(err).Msg("err encountered while querying DB")
 		err := error.NewHttpError(
