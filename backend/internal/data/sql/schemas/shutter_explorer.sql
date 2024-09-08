@@ -49,6 +49,7 @@ CREATE TABLE transaction_submitted_event (
     encrypted_transaction               BYTEA  NOT NULL,
     created_at                          TIMESTAMP WITH TIME ZONE DEFAULT NOW()  NOT NULL,
     updated_at                          TIMESTAMP WITH TIME ZONE DEFAULT NOW()  NOT NULL,
+    event_tx_hash                       BYTEA NOT NULL,
     UNIQUE (event_block_hash, event_block_number, event_tx_index, event_log_index)
 );
 
@@ -75,18 +76,26 @@ CREATE TABLE IF NOT EXISTS block
     updated_at          TIMESTAMP WITH TIME ZONE DEFAULT NOW()  NOT NULL
 );
 
+CREATE TYPE tx_status_val AS ENUM 
+(
+    'included', 
+    'not included'
+);
 
 CREATE TABLE IF NOT EXISTS decrypted_tx
 (
-    slot                                BIGINT,
-    tx_index                            BIGINT,
+    id                                  BIGSERIAL PRIMARY KEY,
+    slot                                BIGINT NOT NULL,
+    tx_index                            BIGINT NOT NULL,
     tx_hash                             BYTEA NOT NULL,
     tx_status                           tx_status_val NOT NULL,
-    decryption_key_id                   BIGINT,
-    transaction_submitted_event_id      BIGINT,
+    decryption_key_id                   BIGINT NOT NULL,
+    transaction_submitted_event_id      BIGINT NOT NULL,
     created_at                          TIMESTAMP WITH TIME ZONE DEFAULT NOW()  NOT NULL,
     updated_at                          TIMESTAMP WITH TIME ZONE DEFAULT NOW()  NOT NULL,
-    PRIMARY KEY (slot, tx_index)
+    UNIQUE (slot, tx_index),
+    FOREIGN KEY (decryption_key_id) REFERENCES decryption_key (id),
+    FOREIGN KEY (transaction_submitted_event_id) REFERENCES transaction_submitted_event (id)
 );
 
 CREATE TABLE IF NOT EXISTS transaction_details

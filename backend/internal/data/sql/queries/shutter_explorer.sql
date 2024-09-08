@@ -50,35 +50,20 @@ SELECT
   lt.latest_created_at AS created_at
 FROM latest_transactions lt;
 
--- name: QueryLatestTXsWhichArentIncluded :many
-WITH latest_events AS (
-    SELECT 
-        id,
-        encrypted_transaction,
-        created_at
-    FROM (
-        SELECT DISTINCT ON (encrypted_transaction)
-            id,
-            encrypted_transaction,
-            created_at
-        FROM 
-            transaction_submitted_event
-        ORDER BY 
-            encrypted_transaction, 
-            created_at DESC
-    ) subquery
-    ORDER BY 
-        created_at DESC
-    LIMIT $1
-)
+-- name: QueryLatestTXsWhichArePending :many
 SELECT
-    le.id,
-    le.encrypted_transaction,
-    le.created_at
-FROM latest_events le
-LEFT JOIN decrypted_tx dt ON le.id = dt.transaction_submitted_event_id
-WHERE dt.tx_status = 'not included' OR dt.tx_status IS NULL
-ORDER BY le.created_at DESC;
+    tse.id,
+    encode(tse.event_tx_hash, 'hex') AS sequencer_tx_hash,
+    tse.created_at
+FROM transaction_submitted_event tse
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM decrypted_tx dt
+    WHERE dt.transaction_submitted_event_id = tse.id
+      AND dt.tx_status IS NOT NULL
+)
+ORDER BY tse.created_at DESC
+LIMIT $1;
 
 -- name: QueryTxHashFromTransactionDetails :many
 SELECT DISTINCT ON (encrypted_tx_hash) 
