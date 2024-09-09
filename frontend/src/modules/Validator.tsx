@@ -1,12 +1,12 @@
 import { Alert, Box, Typography } from '@mui/material';
 import Grid2 from '@mui/material/Grid2';
 import InfoBox from "../components/InfoBox";
-import useFetch from "../hooks/useFetch";
+import useFetchWithPolling from "../hooks/useFetchWithPolling";
 
 const Validator = () => {
-    const { data: shutterizedValidatorsData, loading: loadingShutterized, error: errorShutterized } = useFetch('/api/shutterizedValidators', 10000);
-    const { data: validatorPercentageData, loading: loadingPercentage, error: errorPercentage } = useFetch('/api/validatorPercentage', 10000);
-    const { data: totalValidatorsData, loading: loadingTotal, error: errorTotal } = useFetch('/api/totalValidators', 10000);
+    const { data: shutterizedValidatorsData, loading: loadingShutterized, error: errorShutterized } = useFetchWithPolling('/api/shutterizedValidators', 10000);
+    const { data: validatorPercentageData, loading: loadingPercentage, error: errorPercentage } = useFetchWithPolling('/api/validatorPercentage', 10000);
+    const { data: totalValidatorsData, loading: loadingTotal, error: errorTotal } = useFetchWithPolling('/api/totalValidators', 10000);
 
     return (
         <Box sx={{ flexGrow: 1, marginTop: 4 }}>

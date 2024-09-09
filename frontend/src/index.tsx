@@ -1,16 +1,20 @@
-import {StrictMode} from 'react';
+import { StrictMode } from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import { WebSocketProvider } from './context/WebSocketContext';
 
 const root = ReactDOM.createRoot(
-  document.getElementById('root') as HTMLElement
+    document.getElementById('root') as HTMLElement
 );
+
 root.render(
-  <StrictMode>
-    <App />
-  </StrictMode>
+    <StrictMode>
+        <WebSocketProvider>
+            <App />
+        </WebSocketProvider>
+    </StrictMode>
 );
 
 // If you want to start measuring performance in your app, pass a function

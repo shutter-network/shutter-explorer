@@ -1,32 +1,26 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const useFetch = (url: string, interval: number) => {
+const useFetch = (url: string) => {
     const [data, setData] = useState<any>(null);
-    const [loading, setLoading] = useState<boolean>(false); // Change initial loading state
+    const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<Error | null>(null);
 
     useEffect(() => {
-        if (!url) return;
-
         const fetchData = async () => {
             try {
-                setLoading(true);
                 const response = await axios.get(url);
                 setData(response.data);
-                setLoading(false);
-            } catch (err: any) {
-                setError(err);
+            } catch (error: any) {
+                setError(error);
+            } finally {
                 setLoading(false);
             }
         };
 
         fetchData();
 
-        const intervalId = setInterval(fetchData, interval);
-
-        return () => clearInterval(intervalId);
-    }, [url, interval]);
+    }, [url]);
 
     return { data, loading, error };
 };

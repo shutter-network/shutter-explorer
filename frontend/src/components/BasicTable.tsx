@@ -1,36 +1,30 @@
-import {useEffect, useState} from "react";
-import {Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@mui/material";
+import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material";
 
-interface Transaction {
-    transactionHash: string;
+interface Column {
+    id: string;
+    label: string;
+    minWidth?: number;
 }
 
-export default function BasicTable() {
-    const [rows, setRows] = useState<Transaction[]>([]);
-    const [error, setError] = useState<Error | null>(null);
+interface BasicTableProps<T> {
+    rows: T[];
+    columns: Column[];
+}
 
-    useEffect(() => {
-        fetch('/data/transaction.json')
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then((data: Transaction[]) => setRows(data))
-            .catch((error: Error) => setError(error));
-    }, []);
-
-    if (error) {
-        return <div>Error: {error.message}</div>;
-    }
-
+export default function BasicTable<T extends { [key: string]: any }>({
+                                                                         rows,
+                                                                         columns,
+                                                                     }: BasicTableProps<T>) {
     return (
         <TableContainer component={Paper}>
             <Table sx={{ minWidth: 650 }} aria-label="simple table">
                 <TableHead>
                     <TableRow>
-                        <TableCell>Transaction Hash</TableCell>
+                        {columns.map((column) => (
+                            <TableCell key={column.id} style={{ minWidth: column.minWidth }}>
+                                {column.label}
+                            </TableCell>
+                        ))}
                     </TableRow>
                 </TableHead>
                 <TableBody>
@@ -39,9 +33,11 @@ export default function BasicTable() {
                             key={index}
                             sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                         >
-                            <TableCell component="th" scope="row">
-                                {row.transactionHash}
-                            </TableCell>
+                            {columns.map((column) => (
+                                <TableCell key={column.id}>
+                                    {row[column.id]}
+                                </TableCell>
+                            ))}
                         </TableRow>
                     ))}
                 </TableBody>
