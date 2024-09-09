@@ -18,8 +18,6 @@ services:
         - P2P_BOOTSTRAP_ADDRESSES=${P2P_BOOTSTRAP_ADDRESSES}
         - P2P_ENVIRONMENT=${P2P_ENVIRONMENT}
         - P2P_DISCOVERY_NAMESPACE=${P2P_DISCOVERY_NAMESPACE}
-    ports:
-      - "23003:23003"
     command: ["start", "--rpc-url", "${RPC_URL}", "--beacon-api-url", "${BEACON_API_URL}", "--sequencer-contract-address", "${SEQUENCER_CONTRACT_ADDRESS}", "--validator-registry-contract-address", "${VALIDATOR_REGISTRY_CONTRACT_ADDRESS}", "--p2pkey", "${P2P_KEY}"]
 
   db:
@@ -41,22 +39,6 @@ services:
       interval: "30s"
       timeout: "5s"
       retries: 3
-
-  migrate:
-      image: golang:1.22-alpine  # Using a Golang image to run Goose
-      depends_on:
-        - db
-      env_file: .env
-      working_dir: /migrations
-      volumes:
-        - ../observer/migrations:/migrations
-      environment:
-        DATABASE_URL: postgres://postgres:${OBSERVER_DB_PASSWORD}@db:5432/postgres?sslmode=disable
-      entrypoint: >
-        sh -c "
-        apk add --no-cache git && 
-        go install github.com/pressly/goose/v3/cmd/goose@latest && 
-        goose -dir /migrations postgres $${DATABASE_URL} up"
 
   backend:
     build: 
