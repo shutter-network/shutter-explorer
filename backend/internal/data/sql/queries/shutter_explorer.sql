@@ -140,3 +140,16 @@ ORDER BY
 SELECT tx_hash, EXTRACT(EPOCH FROM created_at)::BIGINT AS included_timestamp  
 FROM decrypted_tx 
 WHERE slot = $1 AND tx_status = 'included';
+
+-- name: QueryFromTransactionDetail :one
+SELECT *
+FROM transaction_details 
+WHERE tx_hash = $1 OR encrypted_tx_hash = $1;
+
+-- name: QueryDecryptedTXFromSubmittedEvent :one
+SELECT 
+    dt.tx_hash, dt.tx_status,
+    tse.encrypted_transaction
+FROM transaction_submitted_event tse 
+LEFT JOIN decrypted_tx dt ON tse.id = dt.transaction_submitted_event_id
+WHERE tse.event_tx_hash = $1;

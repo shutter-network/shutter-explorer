@@ -19,6 +19,11 @@ type TransactionUsecase struct {
 	erpcDBQuery     *data.Queries
 }
 
+type QueryTransactionDetailResp struct {
+	*data.TransactionDetail
+	TxStatus data.NullTxStatusVal
+}
+
 func NewTransactionUsecase(
 	observerDB *pgxpool.Pool,
 	erpcDB *pgxpool.Pool,
@@ -144,4 +149,42 @@ func (uc *TransactionUsecase) QueryIncludedTransactions(ctx context.Context, lim
 		return nil, &err
 	}
 	return txs, nil
+}
+
+func (uc *TransactionUsecase) QueryTransactionDetail(ctx context.Context, txHash string) (*QueryTransactionDetailResp, *error.Http) {
+	erpcTX, err := uc.erpcDBQuery.QueryFromTransactionDetail(ctx, txHash)
+
+	if err != nil {
+		log.Err(err).Msg("err encountered while querying erpc DB")
+		err := error.NewHttpError(
+			"error encountered while querying for data",
+			"",
+			http.StatusInternalServerError,
+		)
+		return nil, &err
+	}
+	txHashBytes, err := hex.DecodeString(erpcTX.TxHash)
+	if err != nil {
+		err := error.NewHttpError(
+			"unable to decode tx hash",
+			"valid encryptedTx query parameter is required",
+			http.StatusBadRequest,
+		)
+		return nil, &err
+	}
+	tse, err := uc.observerDBQuery.QueryDecryptedTXFromSubmittedEvent(ctx, txHashBytes)
+	if err != nil {
+		log.Err(err).Msg("err encountered while querying observer DB")
+		err := error.NewHttpError(
+			"error encountered while querying for data",
+			"",
+			http.StatusInternalServerError,
+		)
+		return nil, &err
+	}
+	resp := &QueryTransactionDetailResp{
+		TransactionDetail: &erpcTX,
+		TxStatus:          tse.TxStatus,
+	}
+	return resp, nil
 }
