@@ -80,3 +80,17 @@ func (uc *SlotUsecase) QueryTop5Epochs(ctx context.Context) ([]data.QuerySlotAnd
 	}
 	return slotAndValidatorData, nil
 }
+
+func (uc *SlotUsecase) QueryIncludedTXsInSlot(ctx context.Context, slot int64) ([]data.QueryIncludedTxsInSlotRow, *error.Http) {
+	includedTxs, err := uc.observerDBQuery.QueryIncludedTxsInSlot(ctx, slot)
+	if err != nil {
+		log.Err(err).Msg("err encountered while querying DB")
+		err := error.NewHttpError(
+			"error encountered while querying for data",
+			"",
+			http.StatusInternalServerError,
+		)
+		return nil, &err
+	}
+	return includedTxs, nil
+}

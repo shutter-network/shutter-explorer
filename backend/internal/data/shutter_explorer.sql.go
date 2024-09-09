@@ -113,6 +113,37 @@ func (q *Queries) QueryIncludedTransactions(ctx context.Context, limit int32) ([
 	return items, nil
 }
 
+const queryIncludedTxsInSlot = `-- name: QueryIncludedTxsInSlot :many
+SELECT tx_hash, EXTRACT(EPOCH FROM created_at)::BIGINT AS included_timestamp  
+FROM decrypted_tx 
+WHERE slot = $1 AND tx_status = 'included'
+`
+
+type QueryIncludedTxsInSlotRow struct {
+	TxHash            []byte
+	IncludedTimestamp int64
+}
+
+func (q *Queries) QueryIncludedTxsInSlot(ctx context.Context, slot int64) ([]QueryIncludedTxsInSlotRow, error) {
+	rows, err := q.db.Query(ctx, queryIncludedTxsInSlot, slot)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []QueryIncludedTxsInSlotRow
+	for rows.Next() {
+		var i QueryIncludedTxsInSlotRow
+		if err := rows.Scan(&i.TxHash, &i.IncludedTimestamp); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const queryLatestPendingTXsWhichCanBeDecrypted = `-- name: QueryLatestPendingTXsWhichCanBeDecrypted :many
 WITH latest_per_hash AS (
   SELECT 
