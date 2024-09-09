@@ -54,6 +54,50 @@ func (q *Queries) QueryDecryptedTXForEncryptedTX(ctx context.Context, encryptedT
 	return items, nil
 }
 
+const queryDecryptedTXFromSubmittedEvent = `-- name: QueryDecryptedTXFromSubmittedEvent :one
+SELECT 
+    dt.tx_hash, dt.tx_status,
+    tse.encrypted_transaction
+FROM transaction_submitted_event tse 
+LEFT JOIN decrypted_tx dt ON tse.id = dt.transaction_submitted_event_id
+WHERE tse.event_tx_hash = $1
+`
+
+type QueryDecryptedTXFromSubmittedEventRow struct {
+	TxHash               []byte
+	TxStatus             NullTxStatusVal
+	EncryptedTransaction []byte
+}
+
+func (q *Queries) QueryDecryptedTXFromSubmittedEvent(ctx context.Context, eventTxHash []byte) (QueryDecryptedTXFromSubmittedEventRow, error) {
+	row := q.db.QueryRow(ctx, queryDecryptedTXFromSubmittedEvent, eventTxHash)
+	var i QueryDecryptedTXFromSubmittedEventRow
+	err := row.Scan(&i.TxHash, &i.TxStatus, &i.EncryptedTransaction)
+	return i, err
+}
+
+const queryFromTransactionDetail = `-- name: QueryFromTransactionDetail :one
+SELECT address, nonce, tx_hash, encrypted_tx_hash, submission_time, inclusion_time, retries, is_cancelled
+FROM transaction_details 
+WHERE tx_hash = $1 OR encrypted_tx_hash = $1
+`
+
+func (q *Queries) QueryFromTransactionDetail(ctx context.Context, txHash string) (TransactionDetail, error) {
+	row := q.db.QueryRow(ctx, queryFromTransactionDetail, txHash)
+	var i TransactionDetail
+	err := row.Scan(
+		&i.Address,
+		&i.Nonce,
+		&i.TxHash,
+		&i.EncryptedTxHash,
+		&i.SubmissionTime,
+		&i.InclusionTime,
+		&i.Retries,
+		&i.IsCancelled,
+	)
+	return i, err
+}
+
 const queryGreeter = `-- name: QueryGreeter :many
 SELECT hello from greeter
 `
