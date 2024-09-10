@@ -6,7 +6,7 @@ import {transactionData, updatedTransactionData, verifyTransactionDetails} from 
 
 describe('<Transaction />', () => {
     it('renders the transaction details correctly', () => {
-        cy.intercept('GET', '/api/transaction/*', {
+        cy.intercept('GET', `/api/transaction/hash=${transactionData.userTransactionHash}`, {
             statusCode: 200,
             body: transactionData,
         }).as('getTransaction');
@@ -23,7 +23,7 @@ describe('<Transaction />', () => {
     });
 
     it('updates the transaction details after polling', () => {
-        cy.intercept('GET', `/api/transaction/${transactionData.userTransactionHash}`, {
+        cy.intercept('GET', `/api/transaction/hash=${transactionData.userTransactionHash}`, {
             statusCode: 200,
             body: updatedTransactionData,
         }).as('getUpdatedTransaction');

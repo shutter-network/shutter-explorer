@@ -4,6 +4,7 @@ import Grid from '@mui/material/Grid2';
 import ResponsiveLayout from "../components/ResponsiveLayout";
 import { FC, useState, useEffect } from "react";
 import useFetchWithPolling from '../hooks/useFetchWithPolling';
+import { StyledTransactionDetails } from '../styles/transactionDetail';
 
 interface TransactionDetails {
     status: string;
@@ -42,61 +43,61 @@ const Transaction: FC = () => {
 
     return (
         <ResponsiveLayout>
-            <Box sx={{ p: 3 }}>
+            <StyledTransactionDetails>
                 <Typography variant="h4" gutterBottom>
                     Transaction Details
                 </Typography>
                 <Grid container spacing={2}>
                     {/* Transaction Status */}
-                    <Grid size={4}>
-                        <Typography variant="body1" fontWeight="bold">Transaction Status</Typography>
+                    <Grid size={{ xs: 12, sm: 4 }}>
+                        <Typography variant="body1" fontWeight="bold" className="card-label">Transaction Status</Typography>
                     </Grid>
-                    <Grid size={8}>
-                        <Typography variant="body1">{transaction.status}</Typography>
+                    <Grid size={{ xs: 12, sm: 8 }}>
+                        <Typography variant="body1" className="status-pending">{transaction.status}</Typography>
                     </Grid>
 
                     {/* Estimated Inclusion Time */}
-                    <Grid size={4}>
-                        <Typography variant="body1" fontWeight="bold">Estimated Inclusion Time</Typography>
+                    <Grid size={{ xs: 12, sm: 4 }}>
+                        <Typography variant="body1" fontWeight="bold" className="card-label">Estimated Inclusion Time</Typography>
                     </Grid>
-                    <Grid size={8}>
-                        <Typography variant="body1">{transaction.estimatedInclusionTime}</Typography>
+                    <Grid size={{ xs: 12, sm: 8 }}>
+                        <Typography variant="body1" className="card-value">{transaction.estimatedInclusionTime}</Typography>
                     </Grid>
 
                     {/* Effective Inclusion Time */}
-                    <Grid size={4}>
-                        <Typography variant="body1" fontWeight="bold">Effective Inclusion Time</Typography>
+                    <Grid size={{ xs: 12, sm: 4 }}>
+                        <Typography variant="body1" fontWeight="bold" className="card-label">Effective Inclusion Time</Typography>
                     </Grid>
-                    <Grid size={8}>
-                        <Typography variant="body1">{transaction.effectiveInclusionTime}</Typography>
+                    <Grid size={{ xs: 12, sm: 8 }}>
+                        <Typography variant="body1" className="card-value">{transaction.effectiveInclusionTime}</Typography>
                     </Grid>
 
                     {/* Transaction Hash */}
-                    <Grid size={4}>
-                        <Typography variant="body1" fontWeight="bold">Transaction</Typography>
+                    <Grid size={{ xs: 12, sm: 4 }}>
+                        <Typography variant="body1" fontWeight="bold" className="card-label">Transaction</Typography>
                     </Grid>
-                    <Grid size={8}>
-                        <Link href={`${explorerUrl}/tx/${transaction.userTransactionHash}`} target="_blank" rel="noopener noreferrer">
+                    <Grid size={{ xs: 12, sm: 8 }}>
+                        <Link href={`${explorerUrl}/tx/${transaction.userTransactionHash}`} target="_blank" rel="noopener noreferrer" className="hash">
                             {transaction.userTransactionHash}
                         </Link>
                     </Grid>
 
                     {/* Sequencer Transaction */}
-                    <Grid size={4}>
-                        <Typography variant="body1" fontWeight="bold">Sequencer Transaction</Typography>
+                    <Grid size={{ xs: 12, sm: 4 }}>
+                        <Typography variant="body1" fontWeight="bold" className="card-label">Sequencer Transaction</Typography>
                     </Grid>
-                    <Grid size={8}>
-                        <Link href={`${explorerUrl}/tx/${transaction.sequencerTransactionHash}`} target="_blank" rel="noopener noreferrer">
+                    <Grid size={{ xs: 12, sm: 8 }}>
+                        <Link href={`${explorerUrl}/tx/${transaction.sequencerTransactionHash}`} target="_blank" rel="noopener noreferrer" className="hash">
                             {transaction.sequencerTransactionHash}
                         </Link>
                     </Grid>
 
                     {/* Inclusion Slot */}
-                    <Grid size={4}>
-                        <Typography variant="body1" fontWeight="bold">Inclusion Slot</Typography>
+                    <Grid size={{ xs: 12, sm: 4 }}>
+                        <Typography variant="body1" fontWeight="bold" className="card-label">Inclusion Slot</Typography>
                     </Grid>
-                    <Grid size={8}>
-                        <Typography variant="body1">{transaction.inclusionSlot}</Typography>
+                    <Grid size={{ xs: 12, sm: 8 }}>
+                        <Typography variant="body1" className="card-value">{transaction.inclusionSlot}</Typography>
                     </Grid>
                 </Grid>
 
@@ -110,7 +111,7 @@ const Transaction: FC = () => {
                         Fetching latest data...
                     </Typography>
                 )}
-            </Box>
+            </StyledTransactionDetails>
         </ResponsiveLayout>
     );
 };
