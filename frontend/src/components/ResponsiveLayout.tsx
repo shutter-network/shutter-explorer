@@ -1,5 +1,5 @@
 import { ChangeEvent, FC, ReactNode, useState } from 'react';
-import { AppBar, Box, CssBaseline, Toolbar, Container } from '@mui/material';
+import { AppBar, Box, CssBaseline, Toolbar } from '@mui/material';
 import Header from './Header';
 import SearchBar from './SearchBar';
 import Sidebar from './Sidebar';
@@ -30,13 +30,13 @@ const ResponsiveLayout: FC<ResponsiveLayoutProps> = ({ children }) => {
                 <Sidebar />
 
                 <Box component="main" sx={mainStyles}>
-                    <Container sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center', mb: 2, padding: 0 }}>
                         <SearchBar
                             placeholder="Search by Txn Hash"
                             value={searchQuery}
                             onChange={handleSearchChange}
                         />
-                    </Container>
+                    </Box>
                     {children}
                 </Box>
             </Box>
