@@ -1,27 +1,44 @@
-import {LineChart, LineChartProps} from '@mui/x-charts/LineChart';
-import {FC} from "react";
+import { LineChart, LineChartProps } from '@mui/x-charts/LineChart';
+import { FC } from 'react';
+import { Typography, Box } from '@mui/material';
 
-const CustomLineChart: FC = () => {
-    // Example data for the line chart
+interface CustomLineChartProps {
+    data: {
+        day: number;
+        averageInclusionTime: number;
+    }[];
+    title?: string;
+}
+
+const CustomLineChart: FC<CustomLineChartProps> = ({ data, title = 'Inclusion Time Chart' }) => {
+    const xAxisData = data.map(point => point.day * 1000);
+    const seriesData = data.map(point => point.averageInclusionTime);
+
     const xAxis = {
-        scaleType: 'linear' as const, // Use 'as const' to narrow the type to the specific string literal
-        data: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
+        scaleType: 'time' as const,
+        data: xAxisData,
+        label: 'Date',
     };
 
-    const series = [{data: [5, 10, 8, 12, 15]}];
+    const series = [{ data: seriesData }];
 
-    // The props might need to be spread or structured differently, depending on the library's API
     const chartProps: LineChartProps = {
         xAxis: [xAxis],
         series,
-        width: 400,
-        height: 300,
+        width: 600,
+        height: 400,
     };
 
     return (
-        <LineChart {...chartProps} />
+        <Box>
+            {/* Display the chart title */}
+            <Typography variant="h6" align="center" gutterBottom>
+                {title}
+            </Typography>
+            {/* Render the LineChart */}
+            <LineChart {...chartProps} />
+        </Box>
     );
 };
-
 
 export default CustomLineChart;
