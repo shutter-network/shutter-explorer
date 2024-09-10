@@ -84,6 +84,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     ports:
       - 80:80
-      - 443:443
+      - "443:443"
+      - "443:443/udp"
     labels:
       caddy.email: "devops@brainbot.com"
