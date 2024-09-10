@@ -56,45 +56,63 @@ func (q *Queries) QueryDecryptedTXForEncryptedTX(ctx context.Context, encryptedT
 
 const queryDecryptedTXFromSubmittedEvent = `-- name: QueryDecryptedTXFromSubmittedEvent :one
 SELECT 
-    dt.tx_hash, dt.tx_status,
-    tse.encrypted_transaction
+    tse.event_tx_hash, tse.sender, FLOOR(EXTRACT(EPOCH FROM tse.created_at)) as created_at_unix,
+    dt.tx_hash AS user_tx_hash, dt.tx_status, dt.slot, FLOOR(EXTRACT(EPOCH FROM dt.created_at)) AS decrypted_tx_created_at_unix
 FROM transaction_submitted_event tse 
 LEFT JOIN decrypted_tx dt ON tse.id = dt.transaction_submitted_event_id
-WHERE tse.event_tx_hash = $1
+WHERE tse.event_tx_hash = $1 OR dt.tx_hash = $1
+ORDER BY 
+    CASE 
+        WHEN dt.tx_status = 'included' THEN 1
+        ELSE 2
+    END,
+    dt.created_at DESC NULLS LAST, 
+    tse.created_at DESC
+LIMIT 1
 `
 
 type QueryDecryptedTXFromSubmittedEventRow struct {
-	TxHash               []byte
-	TxStatus             NullTxStatusVal
-	EncryptedTransaction []byte
+	EventTxHash              []byte
+	Sender                   []byte
+	CreatedAtUnix            float64
+	UserTxHash               []byte
+	TxStatus                 NullTxStatusVal
+	Slot                     pgtype.Int8
+	DecryptedTxCreatedAtUnix float64
 }
 
 func (q *Queries) QueryDecryptedTXFromSubmittedEvent(ctx context.Context, eventTxHash []byte) (QueryDecryptedTXFromSubmittedEventRow, error) {
 	row := q.db.QueryRow(ctx, queryDecryptedTXFromSubmittedEvent, eventTxHash)
 	var i QueryDecryptedTXFromSubmittedEventRow
-	err := row.Scan(&i.TxHash, &i.TxStatus, &i.EncryptedTransaction)
+	err := row.Scan(
+		&i.EventTxHash,
+		&i.Sender,
+		&i.CreatedAtUnix,
+		&i.UserTxHash,
+		&i.TxStatus,
+		&i.Slot,
+		&i.DecryptedTxCreatedAtUnix,
+	)
 	return i, err
 }
 
 const queryFromTransactionDetail = `-- name: QueryFromTransactionDetail :one
-SELECT address, nonce, tx_hash, encrypted_tx_hash, submission_time, inclusion_time, retries, is_cancelled
+SELECT tx_hash as user_tx_hash, encrypted_tx_hash
 FROM transaction_details 
 WHERE tx_hash = $1 OR encrypted_tx_hash = $1
+ORDER BY submission_time DESC
+LIMIT 1
 `
 
-func (q *Queries) QueryFromTransactionDetail(ctx context.Context, txHash string) (TransactionDetail, error) {
+type QueryFromTransactionDetailRow struct {
+	UserTxHash      string
+	EncryptedTxHash string
+}
+
+func (q *Queries) QueryFromTransactionDetail(ctx context.Context, txHash string) (QueryFromTransactionDetailRow, error) {
 	row := q.db.QueryRow(ctx, queryFromTransactionDetail, txHash)
-	var i TransactionDetail
-	err := row.Scan(
-		&i.Address,
-		&i.Nonce,
-		&i.TxHash,
-		&i.EncryptedTxHash,
-		&i.SubmissionTime,
-		&i.InclusionTime,
-		&i.Retries,
-		&i.IsCancelled,
-	)
+	var i QueryFromTransactionDetailRow
+	err := row.Scan(&i.UserTxHash, &i.EncryptedTxHash)
 	return i, err
 }
 

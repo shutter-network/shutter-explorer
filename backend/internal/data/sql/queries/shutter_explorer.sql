@@ -142,14 +142,24 @@ FROM decrypted_tx
 WHERE slot = $1 AND tx_status = 'included';
 
 -- name: QueryFromTransactionDetail :one
-SELECT *
+SELECT tx_hash as user_tx_hash, encrypted_tx_hash
 FROM transaction_details 
-WHERE tx_hash = $1 OR encrypted_tx_hash = $1;
+WHERE tx_hash = $1 OR encrypted_tx_hash = $1
+ORDER BY submission_time DESC
+LIMIT 1;
 
 -- name: QueryDecryptedTXFromSubmittedEvent :one
 SELECT 
-    dt.tx_hash, dt.tx_status,
-    tse.encrypted_transaction
+    tse.event_tx_hash, tse.sender, FLOOR(EXTRACT(EPOCH FROM tse.created_at)) as created_at_unix,
+    dt.tx_hash AS user_tx_hash, dt.tx_status, dt.slot, FLOOR(EXTRACT(EPOCH FROM dt.created_at)) AS decrypted_tx_created_at_unix
 FROM transaction_submitted_event tse 
 LEFT JOIN decrypted_tx dt ON tse.id = dt.transaction_submitted_event_id
-WHERE tse.event_tx_hash = $1;
+WHERE tse.event_tx_hash = $1 OR dt.tx_hash = $1
+ORDER BY 
+    CASE 
+        WHEN dt.tx_status = 'included' THEN 1
+        ELSE 2
+    END,
+    dt.created_at DESC NULLS LAST, 
+    tse.created_at DESC
+LIMIT 1;
