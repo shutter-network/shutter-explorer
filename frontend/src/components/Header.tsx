@@ -1,8 +1,7 @@
-import { Box, Button } from '@mui/material';
-import { navButtonStyles, navIconStyles, joinButtonStyles } from '../styles/header';
+import { Box } from '@mui/material';
 import logo from '../assets/shutter-logo.svg';
-import chevronDown from '../assets/icons/chevron_down.svg'
-
+import chevronDown from '../assets/icons/chevron_down.svg';
+import {NavIcon, NavButton, JoinButton} from "../styles/header";
 
 const Header = () => {
     return (
@@ -16,35 +15,32 @@ const Header = () => {
                 />
 
                 <Box component="nav" sx={{ display: 'flex', gap: '8px' }}>
-                    <Button sx={navButtonStyles}>
+                    <NavButton>
                         About
-                        <img
+                        <NavIcon
                             src={chevronDown}
                             alt="Chevron Down"
-                            style={navIconStyles}
                         />
-                    </Button>
-                    <Button sx={navButtonStyles}>
+                    </NavButton>
+                    <NavButton>
                         Products
-                        <img
+                        <NavIcon
                             src={chevronDown}
                             alt="Chevron Down"
-                            style={navIconStyles}
                         />
-                    </Button>
-                    <Button sx={navButtonStyles}>
+                    </NavButton>
+                    <NavButton>
                         Learn
-                        <img
+                        <NavIcon
                             src={chevronDown}
                             alt="Chevron Down"
-                            style={navIconStyles}
                         />
-                    </Button>
+                    </NavButton>
                 </Box>
             </Box>
 
             {/* Right Section */}
-            <Button sx={joinButtonStyles}>Join movement</Button>
+            <JoinButton>Join movement</JoinButton>
         </Box>
     );
 };

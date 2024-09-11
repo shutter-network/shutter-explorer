@@ -1,7 +1,9 @@
 import styled from 'styled-components';
 import { TextField } from '@mui/material';
 
-export const SearchContainer = styled.div`
+export const SearchContainer = styled.div.attrs({
+    className: 'search-container',
+})`
   display: flex;
   align-items: flex-start;
   justify-content: flex-start;
@@ -14,7 +16,9 @@ export const SearchContainer = styled.div`
   }
 `;
 
-export const ChainSelect = styled.div`
+export const ChainSelect = styled.div.attrs({
+    className: 'chain-select',
+})`
   display: flex;
   align-items: center;
   gap: 8px;
@@ -27,24 +31,32 @@ export const ChainSelect = styled.div`
   height: 40px;
 `;
 
-export const ChainIcon = styled.img`
+export const ChainIcon = styled.img.attrs({
+    className: 'chain-icon',
+})`
   width: 20px;
   height: 20px;
 `;
 
-export const ChainName = styled.span`
+export const ChainName = styled.span.attrs({
+    className: 'chain-name',
+})`
   flex: 1;
   padding: 0 4px;
   color: #051016;
   font: 600 14px/1 'Space Grotesk', sans-serif;
 `;
 
-export const DropdownIcon = styled.img`
+export const DropdownIcon = styled.img.attrs({
+    className: 'dropdown-icon',
+})`
   width: 16px;
   height: 16px;
 `;
 
-export const StyledTextField = styled(TextField)`
+export const StyledTextField = styled(TextField).attrs({
+    className: 'styled-text-field',
+})`
   && {
     max-width: 400px;
     width: 100%;

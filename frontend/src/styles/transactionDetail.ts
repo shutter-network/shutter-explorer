@@ -1,7 +1,9 @@
 import styled from 'styled-components';
 import { Box } from '@mui/material';
 
-export const StyledTransactionDetails = styled(Box)`
+export const StyledTransactionDetails = styled(Box).attrs({
+    className: 'transaction-details',
+})`
   .transaction-section {
     display: flex;
     gap: 20px;
