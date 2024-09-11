@@ -124,3 +124,25 @@ func (svc *TransactionService) QueryTransactionDetailsByTxHash(ctx *gin.Context)
 		"message": txDetail,
 	})
 }
+
+func (svc *TransactionService) QueryLatestSequencerTransactions(ctx *gin.Context) {
+	limit, ok := ctx.GetQuery("limit")
+	if !ok {
+		err := error.NewHttpError(
+			"query parameter not found",
+			"limit query parameter is required",
+			http.StatusBadRequest,
+		)
+		ctx.Error(err)
+		return
+	}
+
+	txs, err := svc.TransactionUsecase.QueryLatestSequencerTransactions(ctx, limit)
+	if err != nil {
+		ctx.Error(err)
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{
+		"message": txs,
+	})
+}

@@ -34,6 +34,7 @@ func NewRouter(ctx context.Context, usecases *usecase.Usecases) *gin.Engine {
 		transaction.GET("/total_executed_transactions", transactionService.QueryTotalExecutedTXsForEachTXStatus)
 		transaction.GET("/total_transactions_per_month", transactionService.QueryTotalExecutedTXsForEachTXStatusPerMonth)
 		transaction.GET("/:hash", transactionService.QueryTransactionDetailsByTxHash)
+		transaction.GET("/latest_sequencer_transactions", transactionService.QueryLatestSequencerTransactions)
 	}
 	{
 		validator := api.Group("/validator")

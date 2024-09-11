@@ -164,3 +164,9 @@ ORDER BY
     dt.created_at DESC NULLS LAST, 
     tse.created_at DESC
 LIMIT 1;
+
+-- name: QueryLatestSequencerTransactions :many
+SELECT encode(event_tx_hash, 'hex') AS sequencer_tx_hash, sender, FLOOR(EXTRACT(EPOCH FROM created_at)) as created_at_unix
+FROM transaction_submitted_event 
+ORDER BY created_at DESC
+LIMIT $1;
