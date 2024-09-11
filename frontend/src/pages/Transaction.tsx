@@ -44,7 +44,7 @@ const Transaction: FC = () => {
     return (
         <ResponsiveLayout>
             <StyledTransactionDetails>
-                <Typography variant="h4" gutterBottom>
+                <Typography variant="h1" align="left">
                     Transaction Details
                 </Typography>
                 <Grid container spacing={2}>

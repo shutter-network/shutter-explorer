@@ -83,7 +83,8 @@ const Slot = () => {
     return (
         <ResponsiveLayout>
             <Box sx={{ flexGrow: 1, marginTop: 4 }}>
-                <Typography variant="h5" align="left">
+
+                <Typography variant="h1" align="left">
                     Slot Overview
                 </Typography>
                 {webSocketError && <Alert severity="error">{webSocketError}</Alert>}

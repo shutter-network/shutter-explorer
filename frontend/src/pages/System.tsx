@@ -4,25 +4,27 @@ import InclusionTime from '../modules/InclusionTime';
 import ResponsiveLayout from "../components/ResponsiveLayout";
 import Keyper from "../modules/Keyper";
 import Grid from '@mui/material/Grid2';
+import TitleSection from "../components/TitleSection";
 
 const System = () => {
     return (
         <ResponsiveLayout>
+            <TitleSection title="System Overview" />
             <Grid container spacing={3} alignItems="stretch">
-                <Grid size={{ xs: 12, sm: 4 }} display="flex">
-                    <Validator />
+                <Grid size={{xs: 12, sm: 4}} display="flex">
+                    <Validator/>
                 </Grid>
 
-                <Grid size={{ xs: 12, sm: 4 }} display="flex">
-                    <Transaction />
+                <Grid size={{xs: 12, sm: 4}} display="flex">
+                    <Transaction/>
                 </Grid>
 
-                <Grid size={{ xs: 12, sm: 4 }} display="flex">
-                    <Keyper />
+                <Grid size={{xs: 12, sm: 4}} display="flex">
+                    <Keyper/>
                 </Grid>
 
-                <Grid size={{ xs: 12 }} display="flex">
-                    <InclusionTime />
+                <Grid size={{xs: 12}} display="flex">
+                    <InclusionTime/>
                 </Grid>
             </Grid>
         </ResponsiveLayout>
