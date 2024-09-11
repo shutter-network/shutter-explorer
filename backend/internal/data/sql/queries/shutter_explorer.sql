@@ -170,3 +170,7 @@ SELECT encode(event_tx_hash, 'hex') AS sequencer_tx_hash, sender, FLOOR(EXTRACT(
 FROM transaction_submitted_event 
 ORDER BY created_at DESC
 LIMIT $1;
+
+-- name: QueryExecutedTransactionStats :many
+SELECT COUNT(id), tx_status FROM decrypted_tx
+GROUP BY tx_status;
