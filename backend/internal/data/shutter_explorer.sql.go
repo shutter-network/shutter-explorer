@@ -98,39 +98,6 @@ func (q *Queries) QueryGreeter(ctx context.Context) ([]string, error) {
 	return items, nil
 }
 
-const queryIncludedTransactions = `-- name: QueryIncludedTransactions :many
-SELECT '0x' || Encode(tx_hash, 'hex') tx_hash, FLOOR(EXTRACT(EPOCH FROM created_at)) AS included_at_unix
-FROM decrypted_tx
-WHERE tx_status = 'included'
-ORDER BY created_at DESC
-LIMIT $1
-`
-
-type QueryIncludedTransactionsRow struct {
-	TxHash         interface{}
-	IncludedAtUnix float64
-}
-
-func (q *Queries) QueryIncludedTransactions(ctx context.Context, limit int32) ([]QueryIncludedTransactionsRow, error) {
-	rows, err := q.db.Query(ctx, queryIncludedTransactions, limit)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []QueryIncludedTransactionsRow
-	for rows.Next() {
-		var i QueryIncludedTransactionsRow
-		if err := rows.Scan(&i.TxHash, &i.IncludedAtUnix); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
 const queryIncludedTxsInSlot = `-- name: QueryIncludedTxsInSlot :many
 SELECT tx_hash, EXTRACT(EPOCH FROM created_at)::BIGINT AS included_timestamp  
 FROM decrypted_tx 
@@ -152,6 +119,83 @@ func (q *Queries) QueryIncludedTxsInSlot(ctx context.Context, slot int64) ([]Que
 	for rows.Next() {
 		var i QueryIncludedTxsInSlotRow
 		if err := rows.Scan(&i.TxHash, &i.IncludedTimestamp); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const queryLatestIncludedTXs = `-- name: QueryLatestIncludedTXs :many
+SELECT '0x' || Encode(dt.tx_hash, 'hex') tx_hash, '0x' || Encode(tse.event_tx_hash, 'hex') event_tx_hash, FLOOR(EXTRACT(EPOCH FROM dt.created_at)) AS included_at_unix
+FROM decrypted_tx dt
+INNER JOIN transaction_submitted_event tse ON dt.transaction_submitted_event_id = tse.id
+WHERE dt.tx_status = 'included'
+ORDER BY dt.created_at DESC
+LIMIT $1
+`
+
+type QueryLatestIncludedTXsRow struct {
+	TxHash         interface{}
+	EventTxHash    interface{}
+	IncludedAtUnix float64
+}
+
+func (q *Queries) QueryLatestIncludedTXs(ctx context.Context, limit int32) ([]QueryLatestIncludedTXsRow, error) {
+	rows, err := q.db.Query(ctx, queryLatestIncludedTXs, limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []QueryLatestIncludedTXsRow
+	for rows.Next() {
+		var i QueryLatestIncludedTXsRow
+		if err := rows.Scan(&i.TxHash, &i.EventTxHash, &i.IncludedAtUnix); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const queryLatestPendingTXs = `-- name: QueryLatestPendingTXs :many
+SELECT
+    tse.id,
+    encode(tse.event_tx_hash, 'hex') AS sequencer_tx_hash,
+    FLOOR(EXTRACT(EPOCH FROM tse.created_at)) as created_at_unix
+FROM transaction_submitted_event tse
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM decrypted_tx dt
+    WHERE dt.transaction_submitted_event_id = tse.id
+      AND dt.tx_status IS NOT NULL
+)
+ORDER BY tse.created_at DESC
+LIMIT $1
+`
+
+type QueryLatestPendingTXsRow struct {
+	ID              int64
+	SequencerTxHash string
+	CreatedAtUnix   float64
+}
+
+func (q *Queries) QueryLatestPendingTXs(ctx context.Context, limit int32) ([]QueryLatestPendingTXsRow, error) {
+	rows, err := q.db.Query(ctx, queryLatestPendingTXs, limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []QueryLatestPendingTXsRow
+	for rows.Next() {
+		var i QueryLatestPendingTXsRow
+		if err := rows.Scan(&i.ID, &i.SequencerTxHash, &i.CreatedAtUnix); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
@@ -204,48 +248,6 @@ func (q *Queries) QueryLatestPendingTXsWhichCanBeDecrypted(ctx context.Context, 
 	for rows.Next() {
 		var i QueryLatestPendingTXsWhichCanBeDecryptedRow
 		if err := rows.Scan(&i.TxHash, &i.CreatedAt); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
-const queryLatestTXsWhichArePending = `-- name: QueryLatestTXsWhichArePending :many
-SELECT
-    tse.id,
-    encode(tse.event_tx_hash, 'hex') AS sequencer_tx_hash,
-    tse.created_at
-FROM transaction_submitted_event tse
-WHERE NOT EXISTS (
-    SELECT 1
-    FROM decrypted_tx dt
-    WHERE dt.transaction_submitted_event_id = tse.id
-      AND dt.tx_status IS NOT NULL
-)
-ORDER BY tse.created_at DESC
-LIMIT $1
-`
-
-type QueryLatestTXsWhichArePendingRow struct {
-	ID              int64
-	SequencerTxHash string
-	CreatedAt       pgtype.Timestamptz
-}
-
-func (q *Queries) QueryLatestTXsWhichArePending(ctx context.Context, limit int32) ([]QueryLatestTXsWhichArePendingRow, error) {
-	rows, err := q.db.Query(ctx, queryLatestTXsWhichArePending, limit)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []QueryLatestTXsWhichArePendingRow
-	for rows.Next() {
-		var i QueryLatestTXsWhichArePendingRow
-		if err := rows.Scan(&i.ID, &i.SequencerTxHash, &i.CreatedAt); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
