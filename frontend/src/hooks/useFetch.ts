@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 
 const useFetch = (url: string) => {
+    const explorerbackend = process.env.REACT_APP_BACKEND_API
+
     const [data, setData] = useState<any>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<Error | null>(null);
@@ -9,7 +11,7 @@ const useFetch = (url: string) => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get(url);
+                const response = await axios.get(explorerbackend+url);
                 setData(response.data);
             } catch (error: any) {
                 setError(error);
