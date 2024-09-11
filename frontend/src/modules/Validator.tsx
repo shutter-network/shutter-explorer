@@ -81,8 +81,6 @@ const Validator = () => {
         <Box sx={{ flexGrow: 1, marginTop: 4 }}>
             {webSocketError && <Alert severity="error">{webSocketError}</Alert>}
 
-            <Grid container spacing={3}>
-                <Grid size={{ xs: 12, sm: 6 }}>
                     <OverviewCard title="Validator Overview" iconSrc={overviewIcon}>
                         {/* Error handling and InfoBox display */}
                         {errorShutterized ? (
@@ -115,8 +113,6 @@ const Validator = () => {
                             />
                         )}
                     </OverviewCard>
-                </Grid>
-            </Grid>
         </Box>
     );
 };

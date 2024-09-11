@@ -1,5 +1,4 @@
 import { Alert, Box } from '@mui/material';
-import Grid from '@mui/material/Grid2';
 import InfoBox from '../components/InfoBox';
 import OverviewCard from '../components/OverviewCard';
 import { useEffect, useState } from 'react';
@@ -63,8 +62,6 @@ const Keyper = () => {
     return (
         <Box sx={{ flexGrow: 1, marginTop: 4 }}>
             {webSocketError && <Alert severity="error">{webSocketError}</Alert>}
-            <Grid container spacing={3}>
-                <Grid size={{ xs: 12, sm: 6 }}>
                     <OverviewCard title="Keyper Overview" iconSrc={overviewIcon}>
                         {errorKeyperCount ? (
                             <Alert severity="error">Error fetching keyper count: {errorKeyperCount.message}</Alert>
@@ -85,8 +82,6 @@ const Keyper = () => {
                             />
                         )}
                     </OverviewCard>
-                </Grid>
-            </Grid>
         </Box>
     );
 };

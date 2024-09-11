@@ -71,8 +71,6 @@ const Transaction = () => {
     return (
         <Box sx={{ flexGrow: 1, marginTop: 4 }}>
             {webSocketError && <Alert severity="error">{webSocketError}</Alert>}
-            <Grid container spacing={3}>
-                <Grid size={{ xs: 12, sm: 6 }}>
                     <OverviewCard title="Transaction Overview" iconSrc={overviewIcon}>
                         {errorExecutedTransactions ? (
                             <Alert severity="error">Error fetching Executed Transactions: {errorExecutedTransactions.message}</Alert>
@@ -102,8 +100,6 @@ const Transaction = () => {
                             />
                         )}
                     </OverviewCard>
-                </Grid>
-            </Grid>
         </Box>
     );
 };
