@@ -18,14 +18,6 @@ export interface Transaction {
     timestamp: number;
 }
 
-interface TransactionDetails {
-    user_transaction_hash: string;
-    sequencer_transaction_hash?: string;
-    status: string;
-    inclusion_time?: number;
-    slot?: number;
-}
-
 interface SequencerTransactions {
     transactions: Array<Transaction>;
 }
