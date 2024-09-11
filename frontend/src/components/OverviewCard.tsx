@@ -4,7 +4,7 @@ import styled from 'styled-components';
 
 interface OverviewCardProps {
     title: string;
-    iconSrc: string;
+    iconSrc?: string;
     children: React.ReactNode;
 }
 
@@ -12,7 +12,7 @@ const OverviewCard: FC<OverviewCardProps> = ({ title, iconSrc, children }) => {
     return (
         <CardContainer>
             <CardHeader>
-                <img src={iconSrc} alt={`${title} icon`} />
+                {iconSrc && <img src={iconSrc} alt={`${title} icon`} />}
                 <Typography variant="h6">{title}</Typography>
             </CardHeader>
             <Box sx={{ marginTop: '16px' }}>

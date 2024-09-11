@@ -1,10 +1,11 @@
-import { Alert, Box, Typography } from '@mui/material';
+import { Alert, Box } from '@mui/material';
 import Grid from '@mui/material/Grid2';
 import InfoBox from '../components/InfoBox';
+import OverviewCard from '../components/OverviewCard';
 import { useEffect, useState } from 'react';
 import { useWebSocket } from '../context/WebSocketContext';
-import { WebsocketEvent } from '../types/WebsocketEvent';
 import useFetch from '../hooks/useFetch';
+import overviewIcon from '../assets/icons/arrows_horizontal.svg';
 
 const Transaction = () => {
     const { data: executedTransactionsData, loading: loadingExecutedTransactions, error: errorExecutedTransactions } = useFetch('/api/transaction/total_executed_transactions');
@@ -21,8 +22,7 @@ const Transaction = () => {
     useEffect(() => {
         if (socket) {
             socket.onmessage = (event: MessageEvent) => {
-                const websocketEvent = JSON.parse(event.data) as WebsocketEvent;
-
+                const websocketEvent = JSON.parse(event.data);
                 if (websocketEvent.error) {
                     setWebSocketError(`Error: ${websocketEvent.error.message} (Code: ${websocketEvent.error.code})`);
                 } else if (websocketEvent.data) {
@@ -31,36 +31,26 @@ const Transaction = () => {
                         case 'executed_transactions_updated':
                             if ('count' in websocketEvent.data) {
                                 setExecutedTransactions(websocketEvent.data.count);
-                            } else {
-                                console.warn('Invalid data format for executed_transactions_updated');
                             }
                             break;
                         case 'shutterized_transactions_per_month_updated':
                             if ('count' in websocketEvent.data) {
                                 setShutterizedTransactionsPerMonth(websocketEvent.data.count);
-                            } else {
-                                console.warn('Invalid data format for shutterized_transactions_per_month_updated');
                             }
                             break;
                         case 'shutterized_transaction_percentage_updated':
                             if ('percentage' in websocketEvent.data) {
                                 setShutterizedTransactionPercentage(websocketEvent.data.percentage);
-                            } else {
-                                console.warn('Invalid data format for shutterized_transaction_percentage_updated');
                             }
                             break;
                         default:
                             console.warn('Unhandled WebSocket event type:', websocketEvent.type);
                     }
-                } else {
-                    setWebSocketError(`Received null data for event type: ${websocketEvent.type}`);
-                    console.warn('Received null data for event type:', websocketEvent.type);
                 }
             };
 
             socket.onerror = () => {
                 setWebSocketError('WebSocket error: A connection error occurred');
-                console.error('WebSocket error: A connection error occurred');
             };
         }
 
@@ -80,43 +70,38 @@ const Transaction = () => {
 
     return (
         <Box sx={{ flexGrow: 1, marginTop: 4 }}>
-            <Typography variant="h5" align="left">
-                Transaction Overview
-            </Typography>
             {webSocketError && <Alert severity="error">{webSocketError}</Alert>}
             <Grid container spacing={3}>
                 <Grid size={{ xs: 12, sm: 6 }}>
-                    {errorExecutedTransactions ? (
-                        <Alert severity="error">Error fetching Executed Transactions: {errorExecutedTransactions.message}</Alert>
-                    ) : (
-                        <InfoBox
-                            title="# Successfully Executed Transactions"
-                            tooltip="Total number of successfully executed transactions"
-                            value={loadingExecutedTransactions ? 'Loading...' : executedTransactions}
-                        />
-                    )}
-                </Grid>
-                <Grid size={{ xs: 12, sm: 6 }}>
-                    {errorShutterizedTransactionsPerMonth ? (
-                        <Alert severity="error">Error fetching Shutterized Transactions per Month: {errorShutterizedTransactionsPerMonth.message}</Alert>
-                    ) : (
-                        <InfoBox
-                            title="# Shutterized Transactions per Month"
-                            tooltip="Number of Shutterized transactions executed in the last month"
-                            value={loadingShutterizedTransactionsPerMonth ? 'Loading...' : shutterizedTransactionsPerMonth}
-                        />
-                    )}
-                </Grid>
-                <Grid size={{ xs: 12, sm: 6 }}>
-                    {errorShutterizedTransactionPercentage ? (
-                        <Alert severity="error">Error fetching Shutterized Transaction Percentage: {errorShutterizedTransactionPercentage.message}</Alert>
-                    ) : (
-                        <InfoBox
-                            title="Percentage of Shutterized Transactions"
-                            tooltip="Percentage of transactions that are Shutterized"
-                            value={loadingShutterizedTransactionPercentage ? 'Loading...' : `${shutterizedTransactionPercentage}%`}
-                        />
-                    )}
+                    <OverviewCard title="Transaction Overview" iconSrc={overviewIcon}>
+                        {errorExecutedTransactions ? (
+                            <Alert severity="error">Error fetching Executed Transactions: {errorExecutedTransactions.message}</Alert>
+                        ) : (
+                            <InfoBox
+                                title="# Successfully Executed Transactions"
+                                tooltip="Total number of successfully executed transactions"
+                                value={loadingExecutedTransactions ? 'Loading...' : executedTransactions}
+                            />
+                        )}
+                        {errorShutterizedTransactionsPerMonth ? (
+                            <Alert severity="error">Error fetching Shutterized Transactions per Month: {errorShutterizedTransactionsPerMonth.message}</Alert>
+                        ) : (
+                            <InfoBox
+                                title="# Shutterized Transactions per Month"
+                                tooltip="Number of Shutterized transactions executed in the last month"
+                                value={loadingShutterizedTransactionsPerMonth ? 'Loading...' : shutterizedTransactionsPerMonth}
+                            />
+                        )}
+                        {errorShutterizedTransactionPercentage ? (
+                            <Alert severity="error">Error fetching Shutterized Transaction Percentage: {errorShutterizedTransactionPercentage.message}</Alert>
+                        ) : (
+                            <InfoBox
+                                title="Percentage of Shutterized Transactions"
+                                tooltip="Percentage of transactions that are Shutterized"
+                                value={loadingShutterizedTransactionPercentage ? 'Loading...' : `${shutterizedTransactionPercentage}%`}
+                            />
+                        )}
+                    </OverviewCard>
                 </Grid>
             </Grid>
         </Box>
