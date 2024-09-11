@@ -7,13 +7,13 @@ import { WebsocketEvent } from "../types/WebsocketEvent";
 import useFetch from "../hooks/useFetch";
 
 const Validator = () => {
-    const { data: shutterizedValidatorsData, loading: loadingShutterized, error: errorShutterized } = useFetch('/api/validator/shutterized_validators');
+    const { data: shutterizedValidatorsData, loading: loadingShutterized, error: errorShutterized } = useFetch(`/api/validator/total-registered-validators`);
     const { data: validatorPercentageData, loading: loadingPercentage, error: errorPercentage } = useFetch('/api/validator/validator_percentage');
     const { data: totalValidatorsData, loading: loadingTotal, error: errorTotal } = useFetch('/api/validator/total_validators');
 
-    const [shutterizedValidators, setShutterizedValidators] = useState(shutterizedValidatorsData?.count || 'N/A');
+    const [shutterizedValidators, setShutterizedValidators] = useState(shutterizedValidatorsData?.message || 'N/A');
     const [validatorPercentage, setValidatorPercentage] = useState(validatorPercentageData?.percentage || 'N/A');
-    const [totalValidators, setTotalValidators] = useState(totalValidatorsData?.total || 'N/A');
+    const [totalValidators, setTotalValidators] = useState(totalValidatorsData?.message || 'N/A');
     const [webSocketError, setWebSocketError] = useState<string | null>(null);
 
     const { socket } = useWebSocket()!;
@@ -73,7 +73,7 @@ const Validator = () => {
     }, [socket]);
 
     useEffect(() => {
-        if (shutterizedValidatorsData?.count) setShutterizedValidators(shutterizedValidatorsData.count);
+        if (shutterizedValidatorsData?.message) setShutterizedValidators(shutterizedValidatorsData.message);
         if (validatorPercentageData?.percentage) setValidatorPercentage(validatorPercentageData.percentage);
         if (totalValidatorsData?.total) setTotalValidators(totalValidatorsData.total);
     }, [shutterizedValidatorsData, validatorPercentageData, totalValidatorsData]);
