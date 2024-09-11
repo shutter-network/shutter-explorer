@@ -1,5 +1,4 @@
 import { Alert, Box } from '@mui/material';
-import Grid from '@mui/material/Grid2';
 import InfoBox from '../components/InfoBox';
 import OverviewCard from '../components/OverviewCard';
 import { useEffect, useState } from 'react';

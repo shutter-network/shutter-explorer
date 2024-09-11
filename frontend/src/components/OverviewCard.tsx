@@ -15,9 +15,9 @@ const OverviewCard: FC<OverviewCardProps> = ({ title, iconSrc, children }) => {
                 {iconSrc && <img src={iconSrc} alt={`${title} icon`} />}
                 <Typography variant="h6">{title}</Typography>
             </CardHeader>
-            <Box sx={{ marginTop: '16px' }}>
+            <CardContent>
                 {children}
-            </Box>
+            </CardContent>
         </CardContainer>
     );
 };
@@ -25,13 +25,14 @@ const OverviewCard: FC<OverviewCardProps> = ({ title, iconSrc, children }) => {
 export default OverviewCard;
 
 const CardContainer = styled(Paper)`
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
   padding: 24px;
   border-radius: 4px;
   background-color: #fff;
   border: 1px solid #ccced0;
-  display: flex;
-  flex-direction: column;
-  justify-content: start;
+  height: 100%;
 `;
 
 const CardHeader = styled.div`
@@ -50,4 +51,9 @@ const CardHeader = styled.div`
     color: #051016;
     letter-spacing: -1.2px;
   }
+`;
+
+const CardContent = styled(Box)`
+  margin-top: 16px;
+  flex-grow: 1;
 `;

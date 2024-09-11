@@ -8,20 +8,20 @@ import Grid from '@mui/material/Grid2';
 const System = () => {
     return (
         <ResponsiveLayout>
-            <Grid container spacing={3}>
-                <Grid size={{ xs: 12, sm: 4 }}>
+            <Grid container spacing={3} alignItems="stretch">
+                <Grid size={{ xs: 12, sm: 4 }} display="flex">
                     <Validator />
                 </Grid>
 
-                <Grid size={{ xs: 12, sm: 4 }}>
+                <Grid size={{ xs: 12, sm: 4 }} display="flex">
                     <Transaction />
                 </Grid>
 
-                <Grid size={{ xs: 12, sm: 4 }}>
+                <Grid size={{ xs: 12, sm: 4 }} display="flex">
                     <Keyper />
                 </Grid>
 
-                <Grid size={{ xs: 12 }}>
+                <Grid size={{ xs: 12 }} display="flex">
                     <InclusionTime />
                 </Grid>
             </Grid>
