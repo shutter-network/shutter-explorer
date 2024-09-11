@@ -9,7 +9,7 @@ interface InfoBoxProps {
 
 const InfoBox: FC<InfoBoxProps> = ({ title, tooltip, value }) => {
     return (
-        <Paper elevation={3} sx={{ padding: 2, textAlign: 'center' }}>
+        <Paper elevation={3} sx={{ padding: 2, textAlign: 'left' }}>
             <Tooltip title={tooltip}>
                 <Typography variant="h6">{title}</Typography>
             </Tooltip>
