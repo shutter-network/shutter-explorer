@@ -3,6 +3,8 @@ package usecase
 import (
 	"context"
 	"net/http"
+	"os"
+	"strconv"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/rs/zerolog/log"
@@ -36,4 +38,19 @@ func (uc *ValidatorUsecase) QueryTotalRegisteredValidators(ctx context.Context) 
 		return 0, &err
 	}
 	return totalValidators, nil
+}
+
+func (uc *ValidatorUsecase) QueryTotalGnosisValidators(ctx context.Context) (int64, *error.Http) {
+	totalGnosisValidatorsStringified := os.Getenv("TOTAL_GNOSIS_VALIDATORS")
+	totalGnosisValidators, err := strconv.Atoi(totalGnosisValidatorsStringified)
+	if err != nil {
+		log.Err(err).Msg("err encountered while parsing total gnosis validators")
+		err := error.NewHttpError(
+			"error encountered while parsing",
+			"",
+			http.StatusInternalServerError,
+		)
+		return 0, &err
+	}
+	return int64(totalGnosisValidators), nil
 }

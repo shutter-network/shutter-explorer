@@ -40,17 +40,17 @@ func (svc *TransactionService) QueryDecryptedTX(ctx *gin.Context) {
 }
 
 func (svc *TransactionService) QueryPendingShutterizedTX(ctx *gin.Context) {
-	txLimit, ok := ctx.GetQuery("txLimit")
+	limit, ok := ctx.GetQuery("limit")
 	if !ok {
 		err := error.NewHttpError(
 			"query parameter not found",
-			"txLimit query parameter is required",
+			"limit query parameter is required",
 			http.StatusBadRequest,
 		)
 		ctx.Error(err)
 		return
 	}
-	erpcTXs, err := svc.TransactionUsecase.QueryPendingShutterizedTX(ctx, txLimit)
+	erpcTXs, err := svc.TransactionUsecase.QueryPendingShutterizedTX(ctx, limit)
 	if err != nil {
 		ctx.Error(err)
 		return
@@ -61,18 +61,7 @@ func (svc *TransactionService) QueryPendingShutterizedTX(ctx *gin.Context) {
 }
 
 func (svc *TransactionService) QueryTotalExecutedTXsForEachTXStatus(ctx *gin.Context) {
-	txStatus, ok := ctx.GetQuery("txStatus")
-	if !ok {
-		err := error.NewHttpError(
-			"query parameter not found",
-			"txStatus query parameter is required",
-			http.StatusBadRequest,
-		)
-		ctx.Error(err)
-		return
-	}
-
-	totalTxs, err := svc.TransactionUsecase.QueryTotalExecutedTXsForEachTXStatus(ctx, txStatus)
+	totalTxs, err := svc.TransactionUsecase.QueryTotalExecutedTXsForEachTXStatus(ctx, "included")
 	if err != nil {
 		ctx.Error(err)
 		return
@@ -83,18 +72,7 @@ func (svc *TransactionService) QueryTotalExecutedTXsForEachTXStatus(ctx *gin.Con
 }
 
 func (svc *TransactionService) QueryTotalExecutedTXsForEachTXStatusPerMonth(ctx *gin.Context) {
-	txStatus, ok := ctx.GetQuery("txStatus")
-	if !ok {
-		err := error.NewHttpError(
-			"query parameter not found",
-			"txStatus query parameter is required",
-			http.StatusBadRequest,
-		)
-		ctx.Error(err)
-		return
-	}
-
-	totalTxsPerMonth, err := svc.TransactionUsecase.QueryTotalExecutedTXsForEachTXStatusPerMonth(ctx, txStatus)
+	totalTxsPerMonth, err := svc.TransactionUsecase.QueryTotalExecutedTXsForEachTXStatusPerMonth(ctx, "included")
 	if err != nil {
 		ctx.Error(err)
 		return
@@ -105,18 +83,18 @@ func (svc *TransactionService) QueryTotalExecutedTXsForEachTXStatusPerMonth(ctx 
 }
 
 func (svc *TransactionService) QueryIncludedTransactions(ctx *gin.Context) {
-	txLimitStringified, ok := ctx.GetQuery("txLimit")
+	limitStringified, ok := ctx.GetQuery("limit")
 	if !ok {
 		err := error.NewHttpError(
 			"query parameter not found",
-			"txLimit query parameter is required",
+			"limit query parameter is required",
 			http.StatusBadRequest,
 		)
 		ctx.Error(err)
 		return
 	}
 
-	txs, err := svc.TransactionUsecase.QueryIncludedTransactions(ctx, txLimitStringified)
+	txs, err := svc.TransactionUsecase.QueryIncludedTransactions(ctx, limitStringified)
 	if err != nil {
 		ctx.Error(err)
 		return
