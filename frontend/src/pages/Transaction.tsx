@@ -23,7 +23,7 @@ const Transaction: FC = () => {
     const [transaction, setTransaction] = useState<TransactionDetails | null>(initialTransaction || null);
 
     const { data: updatedData, loading, error } = useFetchWithPolling(
-        initialTransaction ? `/api/transaction/hash=${initialTransaction.userTransactionHash}` : '',
+        initialTransaction ? `/api/transaction/${initialTransaction.userTransactionHash}` : '',
         10000
     );
 
