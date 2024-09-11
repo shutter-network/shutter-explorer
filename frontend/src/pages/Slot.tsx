@@ -1,7 +1,7 @@
 import { Alert, Box, Typography } from '@mui/material';
 import Grid from '@mui/material/Grid2';
 import BasicTable from "../components/BasicTable";
-import ResponsiveLayout from "../layouts/ResponsiveLayout";
+import ResponsiveLayout from "../components/ResponsiveLayout";
 import useFetch from "../hooks/useFetch";
 import { useEffect, useState } from 'react';
 import { useWebSocket } from '../context/WebSocketContext';

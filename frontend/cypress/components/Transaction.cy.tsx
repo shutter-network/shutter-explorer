@@ -6,7 +6,7 @@ import {transactionData, updatedTransactionData, verifyTransactionDetails} from 
 
 describe('<Transaction />', () => {
     it('renders the transaction details correctly', () => {
-        cy.intercept('GET', '/api/transaction/*', {
+        cy.intercept('GET', `/api/transaction/${transactionData.userTransactionHash}`, {
             statusCode: 200,
             body: transactionData,
         }).as('getTransaction');
