@@ -93,3 +93,17 @@ func (uc *InclusionTimeUsecase) QueryExecutedTransactionStats(ctx context.Contex
 
 	return resp, nil
 }
+
+func (uc *InclusionTimeUsecase) QueryHistoricalInclusionTimes(ctx context.Context) ([]data.QueryHistoricalInclusionTimesRow, *error.Http) {
+	historicalInclusionTimes, err := uc.observerDBQuery.QueryHistoricalInclusionTimes(ctx)
+	if err != nil {
+		log.Err(err).Msg("err encountered while querying DB")
+		err := error.NewHttpError(
+			"error encountered while querying for data",
+			"",
+			http.StatusInternalServerError,
+		)
+		return nil, &err
+	}
+	return historicalInclusionTimes, nil
+}
