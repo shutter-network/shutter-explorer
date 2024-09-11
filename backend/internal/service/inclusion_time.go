@@ -38,3 +38,14 @@ func (svc *InclusionTimeService) QueryExecutedTransactionStats(ctx *gin.Context)
 		"message": stats,
 	})
 }
+
+func (svc *InclusionTimeService) QueryHistoricalInclusionTimes(ctx *gin.Context) {
+	historicalInclusionTimes, err := svc.InclusionTimeUsecase.QueryHistoricalInclusionTimes(ctx)
+	if err != nil {
+		ctx.Error(err)
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{
+		"message": historicalInclusionTimes,
+	})
+}
