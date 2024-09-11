@@ -1,5 +1,4 @@
 import Validator from '../modules/Validator';
-import KeyperSet from '../modules/KeyperSet';
 import Transaction from '../modules/Transaction';
 import InclusionTime from '../modules/InclusionTime';
 import ResponsiveLayout from "../layouts/ResponsiveLayout";
