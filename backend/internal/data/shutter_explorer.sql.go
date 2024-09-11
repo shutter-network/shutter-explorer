@@ -54,6 +54,36 @@ func (q *Queries) QueryDecryptedTXForEncryptedTX(ctx context.Context, encryptedT
 	return items, nil
 }
 
+const queryExecutedTransactionStats = `-- name: QueryExecutedTransactionStats :many
+SELECT COUNT(id), tx_status FROM decrypted_tx
+GROUP BY tx_status
+`
+
+type QueryExecutedTransactionStatsRow struct {
+	Count    int64
+	TxStatus TxStatusVal
+}
+
+func (q *Queries) QueryExecutedTransactionStats(ctx context.Context) ([]QueryExecutedTransactionStatsRow, error) {
+	rows, err := q.db.Query(ctx, queryExecutedTransactionStats)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []QueryExecutedTransactionStatsRow
+	for rows.Next() {
+		var i QueryExecutedTransactionStatsRow
+		if err := rows.Scan(&i.Count, &i.TxStatus); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const queryFromTransactionDetails = `-- name: QueryFromTransactionDetails :one
 SELECT tx_hash as user_tx_hash, encrypted_tx_hash
 FROM transaction_details 
