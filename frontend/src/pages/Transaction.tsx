@@ -5,6 +5,7 @@ import ResponsiveLayout from "../components/ResponsiveLayout";
 import { FC, useState, useEffect } from "react";
 import useFetchWithPolling from '../hooks/useFetchWithPolling';
 import { StyledTransactionDetails } from '../styles/transactionDetail';
+import TitleSection from "../components/TitleSection";
 
 interface TransactionDetails {
     TxStatus: string;
@@ -44,9 +45,7 @@ const Transaction: FC = () => {
     return (
         <ResponsiveLayout>
             <StyledTransactionDetails>
-                <Typography variant="h1" align="left">
-                    Transaction Details
-                </Typography>
+                <TitleSection title="Transaction Details" />
                 <Grid container spacing={2}>
                     {/* Transaction Status */}
                     <Grid size={{ xs: 12, sm: 4 }}>

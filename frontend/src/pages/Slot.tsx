@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 import { useWebSocket } from '../context/WebSocketContext';
 import {SequencerTransaction, Transaction, WebsocketEvent} from "../types/WebsocketEvent";
 import {getTimeAgo} from "../utils/utils";
+import TitleSection from "../components/TitleSection";
 
 const Slot = () => {
     const { data: sequencerTransactionsData, loading: loadingSequencer, error: errorSequencer } = useFetch('/api/transaction/latest_sequencer_transactions?limit=10');
@@ -84,9 +85,7 @@ const Slot = () => {
         <ResponsiveLayout>
             <Box sx={{ flexGrow: 1, marginTop: 4 }}>
 
-                <Typography variant="h1" align="left">
-                    Slot Overview
-                </Typography>
+                <TitleSection title="Slot Overview" />
                 {webSocketError && <Alert severity="error">{webSocketError}</Alert>}
                 <Grid container spacing={3}>
                     <Grid size={12}>
