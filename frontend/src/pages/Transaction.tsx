@@ -1,5 +1,5 @@
 import { useLocation } from 'react-router-dom';
-import { Box, Typography, Link } from '@mui/material';
+import { Typography, Link } from '@mui/material';
 import Grid from '@mui/material/Grid2';
 import ResponsiveLayout from "../components/ResponsiveLayout";
 import { FC, useState, useEffect } from "react";
