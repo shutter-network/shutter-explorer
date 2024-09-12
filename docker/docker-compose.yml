@@ -63,6 +63,7 @@ services:
       GENESIS_TIMESTAMP: 
       SLOT_DURATION: 
       SLOTS_PER_EXPOCH: 
+      TOTAL_GNOSIS_VALIDATORS: 
     command: ["./backend"]
     labels:
       caddy: "${SERVICE_DOMAIN_NAME}"
