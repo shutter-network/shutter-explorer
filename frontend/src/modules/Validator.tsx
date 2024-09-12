@@ -7,13 +7,12 @@ import { WebsocketEvent } from "../types/WebsocketEvent";
 import useFetch from "../hooks/useFetch";
 
 const Validator = () => {
-    const { data: shutterizedValidatorsData, loading: loadingShutterized, error: errorShutterized } = useFetch(`/api/validator/total-registered-validators`);
-    const { data: validatorPercentageData, loading: loadingPercentage, error: errorPercentage } = useFetch('/api/validator/validator_percentage');
-    const { data: totalValidatorsData, loading: loadingTotal, error: errorTotal } = useFetch('/api/validator/total_validators');
+    const { data: shutterizedValidatorsData, loading: loadingShutterized, error: errorShutterized } = useFetch(`/api/validator/total_registered_validators`);
+    const { data: totalValidatorsData, loading: loadingTotal, error: errorTotal } = useFetch('/api/validator/total_gnosis_validators');
 
     const [shutterizedValidators, setShutterizedValidators] = useState(shutterizedValidatorsData?.message || 'N/A');
-    const [validatorPercentage, setValidatorPercentage] = useState(validatorPercentageData?.percentage || 'N/A');
     const [totalValidators, setTotalValidators] = useState(totalValidatorsData?.message || 'N/A');
+    const [validatorPercentage, setValidatorPercentage] = useState((shutterizedValidatorsData?.message*100)/totalValidatorsData?.message || 'N/A');
     const [webSocketError, setWebSocketError] = useState<string | null>(null);
 
     const { socket } = useWebSocket()!;
@@ -73,10 +72,15 @@ const Validator = () => {
     }, [socket]);
 
     useEffect(() => {
-        if (shutterizedValidatorsData?.message) setShutterizedValidators(shutterizedValidatorsData.message);
-        if (validatorPercentageData?.percentage) setValidatorPercentage(validatorPercentageData.percentage);
-        if (totalValidatorsData?.total) setTotalValidators(totalValidatorsData.total);
-    }, [shutterizedValidatorsData, validatorPercentageData, totalValidatorsData]);
+        if (shutterizedValidatorsData?.message){
+            setShutterizedValidators(shutterizedValidatorsData.message);
+            setValidatorPercentage((shutterizedValidatorsData?.message*100)/totalValidatorsData?.message);
+        } 
+        if (totalValidatorsData?.total){
+            setTotalValidators(totalValidatorsData.total);
+            setValidatorPercentage((shutterizedValidatorsData?.message*100)/totalValidatorsData?.message);
+        } 
+    }, [shutterizedValidatorsData, totalValidatorsData]);
 
     return (
         <Box sx={{ flexGrow: 1, marginTop: 4 }}>
@@ -97,13 +101,17 @@ const Validator = () => {
                     )}
                 </Grid>
                 <Grid size={{ xs: 12, sm: 6 }}>
-                    {errorPercentage ? (
-                        <Alert severity="error">Error fetching validator percentage: {errorPercentage.message}</Alert>
+                    {errorShutterized || errorTotal ? (
+                        errorShutterized?
+                        <Alert severity="error">Error fetching validator percentage: {errorShutterized?.message}</Alert>:
+                        errorTotal?
+                        <Alert severity="error">Error fetching validator percentage: {errorTotal?.message}</Alert>:
+                        null
                     ) : (
                         <InfoBox
                             title="Validator Percentage"
                             tooltip="Percentage amongst all validators"
-                            value={loadingPercentage ? 'Loading...' : `${validatorPercentage}%`}
+                            value={loadingShutterized || loadingTotal ? 'Loading...' : `${validatorPercentage}%`}
                         />
                     )}
                 </Grid>
