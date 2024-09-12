@@ -22,7 +22,7 @@ const useFetch = (url: string) => {
 
         fetchData();
 
-    }, [url]);
+    }, [url, explorerbackend]);
 
     return { data, loading, error };
 };
