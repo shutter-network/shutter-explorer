@@ -141,14 +141,14 @@ SELECT tx_hash, EXTRACT(EPOCH FROM created_at)::BIGINT AS included_timestamp
 FROM decrypted_tx 
 WHERE slot = $1 AND tx_status = 'included';
 
--- name: QueryFromTransactionDetail :one
+-- name: QueryFromTransactionDetails :one
 SELECT tx_hash as user_tx_hash, encrypted_tx_hash
 FROM transaction_details 
 WHERE tx_hash = $1 OR encrypted_tx_hash = $1
 ORDER BY submission_time DESC
 LIMIT 1;
 
--- name: QueryDecryptedTXFromSubmittedEvent :one
+-- name: QueryTransactionDetailsByTxHash :one
 SELECT 
     tse.event_tx_hash, tse.sender, FLOOR(EXTRACT(EPOCH FROM tse.created_at)) as created_at_unix,
     dt.tx_hash AS user_tx_hash, dt.tx_status, dt.slot, FLOOR(EXTRACT(EPOCH FROM dt.created_at)) AS decrypted_tx_created_at_unix

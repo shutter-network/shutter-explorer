@@ -54,49 +54,7 @@ func (q *Queries) QueryDecryptedTXForEncryptedTX(ctx context.Context, encryptedT
 	return items, nil
 }
 
-const queryDecryptedTXFromSubmittedEvent = `-- name: QueryDecryptedTXFromSubmittedEvent :one
-SELECT 
-    tse.event_tx_hash, tse.sender, FLOOR(EXTRACT(EPOCH FROM tse.created_at)) as created_at_unix,
-    dt.tx_hash AS user_tx_hash, dt.tx_status, dt.slot, FLOOR(EXTRACT(EPOCH FROM dt.created_at)) AS decrypted_tx_created_at_unix
-FROM transaction_submitted_event tse 
-LEFT JOIN decrypted_tx dt ON tse.id = dt.transaction_submitted_event_id
-WHERE tse.event_tx_hash = $1 OR dt.tx_hash = $1
-ORDER BY 
-    CASE 
-        WHEN dt.tx_status = 'included' THEN 1
-        ELSE 2
-    END,
-    dt.created_at DESC NULLS LAST, 
-    tse.created_at DESC
-LIMIT 1
-`
-
-type QueryDecryptedTXFromSubmittedEventRow struct {
-	EventTxHash              []byte
-	Sender                   []byte
-	CreatedAtUnix            float64
-	UserTxHash               []byte
-	TxStatus                 NullTxStatusVal
-	Slot                     pgtype.Int8
-	DecryptedTxCreatedAtUnix float64
-}
-
-func (q *Queries) QueryDecryptedTXFromSubmittedEvent(ctx context.Context, eventTxHash []byte) (QueryDecryptedTXFromSubmittedEventRow, error) {
-	row := q.db.QueryRow(ctx, queryDecryptedTXFromSubmittedEvent, eventTxHash)
-	var i QueryDecryptedTXFromSubmittedEventRow
-	err := row.Scan(
-		&i.EventTxHash,
-		&i.Sender,
-		&i.CreatedAtUnix,
-		&i.UserTxHash,
-		&i.TxStatus,
-		&i.Slot,
-		&i.DecryptedTxCreatedAtUnix,
-	)
-	return i, err
-}
-
-const queryFromTransactionDetail = `-- name: QueryFromTransactionDetail :one
+const queryFromTransactionDetails = `-- name: QueryFromTransactionDetails :one
 SELECT tx_hash as user_tx_hash, encrypted_tx_hash
 FROM transaction_details 
 WHERE tx_hash = $1 OR encrypted_tx_hash = $1
@@ -104,14 +62,14 @@ ORDER BY submission_time DESC
 LIMIT 1
 `
 
-type QueryFromTransactionDetailRow struct {
+type QueryFromTransactionDetailsRow struct {
 	UserTxHash      string
 	EncryptedTxHash string
 }
 
-func (q *Queries) QueryFromTransactionDetail(ctx context.Context, txHash string) (QueryFromTransactionDetailRow, error) {
-	row := q.db.QueryRow(ctx, queryFromTransactionDetail, txHash)
-	var i QueryFromTransactionDetailRow
+func (q *Queries) QueryFromTransactionDetails(ctx context.Context, txHash string) (QueryFromTransactionDetailsRow, error) {
+	row := q.db.QueryRow(ctx, queryFromTransactionDetails, txHash)
+	var i QueryFromTransactionDetailsRow
 	err := row.Scan(&i.UserTxHash, &i.EncryptedTxHash)
 	return i, err
 }
@@ -444,6 +402,48 @@ func (q *Queries) QueryTotalTXsForEachTXStatusPerMonth(ctx context.Context, txSt
 		return nil, err
 	}
 	return items, nil
+}
+
+const queryTransactionDetailsByTxHash = `-- name: QueryTransactionDetailsByTxHash :one
+SELECT 
+    tse.event_tx_hash, tse.sender, FLOOR(EXTRACT(EPOCH FROM tse.created_at)) as created_at_unix,
+    dt.tx_hash AS user_tx_hash, dt.tx_status, dt.slot, FLOOR(EXTRACT(EPOCH FROM dt.created_at)) AS decrypted_tx_created_at_unix
+FROM transaction_submitted_event tse 
+LEFT JOIN decrypted_tx dt ON tse.id = dt.transaction_submitted_event_id
+WHERE tse.event_tx_hash = $1 OR dt.tx_hash = $1
+ORDER BY 
+    CASE 
+        WHEN dt.tx_status = 'included' THEN 1
+        ELSE 2
+    END,
+    dt.created_at DESC NULLS LAST, 
+    tse.created_at DESC
+LIMIT 1
+`
+
+type QueryTransactionDetailsByTxHashRow struct {
+	EventTxHash              []byte
+	Sender                   []byte
+	CreatedAtUnix            float64
+	UserTxHash               []byte
+	TxStatus                 NullTxStatusVal
+	Slot                     pgtype.Int8
+	DecryptedTxCreatedAtUnix float64
+}
+
+func (q *Queries) QueryTransactionDetailsByTxHash(ctx context.Context, eventTxHash []byte) (QueryTransactionDetailsByTxHashRow, error) {
+	row := q.db.QueryRow(ctx, queryTransactionDetailsByTxHash, eventTxHash)
+	var i QueryTransactionDetailsByTxHashRow
+	err := row.Scan(
+		&i.EventTxHash,
+		&i.Sender,
+		&i.CreatedAtUnix,
+		&i.UserTxHash,
+		&i.TxStatus,
+		&i.Slot,
+		&i.DecryptedTxCreatedAtUnix,
+	)
+	return i, err
 }
 
 const queryTxHashFromTransactionDetails = `-- name: QueryTxHashFromTransactionDetails :many
