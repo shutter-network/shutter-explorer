@@ -3,7 +3,6 @@ package router
 import (
 	"context"
 
-	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/shutter-network/shutter-explorer/backend/internal/middleware"
 	"github.com/shutter-network/shutter-explorer/backend/internal/service"
@@ -13,7 +12,6 @@ import (
 
 func NewRouter(ctx context.Context, usecases *usecase.Usecases) *gin.Engine {
 	router := gin.New()
-	router.Use(cors.Default())
 	router.Use(gin.Logger())
 	router.Use(gin.Recovery())
 
