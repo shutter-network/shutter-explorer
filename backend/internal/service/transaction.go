@@ -104,7 +104,7 @@ func (svc *TransactionService) QueryIncludedTransactions(ctx *gin.Context) {
 	})
 }
 
-func (svc *TransactionService) QueryTransactionDetail(ctx *gin.Context) {
+func (svc *TransactionService) QueryTransactionDetailsByTxHash(ctx *gin.Context) {
 	txHash := ctx.Param("hash")
 	if len(txHash) == 0 {
 		err := error.NewHttpError(
@@ -115,7 +115,7 @@ func (svc *TransactionService) QueryTransactionDetail(ctx *gin.Context) {
 		ctx.Error(err)
 		return
 	}
-	txDetail, err := svc.TransactionUsecase.QueryTransactionDetail(ctx, txHash)
+	txDetail, err := svc.TransactionUsecase.QueryTransactionDetailsByTxHash(ctx, txHash)
 	if err != nil {
 		ctx.Error(err)
 		return

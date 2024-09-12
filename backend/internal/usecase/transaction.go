@@ -168,7 +168,7 @@ func (uc *TransactionUsecase) QueryIncludedTransactions(ctx context.Context, lim
 	return txs, nil
 }
 
-func (uc *TransactionUsecase) QueryTransactionDetail(ctx context.Context, txHash string) (*QueryTransactionDetailResp, *error.Http) {
+func (uc *TransactionUsecase) QueryTransactionDetailsByTxHash(ctx context.Context, txHash string) (*QueryTransactionDetailResp, *error.Http) {
 	txHashBytes, err := hex.DecodeString(txHash)
 	if err != nil {
 		err := error.NewHttpError(
@@ -179,18 +179,31 @@ func (uc *TransactionUsecase) QueryTransactionDetail(ctx context.Context, txHash
 		return nil, &err
 	}
 
-	erpcTX, erpcTxErr := uc.erpcDBQuery.QueryFromTransactionDetail(ctx, txHash)
-	if erpcTxErr != nil && erpcTxErr != pgx.ErrNoRows {
-		log.Err(err).Msg("err encountered while querying erpc DB")
-		err := error.NewHttpError(
-			"error encountered while querying for data",
-			"",
-			http.StatusInternalServerError,
-		)
-		return nil, &err
+	erpcTX, erpcTxErr := uc.erpcDBQuery.QueryFromTransactionDetails(ctx, txHash)
+	if erpcTxErr != nil {
+		if erpcTxErr != pgx.ErrNoRows {
+			log.Err(err).Msg("err encountered while querying erpc DB")
+			err := error.NewHttpError(
+				"error encountered while querying for data",
+				"",
+				http.StatusInternalServerError,
+			)
+			return nil, &err
+		}
+	} else {
+		txHashBytes, err = hex.DecodeString(erpcTX.EncryptedTxHash)
+		if err != nil {
+			log.Err(err).Msg("err encountered while decoding sequencer tx hash")
+			err := error.NewHttpError(
+				"error encountered while decoding sequencer tx hash",
+				"",
+				http.StatusInternalServerError,
+			)
+			return nil, &err
+		}
 	}
 
-	tse, err := uc.observerDBQuery.QueryDecryptedTXFromSubmittedEvent(ctx, txHashBytes)
+	tse, err := uc.observerDBQuery.QueryTransactionDetailsByTxHash(ctx, txHashBytes)
 	if err != nil {
 		log.Err(err).Msg("err encountered while querying observer DB")
 		if err == pgx.ErrNoRows {
@@ -268,6 +281,7 @@ func (uc *TransactionUsecase) QueryTransactionDetail(ctx context.Context, txHash
 		}
 	}
 
+	//notice: EstimatedInclusionTime is always going to be current inclusion time at the time of the query
 	resp := &QueryTransactionDetailResp{
 		Sender:                 hex.EncodeToString(tse.Sender),
 		SequencerTxHash:        hex.EncodeToString(tse.EventTxHash),
