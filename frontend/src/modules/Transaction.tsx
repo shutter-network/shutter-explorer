@@ -7,12 +7,12 @@ import { WebsocketEvent } from '../types/WebsocketEvent';
 import useFetch from '../hooks/useFetch';
 
 const Transaction = () => {
-    const { data: executedTransactionsData, loading: loadingExecutedTransactions, error: errorExecutedTransactions } = useFetch('/transaction/executed_transactions');
-    const { data: shutterizedTransactionsPerMonthData, loading: loadingShutterizedTransactionsPerMonth, error: errorShutterizedTransactionsPerMonth } = useFetch('/transaction/shutterized_transactions_per_month');
+    const { data: executedTransactionsData, loading: loadingExecutedTransactions, error: errorExecutedTransactions } = useFetch('/api/transaction/total_executed_transactions');
+    const { data: shutterizedTransactionsPerMonthData, loading: loadingShutterizedTransactionsPerMonth, error: errorShutterizedTransactionsPerMonth } = useFetch('/api/transaction/total_transactions_per_month');
     const { data: shutterizedTransactionPercentageData, loading: loadingShutterizedTransactionPercentage, error: errorShutterizedTransactionPercentage } = useFetch('/transaction/shutterized_transaction_percentage');
 
-    const [executedTransactions, setExecutedTransactions] = useState<string | number>(executedTransactionsData?.count || 'N/A');
-    const [shutterizedTransactionsPerMonth, setShutterizedTransactionsPerMonth] = useState<string | number>(shutterizedTransactionsPerMonthData?.count || 'N/A');
+    const [executedTransactions, setExecutedTransactions] = useState<string | number>(executedTransactionsData?.message || 'N/A');
+    const [shutterizedTransactionsPerMonth, setShutterizedTransactionsPerMonth] = useState<string | number>(shutterizedTransactionsPerMonthData?.message || 'N/A');
     const [shutterizedTransactionPercentage, setShutterizedTransactionPercentage] = useState<string | number>(shutterizedTransactionPercentageData?.percentage || 'N/A');
     const [webSocketError, setWebSocketError] = useState<string | null>(null);
 
@@ -73,8 +73,8 @@ const Transaction = () => {
     }, [socket]);
 
     useEffect(() => {
-        if (executedTransactionsData?.count) setExecutedTransactions(executedTransactionsData.count);
-        if (shutterizedTransactionsPerMonthData?.count) setShutterizedTransactionsPerMonth(shutterizedTransactionsPerMonthData.count);
+        if (executedTransactionsData?.message) setExecutedTransactions(executedTransactionsData.message);
+        if (shutterizedTransactionsPerMonthData?.message) setShutterizedTransactionsPerMonth(shutterizedTransactionsPerMonthData.message);
         if (shutterizedTransactionPercentageData?.percentage) setShutterizedTransactionPercentage(shutterizedTransactionPercentageData.percentage);
     }, [executedTransactionsData, shutterizedTransactionsPerMonthData, shutterizedTransactionPercentageData]);
 

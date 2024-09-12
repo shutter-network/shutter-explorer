@@ -10,7 +10,7 @@ import {getTimeAgo} from "../utils/utils";
 
 const Slot = () => {
     const { data: sequencerTransactionsData, loading: loadingSequencer, error: errorSequencer } = useFetch('/api/transaction/latest_sequencer_transactions');
-    const { data: userTransactionsData, loading: loadingUser, error: errorUser } = useFetch('/api/transaction/latest_user_transactions');
+    const { data: userTransactionsData, loading: loadingUser, error: errorUser } = useFetch('/api/transaction/latest_user_transactions?limit=10');
 
     const sequencerTransactionColumns = [
         { id: 'hash', label: 'Sequencer Transaction Hash', minWidth: 170 },
@@ -23,7 +23,7 @@ const Slot = () => {
     ];
 
     const [sequencerTransactions, setSequencerTransactions] = useState(sequencerTransactionsData?.transactions || []);
-    const [userTransactions, setUserTransactions] = useState(userTransactionsData?.transactions || []);
+    const [userTransactions, setUserTransactions] = useState(userTransactionsData?.message || []);
     const [webSocketError, setWebSocketError] = useState<string | null>(null); // State to store WebSocket errors
 
     const { socket } = useWebSocket()!;
@@ -32,8 +32,8 @@ const Slot = () => {
         if (sequencerTransactionsData?.transactions) {
             setSequencerTransactions(sequencerTransactionsData.transactions);
         }
-        if (userTransactionsData?.transactions) {
-            setUserTransactions(userTransactionsData.transactions);
+        if (userTransactionsData?.message) {
+            setUserTransactions(userTransactionsData.message);
         }
     }, [sequencerTransactionsData, userTransactionsData]);
 
