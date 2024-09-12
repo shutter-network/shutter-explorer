@@ -4,12 +4,22 @@ import (
 	"context"
 	"encoding/hex"
 	"net/http"
+	"os"
 	"strconv"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/rs/zerolog/log"
 	"github.com/shutter-network/shutter-explorer/backend/internal/data"
 	"github.com/shutter-network/shutter-explorer/backend/internal/error"
+)
+
+type TxStatus string
+
+const (
+	Pending                TxStatus = "Pending"
+	Completed              TxStatus = "Completed"
+	DecryptionKeyGenerated TxStatus = "DecryptionKeyGenerated"
 )
 
 type TransactionUsecase struct {
@@ -17,6 +27,18 @@ type TransactionUsecase struct {
 	erpcDB          *pgxpool.Pool
 	observerDBQuery *data.Queries
 	erpcDBQuery     *data.Queries
+}
+
+type QueryTransactionDetailResp struct {
+	Sender                 string
+	SequencerTxHash        string
+	UserTxHash             string
+	TxStatus               string
+	InclusionSlot          int64
+	SequencerTxSubmittedAt int64
+	DecryptedTxCreatedAt   int64
+	EffectiveInclusionTime int64
+	EstimatedInclusionTime int64
 }
 
 func NewTransactionUsecase(
@@ -64,7 +86,7 @@ func (uc *TransactionUsecase) QueryPendingShutterizedTX(ctx context.Context, lim
 		)
 		return nil, &err
 	}
-	pendingObserverTxs, err := uc.observerDBQuery.QueryLatestTXsWhichArentIncluded(ctx, int32(limit))
+	pendingObserverTxs, err := uc.observerDBQuery.QueryLatestTXsWhichArePending(ctx, int32(limit))
 	if err != nil {
 		log.Err(err).Msg("err encountered while querying DB")
 		err := error.NewHttpError(
@@ -74,13 +96,13 @@ func (uc *TransactionUsecase) QueryPendingShutterizedTX(ctx context.Context, lim
 		)
 		return nil, &err
 	}
-	ecTXHashes := make([]string, len(pendingObserverTxs))
+	sqTXHashes := make([]string, len(pendingObserverTxs))
 
 	for i := 0; i < len(pendingObserverTxs); i++ {
-		ecTXHashes[i] = hex.EncodeToString(pendingObserverTxs[i].EncryptedTransaction)
+		sqTXHashes[i] = pendingObserverTxs[i].SequencerTxHash
 	}
 
-	erpcTXs, err := uc.erpcDBQuery.QueryTxHashFromTransactionDetails(ctx, ecTXHashes)
+	erpcTXs, err := uc.erpcDBQuery.QueryTxHashFromTransactionDetails(ctx, sqTXHashes)
 	if err != nil {
 		log.Err(err).Msg("err encountered while querying DB")
 		err := error.NewHttpError(
@@ -94,7 +116,7 @@ func (uc *TransactionUsecase) QueryPendingShutterizedTX(ctx context.Context, lim
 }
 
 func (uc *TransactionUsecase) QueryTotalExecutedTXsForEachTXStatus(ctx context.Context, txStatus string) (int64, *error.Http) {
-	totalTxs, err := uc.observerDBQuery.QueryTotalTXsForEachTXStatus(ctx, txStatus)
+	totalTxs, err := uc.observerDBQuery.QueryTotalTXsForEachTXStatus(ctx, data.TxStatusVal(txStatus))
 	if err != nil {
 		log.Err(err).Msg("err encountered while querying DB")
 		err := error.NewHttpError(
@@ -108,7 +130,7 @@ func (uc *TransactionUsecase) QueryTotalExecutedTXsForEachTXStatus(ctx context.C
 }
 
 func (uc *TransactionUsecase) QueryTotalExecutedTXsForEachTXStatusPerMonth(ctx context.Context, txStatus string) ([]data.QueryTotalTXsForEachTXStatusPerMonthRow, *error.Http) {
-	totalTxsPerMonth, err := uc.observerDBQuery.QueryTotalTXsForEachTXStatusPerMonth(ctx, txStatus)
+	totalTxsPerMonth, err := uc.observerDBQuery.QueryTotalTXsForEachTXStatusPerMonth(ctx, data.TxStatusVal(txStatus))
 	if err != nil {
 		log.Err(err).Msg("err encountered while querying DB")
 		err := error.NewHttpError(
@@ -144,4 +166,132 @@ func (uc *TransactionUsecase) QueryIncludedTransactions(ctx context.Context, lim
 		return nil, &err
 	}
 	return txs, nil
+}
+
+func (uc *TransactionUsecase) QueryTransactionDetailsByTxHash(ctx context.Context, txHash string) (*QueryTransactionDetailResp, *error.Http) {
+	txHashBytes, err := hex.DecodeString(txHash)
+	if err != nil {
+		err := error.NewHttpError(
+			"unable to decode tx hash",
+			"valid txHash query parameter is required",
+			http.StatusBadRequest,
+		)
+		return nil, &err
+	}
+
+	erpcTX, erpcTxErr := uc.erpcDBQuery.QueryFromTransactionDetails(ctx, txHash)
+	if erpcTxErr != nil {
+		if erpcTxErr != pgx.ErrNoRows {
+			log.Err(err).Msg("err encountered while querying erpc DB")
+			err := error.NewHttpError(
+				"error encountered while querying for data",
+				"",
+				http.StatusInternalServerError,
+			)
+			return nil, &err
+		}
+	} else {
+		txHashBytes, err = hex.DecodeString(erpcTX.EncryptedTxHash)
+		if err != nil {
+			log.Err(err).Msg("err encountered while decoding sequencer tx hash")
+			err := error.NewHttpError(
+				"error encountered while decoding sequencer tx hash",
+				"",
+				http.StatusInternalServerError,
+			)
+			return nil, &err
+		}
+	}
+
+	tse, err := uc.observerDBQuery.QueryTransactionDetailsByTxHash(ctx, txHashBytes)
+	if err != nil {
+		log.Err(err).Msg("err encountered while querying observer DB")
+		if err == pgx.ErrNoRows {
+			err := error.NewHttpError(
+				"transaction for provided tx hash not found",
+				"",
+				http.StatusNotFound,
+			)
+			return nil, &err
+		}
+		err := error.NewHttpError(
+			"error encountered while querying for data",
+			"",
+			http.StatusInternalServerError,
+		)
+		return nil, &err
+	}
+
+	var effectiveInclusionTime int64
+	var inclusionSlot int64
+	txStatus := Pending
+	if tse.TxStatus.Valid {
+		if tse.TxStatus.TxStatusVal == data.TxStatusValIncluded {
+			txStatus = Completed
+			effectiveInclusionTime = int64(tse.DecryptedTxCreatedAtUnix)
+			if tse.Slot.Valid {
+				inclusionSlot = tse.Slot.Int64
+			}
+		} else if tse.TxStatus.TxStatusVal == data.TxStatusValNotincluded {
+			txStatus = DecryptionKeyGenerated
+		}
+	}
+
+	totalRegisteredValidators, err := uc.observerDBQuery.QueryTotalRegisteredValidators(ctx)
+	if err != nil {
+		log.Err(err).Msg("err encountered while querying DB")
+		err := error.NewHttpError(
+			"error encountered while querying for data",
+			"",
+			http.StatusInternalServerError,
+		)
+		return nil, &err
+	}
+	totalGnosisValidatorsStringified := os.Getenv("TOTAL_GNOSIS_VALIDATORS")
+	totalGnosisValidators, err := strconv.Atoi(totalGnosisValidatorsStringified)
+	if err != nil {
+		log.Err(err).Msg("err encountered while parsing total gnosis validators")
+		err := error.NewHttpError(
+			"error encountered while parsing",
+			"",
+			http.StatusInternalServerError,
+		)
+		return nil, &err
+	}
+
+	slotDurationStringified := os.Getenv("SLOT_DURATION")
+	slotDuration, err := strconv.Atoi(slotDurationStringified)
+	if err != nil {
+		log.Err(err).Msg("err encountered while parsing slot duration")
+		err := error.NewHttpError(
+			"error encountered while parsing",
+			"",
+			http.StatusInternalServerError,
+		)
+		return nil, &err
+	}
+	estimatedInclusionTime := (int64(totalGnosisValidators) / totalRegisteredValidators) * int64(slotDuration)
+
+	var userTxHash string
+	if len(tse.UserTxHash) > 0 {
+		userTxHash = hex.EncodeToString(tse.UserTxHash)
+	} else {
+		if erpcTxErr == nil {
+			userTxHash = erpcTX.UserTxHash
+		}
+	}
+
+	//notice: EstimatedInclusionTime is always going to be current inclusion time at the time of the query
+	resp := &QueryTransactionDetailResp{
+		Sender:                 hex.EncodeToString(tse.Sender),
+		SequencerTxHash:        hex.EncodeToString(tse.EventTxHash),
+		UserTxHash:             userTxHash,
+		TxStatus:               string(txStatus),
+		InclusionSlot:          inclusionSlot,
+		SequencerTxSubmittedAt: int64(tse.CreatedAtUnix),
+		DecryptedTxCreatedAt:   int64(tse.DecryptedTxCreatedAtUnix),
+		EffectiveInclusionTime: effectiveInclusionTime,
+		EstimatedInclusionTime: estimatedInclusionTime,
+	}
+	return resp, nil
 }

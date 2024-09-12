@@ -103,3 +103,24 @@ func (svc *TransactionService) QueryIncludedTransactions(ctx *gin.Context) {
 		"message": txs,
 	})
 }
+
+func (svc *TransactionService) QueryTransactionDetailsByTxHash(ctx *gin.Context) {
+	txHash := ctx.Param("hash")
+	if len(txHash) == 0 {
+		err := error.NewHttpError(
+			"query parameter not found",
+			"hash parameter is required",
+			http.StatusBadRequest,
+		)
+		ctx.Error(err)
+		return
+	}
+	txDetail, err := svc.TransactionUsecase.QueryTransactionDetailsByTxHash(ctx, txHash)
+	if err != nil {
+		ctx.Error(err)
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{
+		"message": txDetail,
+	})
+}

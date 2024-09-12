@@ -24,7 +24,7 @@ WHERE tse.encrypted_transaction = $1
 
 type QueryDecryptedTXForEncryptedTXRow struct {
 	TxHash               []byte
-	TxStatus             interface{}
+	TxStatus             TxStatusVal
 	EncryptedTransaction []byte
 	Key                  []byte
 }
@@ -52,6 +52,26 @@ func (q *Queries) QueryDecryptedTXForEncryptedTX(ctx context.Context, encryptedT
 		return nil, err
 	}
 	return items, nil
+}
+
+const queryFromTransactionDetails = `-- name: QueryFromTransactionDetails :one
+SELECT tx_hash as user_tx_hash, encrypted_tx_hash
+FROM transaction_details 
+WHERE tx_hash = $1 OR encrypted_tx_hash = $1
+ORDER BY submission_time DESC
+LIMIT 1
+`
+
+type QueryFromTransactionDetailsRow struct {
+	UserTxHash      string
+	EncryptedTxHash string
+}
+
+func (q *Queries) QueryFromTransactionDetails(ctx context.Context, txHash string) (QueryFromTransactionDetailsRow, error) {
+	row := q.db.QueryRow(ctx, queryFromTransactionDetails, txHash)
+	var i QueryFromTransactionDetailsRow
+	err := row.Scan(&i.UserTxHash, &i.EncryptedTxHash)
+	return i, err
 }
 
 const queryGreeter = `-- name: QueryGreeter :many
@@ -194,53 +214,38 @@ func (q *Queries) QueryLatestPendingTXsWhichCanBeDecrypted(ctx context.Context, 
 	return items, nil
 }
 
-const queryLatestTXsWhichArentIncluded = `-- name: QueryLatestTXsWhichArentIncluded :many
-WITH latest_events AS (
-    SELECT 
-        id,
-        encrypted_transaction,
-        created_at
-    FROM (
-        SELECT DISTINCT ON (encrypted_transaction)
-            id,
-            encrypted_transaction,
-            created_at
-        FROM 
-            transaction_submitted_event
-        ORDER BY 
-            encrypted_transaction, 
-            created_at DESC
-    ) subquery
-    ORDER BY 
-        created_at DESC
-    LIMIT $1
-)
+const queryLatestTXsWhichArePending = `-- name: QueryLatestTXsWhichArePending :many
 SELECT
-    le.id,
-    le.encrypted_transaction,
-    le.created_at
-FROM latest_events le
-LEFT JOIN decrypted_tx dt ON le.id = dt.transaction_submitted_event_id
-WHERE dt.tx_status = 'not included' OR dt.tx_status IS NULL
-ORDER BY le.created_at DESC
+    tse.id,
+    encode(tse.event_tx_hash, 'hex') AS sequencer_tx_hash,
+    tse.created_at
+FROM transaction_submitted_event tse
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM decrypted_tx dt
+    WHERE dt.transaction_submitted_event_id = tse.id
+      AND dt.tx_status IS NOT NULL
+)
+ORDER BY tse.created_at DESC
+LIMIT $1
 `
 
-type QueryLatestTXsWhichArentIncludedRow struct {
-	ID                   int64
-	EncryptedTransaction []byte
-	CreatedAt            pgtype.Timestamptz
+type QueryLatestTXsWhichArePendingRow struct {
+	ID              int64
+	SequencerTxHash string
+	CreatedAt       pgtype.Timestamptz
 }
 
-func (q *Queries) QueryLatestTXsWhichArentIncluded(ctx context.Context, limit int32) ([]QueryLatestTXsWhichArentIncludedRow, error) {
-	rows, err := q.db.Query(ctx, queryLatestTXsWhichArentIncluded, limit)
+func (q *Queries) QueryLatestTXsWhichArePending(ctx context.Context, limit int32) ([]QueryLatestTXsWhichArePendingRow, error) {
+	rows, err := q.db.Query(ctx, queryLatestTXsWhichArePending, limit)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []QueryLatestTXsWhichArentIncludedRow
+	var items []QueryLatestTXsWhichArePendingRow
 	for rows.Next() {
-		var i QueryLatestTXsWhichArentIncludedRow
-		if err := rows.Scan(&i.ID, &i.EncryptedTransaction, &i.CreatedAt); err != nil {
+		var i QueryLatestTXsWhichArePendingRow
+		if err := rows.Scan(&i.ID, &i.SequencerTxHash, &i.CreatedAt); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
@@ -357,7 +362,7 @@ const queryTotalTXsForEachTXStatus = `-- name: QueryTotalTXsForEachTXStatus :one
 SELECT COUNT(*) FROM public.decrypted_tx where tx_status = $1
 `
 
-func (q *Queries) QueryTotalTXsForEachTXStatus(ctx context.Context, txStatus interface{}) (int64, error) {
+func (q *Queries) QueryTotalTXsForEachTXStatus(ctx context.Context, txStatus TxStatusVal) (int64, error) {
 	row := q.db.QueryRow(ctx, queryTotalTXsForEachTXStatus, txStatus)
 	var count int64
 	err := row.Scan(&count)
@@ -379,7 +384,7 @@ type QueryTotalTXsForEachTXStatusPerMonthRow struct {
 	TotalTxs int64
 }
 
-func (q *Queries) QueryTotalTXsForEachTXStatusPerMonth(ctx context.Context, txStatus interface{}) ([]QueryTotalTXsForEachTXStatusPerMonthRow, error) {
+func (q *Queries) QueryTotalTXsForEachTXStatusPerMonth(ctx context.Context, txStatus TxStatusVal) ([]QueryTotalTXsForEachTXStatusPerMonthRow, error) {
 	rows, err := q.db.Query(ctx, queryTotalTXsForEachTXStatusPerMonth, txStatus)
 	if err != nil {
 		return nil, err
@@ -397,6 +402,48 @@ func (q *Queries) QueryTotalTXsForEachTXStatusPerMonth(ctx context.Context, txSt
 		return nil, err
 	}
 	return items, nil
+}
+
+const queryTransactionDetailsByTxHash = `-- name: QueryTransactionDetailsByTxHash :one
+SELECT 
+    tse.event_tx_hash, tse.sender, FLOOR(EXTRACT(EPOCH FROM tse.created_at)) as created_at_unix,
+    dt.tx_hash AS user_tx_hash, dt.tx_status, dt.slot, FLOOR(EXTRACT(EPOCH FROM dt.created_at)) AS decrypted_tx_created_at_unix
+FROM transaction_submitted_event tse 
+LEFT JOIN decrypted_tx dt ON tse.id = dt.transaction_submitted_event_id
+WHERE tse.event_tx_hash = $1 OR dt.tx_hash = $1
+ORDER BY 
+    CASE 
+        WHEN dt.tx_status = 'included' THEN 1
+        ELSE 2
+    END,
+    dt.created_at DESC NULLS LAST, 
+    tse.created_at DESC
+LIMIT 1
+`
+
+type QueryTransactionDetailsByTxHashRow struct {
+	EventTxHash              []byte
+	Sender                   []byte
+	CreatedAtUnix            float64
+	UserTxHash               []byte
+	TxStatus                 NullTxStatusVal
+	Slot                     pgtype.Int8
+	DecryptedTxCreatedAtUnix float64
+}
+
+func (q *Queries) QueryTransactionDetailsByTxHash(ctx context.Context, eventTxHash []byte) (QueryTransactionDetailsByTxHashRow, error) {
+	row := q.db.QueryRow(ctx, queryTransactionDetailsByTxHash, eventTxHash)
+	var i QueryTransactionDetailsByTxHashRow
+	err := row.Scan(
+		&i.EventTxHash,
+		&i.Sender,
+		&i.CreatedAtUnix,
+		&i.UserTxHash,
+		&i.TxStatus,
+		&i.Slot,
+		&i.DecryptedTxCreatedAtUnix,
+	)
+	return i, err
 }
 
 const queryTxHashFromTransactionDetails = `-- name: QueryTxHashFromTransactionDetails :many
