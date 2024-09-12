@@ -54,17 +54,17 @@ func (uc *TransactionUsecase) QueryDecryptedTX(ctx context.Context, ecTx string)
 	return decryptedTx, nil
 }
 
-func (uc *TransactionUsecase) QueryPendingShutterizedTX(ctx context.Context, txLimitStringified string) ([]data.QueryTxHashFromTransactionDetailsRow, *error.Http) {
-	txLimit, err := strconv.Atoi(txLimitStringified)
+func (uc *TransactionUsecase) QueryPendingShutterizedTX(ctx context.Context, limitStringified string) ([]data.QueryTxHashFromTransactionDetailsRow, *error.Http) {
+	limit, err := strconv.Atoi(limitStringified)
 	if err != nil {
 		err := error.NewHttpError(
-			"unable to decode txLimit",
-			"valid txLimit query parameter is required",
+			"unable to decode limit",
+			"valid limit query parameter is required",
 			http.StatusBadRequest,
 		)
 		return nil, &err
 	}
-	pendingObserverTxs, err := uc.observerDBQuery.QueryLatestTXsWhichArentIncluded(ctx, int32(txLimit))
+	pendingObserverTxs, err := uc.observerDBQuery.QueryLatestTXsWhichArentIncluded(ctx, int32(limit))
 	if err != nil {
 		log.Err(err).Msg("err encountered while querying DB")
 		err := error.NewHttpError(
@@ -121,19 +121,19 @@ func (uc *TransactionUsecase) QueryTotalExecutedTXsForEachTXStatusPerMonth(ctx c
 	return totalTxsPerMonth, nil
 }
 
-func (uc *TransactionUsecase) QueryIncludedTransactions(ctx context.Context, txLimitStringified string) ([]data.QueryIncludedTransactionsRow, *error.Http) {
-	txLimit, err := strconv.Atoi(txLimitStringified)
+func (uc *TransactionUsecase) QueryIncludedTransactions(ctx context.Context, limitStringified string) ([]data.QueryIncludedTransactionsRow, *error.Http) {
+	limit, err := strconv.Atoi(limitStringified)
 	if err != nil {
 		log.Err(err).Msg("err encountered while querying DB")
 		err := error.NewHttpError(
-			"unable to decode txLimit",
-			"valid txLimit query parameter is required",
+			"unable to decode limit",
+			"valid limit query parameter is required",
 			http.StatusBadRequest,
 		)
 		return nil, &err
 	}
 
-	txs, err := uc.observerDBQuery.QueryIncludedTransactions(ctx, int32(txLimit))
+	txs, err := uc.observerDBQuery.QueryIncludedTransactions(ctx, int32(limit))
 	if err != nil {
 		log.Err(err).Msg("err encountered while querying DB")
 		err := error.NewHttpError(

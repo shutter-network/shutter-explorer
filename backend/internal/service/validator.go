@@ -27,3 +27,14 @@ func (svc *ValidatorService) QueryTotalRegisteredValidators(ctx *gin.Context) {
 		"message": totalValidators,
 	})
 }
+
+func (svc *ValidatorService) QueryTotalGnosisValidators(ctx *gin.Context) {
+	totalValidators, err := svc.ValidatorUsecase.QueryTotalGnosisValidators(ctx)
+	if err != nil {
+		ctx.Error(err)
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{
+		"message": totalValidators,
+	})
+}

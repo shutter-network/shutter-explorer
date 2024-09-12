@@ -74,7 +74,6 @@ WITH latest_events AS (
 SELECT
     le.id,
     le.encrypted_transaction,
-	  dt.tx_status,
     le.created_at
 FROM latest_events le
 LEFT JOIN decrypted_tx dt ON le.id = dt.transaction_submitted_event_id
@@ -90,11 +89,10 @@ WHERE encrypted_tx_hash IN (SELECT UNNEST($1::text[]))
 ORDER BY encrypted_tx_hash, submission_time DESC;
 
 -- name: QueryIncludedTransactions :many
-SELECT dt.tx_hash, tse.encrypted_transaction, dt.created_at
-FROM decrypted_tx dt
-INNER JOIN transaction_submitted_event tse ON dt.transaction_submitted_event_id = tse.id
-WHERE dt.tx_status = 'included'
-ORDER BY dt.created_at
+SELECT '0x' || Encode(tx_hash, 'hex') tx_hash, FLOOR(EXTRACT(EPOCH FROM created_at)) AS included_at_unix
+FROM decrypted_tx
+WHERE tx_status = 'included'
+ORDER BY created_at DESC
 LIMIT $1;
 
 -- name: QueryTotalRegisteredValidators :one

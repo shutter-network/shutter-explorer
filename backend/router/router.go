@@ -30,20 +30,21 @@ func NewRouter(ctx context.Context, usecases *usecase.Usecases) *gin.Engine {
 	api := router.Group("/api")
 	{
 		transaction := api.Group("/transaction")
-		transaction.GET("/get-decrypted-tx", transactionService.QueryDecryptedTX)
-		transaction.GET("/pending-txs", transactionService.QueryPendingShutterizedTX)
-		transaction.GET("/included-txs", transactionService.QueryIncludedTransactions)
-		transaction.GET("/total-successful-txs", transactionService.QueryTotalExecutedTXsForEachTXStatus)
-		transaction.GET("/total-txs-month", transactionService.QueryTotalExecutedTXsForEachTXStatusPerMonth)
+		transaction.GET("/get_decrypted_transactions", transactionService.QueryDecryptedTX)
+		transaction.GET("/latest_pending_transactions", transactionService.QueryPendingShutterizedTX)
+		transaction.GET("/latest_user_transactions", transactionService.QueryIncludedTransactions)
+		transaction.GET("/total_executed_transactions", transactionService.QueryTotalExecutedTXsForEachTXStatus)
+		transaction.GET("/total_transactions_per_month", transactionService.QueryTotalExecutedTXsForEachTXStatusPerMonth)
 	}
 	{
 		validator := api.Group("/validator")
-		validator.GET("/total-registered-validators", validatorService.QueryTotalRegisteredValidators)
+		validator.GET("/total_registered_validators", validatorService.QueryTotalRegisteredValidators)
+		validator.GET("/total_gnosis_validators", validatorService.QueryTotalGnosisValidators)
 	}
 	{
 		slot := api.Group("slot")
-		slot.GET("/top-5-epochs", slotService.QueryTop5Epochs)
-		slot.GET("/included-txs", slotService.QueryIncludedTXsInSlot)
+		slot.GET("/top_5_epochs", slotService.QueryTop5Epochs)
+		slot.GET("/included_transactions", slotService.QueryIncludedTXsInSlot)
 	}
 	return router
 }

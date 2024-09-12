@@ -79,18 +79,16 @@ func (q *Queries) QueryGreeter(ctx context.Context) ([]string, error) {
 }
 
 const queryIncludedTransactions = `-- name: QueryIncludedTransactions :many
-SELECT dt.tx_hash, tse.encrypted_transaction, dt.created_at
-FROM decrypted_tx dt
-INNER JOIN transaction_submitted_event tse ON dt.transaction_submitted_event_id = tse.id
-WHERE dt.tx_status = 'included'
-ORDER BY dt.created_at
+SELECT '0x' || Encode(tx_hash, 'hex') tx_hash, FLOOR(EXTRACT(EPOCH FROM created_at)) AS included_at_unix
+FROM decrypted_tx
+WHERE tx_status = 'included'
+ORDER BY created_at DESC
 LIMIT $1
 `
 
 type QueryIncludedTransactionsRow struct {
-	TxHash               []byte
-	EncryptedTransaction []byte
-	CreatedAt            pgtype.Timestamptz
+	TxHash         interface{}
+	IncludedAtUnix float64
 }
 
 func (q *Queries) QueryIncludedTransactions(ctx context.Context, limit int32) ([]QueryIncludedTransactionsRow, error) {
@@ -102,7 +100,7 @@ func (q *Queries) QueryIncludedTransactions(ctx context.Context, limit int32) ([
 	var items []QueryIncludedTransactionsRow
 	for rows.Next() {
 		var i QueryIncludedTransactionsRow
-		if err := rows.Scan(&i.TxHash, &i.EncryptedTransaction, &i.CreatedAt); err != nil {
+		if err := rows.Scan(&i.TxHash, &i.IncludedAtUnix); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
@@ -220,7 +218,6 @@ WITH latest_events AS (
 SELECT
     le.id,
     le.encrypted_transaction,
-	  dt.tx_status,
     le.created_at
 FROM latest_events le
 LEFT JOIN decrypted_tx dt ON le.id = dt.transaction_submitted_event_id
@@ -231,7 +228,6 @@ ORDER BY le.created_at DESC
 type QueryLatestTXsWhichArentIncludedRow struct {
 	ID                   int64
 	EncryptedTransaction []byte
-	TxStatus             interface{}
 	CreatedAt            pgtype.Timestamptz
 }
 
@@ -244,12 +240,7 @@ func (q *Queries) QueryLatestTXsWhichArentIncluded(ctx context.Context, limit in
 	var items []QueryLatestTXsWhichArentIncludedRow
 	for rows.Next() {
 		var i QueryLatestTXsWhichArentIncludedRow
-		if err := rows.Scan(
-			&i.ID,
-			&i.EncryptedTransaction,
-			&i.TxStatus,
-			&i.CreatedAt,
-		); err != nil {
+		if err := rows.Scan(&i.ID, &i.EncryptedTransaction, &i.CreatedAt); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
