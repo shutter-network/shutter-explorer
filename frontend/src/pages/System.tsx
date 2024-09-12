@@ -5,26 +5,52 @@ import ResponsiveLayout from "../components/ResponsiveLayout";
 import Keyper from "../modules/Keyper";
 import Grid from '@mui/material/Grid2';
 import TitleSection from "../components/TitleSection";
+import TransactionGauge from "../modules/TransactionGauge";
 
 const System = () => {
     return (
         <ResponsiveLayout>
             <TitleSection title="System Overview" />
             <Grid container spacing={3} alignItems="stretch">
-                <Grid size={{xs: 12, sm: 4}} display="flex">
-                    <Validator/>
+                {/* Validator Section */}
+                <Grid size={{ xs: 12, sm: 4 }} sx={{ display: 'flex', flexDirection: 'column' }}>
+                    <Validator />
                 </Grid>
 
-                <Grid size={{xs: 12, sm: 4}} display="flex">
-                    <Transaction/>
+                {/* Transaction Section */}
+                <Grid size={{ xs: 12, sm: 4 }} sx={{ display: 'flex', flexDirection: 'column' }}>
+                    <Transaction />
                 </Grid>
 
-                <Grid size={{xs: 12, sm: 4}} display="flex">
-                    <Keyper/>
+                {/* Keyper Section */}
+                <Grid size={{ xs: 12, sm: 4 }} sx={{ display: 'flex', flexDirection: 'column' }}>
+                    <Keyper />
                 </Grid>
 
-                <Grid size={{xs: 12}} display="flex">
-                    <InclusionTime/>
+                {/* Inclusion Time Section */}
+                <Grid
+                    size={{ xs: 12, sm: 8 }}
+                    sx={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        flexGrow: 1,
+                        width: '100%',
+                    }}
+                >
+                    <InclusionTime />
+                </Grid>
+
+                {/* Transaction Gauge Section */}
+                <Grid
+                    size={{ xs: 12, sm: 4 }}
+                    sx={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        flexGrow: 1,
+                        width: '100%',
+                    }}
+                >
+                    <TransactionGauge />
                 </Grid>
             </Grid>
         </ResponsiveLayout>

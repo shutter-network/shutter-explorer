@@ -14,7 +14,7 @@ const Transaction = () => {
     const [executedTransactions, setExecutedTransactions] = useState<string | number>(executedTransactionsData?.message || 'N/A');
     const [shutterizedTransactionsPerMonth, setShutterizedTransactionsPerMonth] = useState<string | number>(shutterizedTransactionsPerMonthData?.message || 'N/A');
     const [shutterizedTransactionPercentage, setShutterizedTransactionPercentage] = useState<string | number>(shutterizedTransactionPercentageData?.percentage || 'N/A');
-    const [webSocketError, setWebSocketError] = useState<string | null>(null);
+    const [, setWebSocketError] = useState<string | null>(null);
 
     const { socket } = useWebSocket()!;
 
@@ -69,7 +69,6 @@ const Transaction = () => {
 
     return (
         <Box sx={{ flexGrow: 1, marginTop: 4 }}>
-            {webSocketError && <Alert severity="error">{webSocketError}</Alert>}
                     <OverviewCard title="Transaction Overview" iconSrc={overviewIcon}>
                         {errorExecutedTransactions ? (
                             <Alert severity="error">Error fetching Executed Transactions: {errorExecutedTransactions.message}</Alert>

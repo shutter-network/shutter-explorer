@@ -5,20 +5,20 @@ import { Typography } from '@mui/material';
 
 interface BasicGaugesProps {
     value: number;
-    title?: string; // Optional title prop
+    title?: string;
+    gaugeColor?: string;
+    labelColor?: string;
 }
 
-const BasicGauges: FC<BasicGaugesProps> = ({ value, title = "Gauge Chart" }) => {
+const BasicGauges: FC<BasicGaugesProps> = ({ value, title = "Gauge Chart", gaugeColor = '#00aaff', labelColor = '#000' }) => {
     return (
         <>
-            {/* Title for the gauge chart */}
-            <Typography variant="h6" align="center" gutterBottom>
+            <Typography variant="h6" align="center" gutterBottom sx={{ color: labelColor }}>
                 {title}
             </Typography>
 
             <Stack direction={{ xs: 'column', md: 'row' }} spacing={{ xs: 1, md: 3 }}>
-                <Gauge width={100} height={100} value={value} />
-                <Gauge width={100} height={100} value={value} startAngle={-90} endAngle={90} />
+                <Gauge width={100} height={100} value={value} startAngle={-90} endAngle={90} sx={{ color: gaugeColor }} />
             </Stack>
         </>
     );
