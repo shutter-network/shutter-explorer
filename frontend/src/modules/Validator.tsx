@@ -76,8 +76,8 @@ const Validator = () => {
             setShutterizedValidators(shutterizedValidatorsData.message);
             setValidatorPercentage((shutterizedValidatorsData?.message*100)/totalValidatorsData?.message);
         } 
-        if (totalValidatorsData?.total){
-            setTotalValidators(totalValidatorsData.total);
+        if (totalValidatorsData?.message){
+            setTotalValidators(totalValidatorsData.message);
             setValidatorPercentage((shutterizedValidatorsData?.message*100)/totalValidatorsData?.message);
         } 
     }, [shutterizedValidatorsData, totalValidatorsData]);
