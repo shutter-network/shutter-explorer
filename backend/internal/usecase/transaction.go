@@ -7,6 +7,7 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/rs/zerolog/log"
@@ -169,20 +170,12 @@ func (uc *TransactionUsecase) QueryLatestIncludedTransactions(ctx context.Contex
 }
 
 func (uc *TransactionUsecase) QueryTransactionDetailsByTxHash(ctx context.Context, txHash string) (*QueryTransactionDetailResp, *error.Http) {
-	txHashBytes, err := hex.DecodeString(txHash)
-	if err != nil {
-		err := error.NewHttpError(
-			"unable to decode tx hash",
-			"valid txHash query parameter is required",
-			http.StatusBadRequest,
-		)
-		return nil, &err
-	}
+	txHashBytes := common.HexToHash(txHash).Bytes()
 
 	erpcTX, erpcTxErr := uc.erpcDBQuery.QueryFromTransactionDetails(ctx, txHash)
 	if erpcTxErr != nil {
 		if erpcTxErr != pgx.ErrNoRows {
-			log.Err(err).Msg("err encountered while querying erpc DB")
+			log.Err(erpcTxErr).Msg("err encountered while querying erpc DB")
 			err := error.NewHttpError(
 				"error encountered while querying for data",
 				"",
@@ -191,16 +184,7 @@ func (uc *TransactionUsecase) QueryTransactionDetailsByTxHash(ctx context.Contex
 			return nil, &err
 		}
 	} else {
-		txHashBytes, err = hex.DecodeString(erpcTX.EncryptedTxHash)
-		if err != nil {
-			log.Err(err).Msg("err encountered while decoding sequencer tx hash")
-			err := error.NewHttpError(
-				"error encountered while decoding sequencer tx hash",
-				"",
-				http.StatusInternalServerError,
-			)
-			return nil, &err
-		}
+		txHashBytes = common.HexToHash(erpcTX.EncryptedTxHash).Bytes()
 	}
 
 	tse, err := uc.observerDBQuery.QueryTransactionDetailsByTxHash(ctx, txHashBytes)
@@ -274,7 +258,7 @@ func (uc *TransactionUsecase) QueryTransactionDetailsByTxHash(ctx context.Contex
 
 	var userTxHash string
 	if len(tse.UserTxHash) > 0 {
-		userTxHash = hex.EncodeToString(tse.UserTxHash)
+		userTxHash = "0x" + hex.EncodeToString(tse.UserTxHash)
 	} else {
 		if erpcTxErr == nil {
 			userTxHash = erpcTX.UserTxHash
@@ -283,8 +267,8 @@ func (uc *TransactionUsecase) QueryTransactionDetailsByTxHash(ctx context.Contex
 
 	//notice: EstimatedInclusionTime is always going to be current inclusion time at the time of the query
 	resp := &QueryTransactionDetailResp{
-		Sender:                 hex.EncodeToString(tse.Sender),
-		SequencerTxHash:        hex.EncodeToString(tse.EventTxHash),
+		Sender:                 "0x" + hex.EncodeToString(tse.Sender),
+		SequencerTxHash:        "0x" + hex.EncodeToString(tse.EventTxHash),
 		UserTxHash:             userTxHash,
 		TxStatus:               string(txStatus),
 		InclusionSlot:          inclusionSlot,
