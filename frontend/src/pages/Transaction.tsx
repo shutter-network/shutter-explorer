@@ -7,29 +7,31 @@ import useFetchWithPolling from '../hooks/useFetchWithPolling';
 import { StyledTransactionDetails } from '../styles/transactionDetail';
 
 interface TransactionDetails {
-    status: string;
-    estimatedInclusionTime: string;
-    effectiveInclusionTime: string;
-    userTransactionHash: string;
-    sequencerTransactionHash: string;
-    inclusionSlot: number;
+    TxStatus: string;
+    EstimatedInclusionTime: string;
+    EffectiveInclusionTime: string;
+    UserTxHash: string;
+    SequencerTxHash: string;
+    InclusionSlot: number;
 }
 
 const Transaction: FC = () => {
     const location = useLocation();
-    const initialTransaction = location.state as TransactionDetails | undefined;
+    const initialTransaction = location.state.message as TransactionDetails | undefined;
     const explorerUrl = process.env.REACT_APP_EXPLORER_URL;
 
     const [transaction, setTransaction] = useState<TransactionDetails | null>(initialTransaction || null);
 
     const { data: updatedData, loading, error } = useFetchWithPolling(
-        initialTransaction ? `/api/transaction/${initialTransaction.userTransactionHash}` : '',
+        initialTransaction ? `/api/transaction/${initialTransaction.UserTxHash}` : '',
         10000
     );
 
+    console.log(error, "error")
+
     useEffect(() => {
         if (updatedData) {
-            setTransaction(updatedData as TransactionDetails);
+            setTransaction(updatedData.message as TransactionDetails);
         }
     }, [updatedData]);
 
@@ -53,7 +55,7 @@ const Transaction: FC = () => {
                         <Typography variant="body1" fontWeight="bold" className="card-label">Transaction Status</Typography>
                     </Grid>
                     <Grid size={{ xs: 12, sm: 8 }}>
-                        <Typography variant="body1" className="status-pending">{transaction.status}</Typography>
+                        <Typography variant="body1" className="status-pending">{transaction.TxStatus}</Typography>
                     </Grid>
 
                     {/* Estimated Inclusion Time */}
@@ -61,7 +63,7 @@ const Transaction: FC = () => {
                         <Typography variant="body1" fontWeight="bold" className="card-label">Estimated Inclusion Time</Typography>
                     </Grid>
                     <Grid size={{ xs: 12, sm: 8 }}>
-                        <Typography variant="body1" className="card-value">{transaction.estimatedInclusionTime}</Typography>
+                        <Typography variant="body1" className="card-value">{transaction.EstimatedInclusionTime}</Typography>
                     </Grid>
 
                     {/* Effective Inclusion Time */}
@@ -69,7 +71,7 @@ const Transaction: FC = () => {
                         <Typography variant="body1" fontWeight="bold" className="card-label">Effective Inclusion Time</Typography>
                     </Grid>
                     <Grid size={{ xs: 12, sm: 8 }}>
-                        <Typography variant="body1" className="card-value">{transaction.effectiveInclusionTime}</Typography>
+                        <Typography variant="body1" className="card-value">{transaction.EffectiveInclusionTime}</Typography>
                     </Grid>
 
                     {/* Transaction Hash */}
@@ -77,8 +79,8 @@ const Transaction: FC = () => {
                         <Typography variant="body1" fontWeight="bold" className="card-label">Transaction</Typography>
                     </Grid>
                     <Grid size={{ xs: 12, sm: 8 }}>
-                        <Link href={`${explorerUrl}/tx/${transaction.userTransactionHash}`} target="_blank" rel="noopener noreferrer" className="hash">
-                            {transaction.userTransactionHash}
+                        <Link href={`${explorerUrl}/tx/${transaction.UserTxHash}`} target="_blank" rel="noopener noreferrer" className="hash">
+                            {transaction.UserTxHash}
                         </Link>
                     </Grid>
 
@@ -87,8 +89,8 @@ const Transaction: FC = () => {
                         <Typography variant="body1" fontWeight="bold" className="card-label">Sequencer Transaction</Typography>
                     </Grid>
                     <Grid size={{ xs: 12, sm: 8 }}>
-                        <Link href={`${explorerUrl}/tx/${transaction.sequencerTransactionHash}`} target="_blank" rel="noopener noreferrer" className="hash">
-                            {transaction.sequencerTransactionHash}
+                        <Link href={`${explorerUrl}/tx/${transaction.SequencerTxHash}`} target="_blank" rel="noopener noreferrer" className="hash">
+                            {transaction.SequencerTxHash}
                         </Link>
                     </Grid>
 
@@ -97,7 +99,7 @@ const Transaction: FC = () => {
                         <Typography variant="body1" fontWeight="bold" className="card-label">Inclusion Slot</Typography>
                     </Grid>
                     <Grid size={{ xs: 12, sm: 8 }}>
-                        <Typography variant="body1" className="card-value">{transaction.inclusionSlot}</Typography>
+                        <Typography variant="body1" className="card-value">{transaction.InclusionSlot}</Typography>
                     </Grid>
                 </Grid>
 

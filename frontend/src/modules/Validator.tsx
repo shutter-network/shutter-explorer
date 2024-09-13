@@ -30,20 +30,15 @@ const Validator = () => {
                         case 'shutterized_validators_updated':
                             if ('count' in websocketEvent.data) {
                                 setShutterizedValidators(websocketEvent.data.count);
+                                setValidatorPercentage((websocketEvent.data.count*100)/totalValidators)
                             } else {
                                 console.warn('Invalid data format for shutterized_validators_updated');
-                            }
-                            break;
-                        case 'validator_percentage_updated':
-                            if ('percentage' in websocketEvent.data) {
-                                setValidatorPercentage(websocketEvent.data.percentage);
-                            } else {
-                                console.warn('Invalid data format for validator_percentage_updated');
                             }
                             break;
                         case 'total_validators_updated':
                             if ('count' in websocketEvent.data) {
                                 setTotalValidators(websocketEvent.data.count);
+                                setValidatorPercentage((shutterizedValidators*100)/websocketEvent.data.count)
                             } else {
                                 console.warn('Invalid data format for total_validators_updated');
                             }
@@ -74,12 +69,11 @@ const Validator = () => {
     useEffect(() => {
         if (shutterizedValidatorsData?.message){
             setShutterizedValidators(shutterizedValidatorsData.message);
-            setValidatorPercentage((shutterizedValidatorsData?.message*100)/totalValidatorsData?.message);
         } 
         if (totalValidatorsData?.message){
             setTotalValidators(totalValidatorsData.message);
-            setValidatorPercentage((shutterizedValidatorsData?.message*100)/totalValidatorsData?.message);
         } 
+        setValidatorPercentage((shutterizedValidatorsData?.message*100)/totalValidatorsData?.message);
     }, [shutterizedValidatorsData, totalValidatorsData]);
 
     return (
