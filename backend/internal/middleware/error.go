@@ -13,6 +13,8 @@ func ErrorHandler() gin.HandlerFunc {
 		ctx.Next()
 		for _, err := range ctx.Errors {
 			switch e := err.Err.(type) {
+			case *error.Http:
+				ctx.AbortWithStatusJSON(e.StatusCode, e)
 			case error.Http:
 				ctx.AbortWithStatusJSON(e.StatusCode, e)
 			default:
