@@ -62,7 +62,7 @@ services:
       ERPC_DB_SSL_MODE: 
       GENESIS_TIMESTAMP: 
       SLOT_DURATION: 
-      SLOTS_PER_EXPOCH: 
+      SLOTS_PER_EPOCH: 
       TOTAL_GNOSIS_VALIDATORS: 
     command: ["./backend"]
     labels:
