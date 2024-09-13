@@ -24,7 +24,7 @@ describe('<Slot />', () => {
         cy.intercept('GET', '/api/transaction/latest_sequencer_transactions?limit=10', {
             statusCode: 200,
             body: {
-                transactions: sequencerTransactions,
+                message: sequencerTransactions,
             },
         }).as('getSequencerTransactions');
 
