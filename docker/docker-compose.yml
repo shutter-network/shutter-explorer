@@ -72,6 +72,8 @@ services:
       caddy.header.Access-Control-Allow-Origin: "*"
       caddy.header.Access-Control-Allow-Methods: "GET, POST, OPTIONS"
       caddy.header.Access-Control-Allow-Headers: "Content-Type, Authorization"
+      caddy.@websocket: "path /ws/*"
+      caddy.reverse_proxy.@websocket: "{{ upstreams 5000 }}" 
 
   caddy:
     image: lucaslorentz/caddy-docker-proxy:latest
