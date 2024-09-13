@@ -27,8 +27,6 @@ const Transaction: FC = () => {
         10000
     );
 
-    console.log(error, "error")
-
     useEffect(() => {
         if (updatedData) {
             setTransaction(updatedData.message as TransactionDetails);
