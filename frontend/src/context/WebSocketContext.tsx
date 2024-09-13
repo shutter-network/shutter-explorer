@@ -8,9 +8,10 @@ export const WebSocketContext = createContext<WebSocketContextType | null>(null)
 
 export const WebSocketProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [socket, setSocket] = useState<WebSocket | null>(null);
+    const websocketURL = process.env.REACT_APP_WS_URL
 
     useEffect(() => {
-        const ws = new WebSocket('wss://your-websocket-server.com'); //todo add env url depending on env
+        const ws = new WebSocket(websocketURL? websocketURL : ""); //todo add env url depending on env
         setSocket(ws);
 
         ws.onopen = () => {
