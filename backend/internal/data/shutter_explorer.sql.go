@@ -54,6 +54,36 @@ func (q *Queries) QueryDecryptedTXForEncryptedTX(ctx context.Context, encryptedT
 	return items, nil
 }
 
+const queryExecutedTransactionStats = `-- name: QueryExecutedTransactionStats :many
+SELECT COUNT(id), tx_status FROM decrypted_tx
+GROUP BY tx_status
+`
+
+type QueryExecutedTransactionStatsRow struct {
+	Count    int64
+	TxStatus TxStatusVal
+}
+
+func (q *Queries) QueryExecutedTransactionStats(ctx context.Context) ([]QueryExecutedTransactionStatsRow, error) {
+	rows, err := q.db.Query(ctx, queryExecutedTransactionStats)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []QueryExecutedTransactionStatsRow
+	for rows.Next() {
+		var i QueryExecutedTransactionStatsRow
+		if err := rows.Scan(&i.Count, &i.TxStatus); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const queryFromTransactionDetails = `-- name: QueryFromTransactionDetails :one
 SELECT tx_hash as user_tx_hash, encrypted_tx_hash
 FROM transaction_details 
@@ -91,6 +121,69 @@ func (q *Queries) QueryGreeter(ctx context.Context) ([]string, error) {
 			return nil, err
 		}
 		items = append(items, hello)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const queryHistoricalInclusionTimes = `-- name: QueryHistoricalInclusionTimes :many
+WITH daily_inclusion_times AS (
+    SELECT
+        EXTRACT(EPOCH FROM DATE(tse.created_at)) AS submission_date_unix,
+        FLOOR(EXTRACT(EPOCH FROM (dtx.created_at - tse.created_at))) AS inclusion_time_seconds
+    FROM
+        transaction_submitted_event tse
+    JOIN
+        decrypted_tx dtx
+    ON
+        tse.id = dtx.transaction_submitted_event_id
+    WHERE
+        dtx.tx_status = 'included'
+        AND tse.created_at >= NOW() - INTERVAL '30 days'
+)
+SELECT
+    submission_date_unix::BIGINT,
+    COUNT(*) AS total_transactions,
+    AVG(inclusion_time_seconds)::BIGINT AS avg_inclusion_time_seconds,
+    MIN(inclusion_time_seconds)::BIGINT AS min_inclusion_time_seconds,
+    MAX(inclusion_time_seconds)::BIGINT AS max_inclusion_time_seconds
+FROM
+    daily_inclusion_times
+GROUP BY
+    submission_date_unix
+ORDER BY
+    submission_date_unix DESC
+`
+
+type QueryHistoricalInclusionTimesRow struct {
+	SubmissionDateUnix      int64
+	TotalTransactions       int64
+	AvgInclusionTimeSeconds int64
+	MinInclusionTimeSeconds int64
+	MaxInclusionTimeSeconds int64
+}
+
+func (q *Queries) QueryHistoricalInclusionTimes(ctx context.Context) ([]QueryHistoricalInclusionTimesRow, error) {
+	rows, err := q.db.Query(ctx, queryHistoricalInclusionTimes)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []QueryHistoricalInclusionTimesRow
+	for rows.Next() {
+		var i QueryHistoricalInclusionTimesRow
+		if err := rows.Scan(
+			&i.SubmissionDateUnix,
+			&i.TotalTransactions,
+			&i.AvgInclusionTimeSeconds,
+			&i.MinInclusionTimeSeconds,
+			&i.MaxInclusionTimeSeconds,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
 	}
 	if err := rows.Err(); err != nil {
 		return nil, err
