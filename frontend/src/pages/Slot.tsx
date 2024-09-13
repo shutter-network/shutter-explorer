@@ -5,11 +5,11 @@ import ResponsiveLayout from "../components/ResponsiveLayout";
 import useFetch from "../hooks/useFetch";
 import { useEffect, useState } from 'react';
 import { useWebSocket } from '../context/WebSocketContext';
-import {Transaction, WebsocketEvent} from "../types/WebsocketEvent";
+import {SequencerTransaction, Transaction, WebsocketEvent} from "../types/WebsocketEvent";
 import {getTimeAgo} from "../utils/utils";
 
 const Slot = () => {
-    const { data: sequencerTransactionsData, loading: loadingSequencer, error: errorSequencer } = useFetch('/api/transaction/latest_sequencer_transactions');
+    const { data: sequencerTransactionsData, loading: loadingSequencer, error: errorSequencer } = useFetch('/api/transaction/latest_sequencer_transactions?limit=10');
     const { data: userTransactionsData, loading: loadingUser, error: errorUser } = useFetch('/api/transaction/latest_user_transactions?limit=10');
 
     const sequencerTransactionColumns = [
@@ -22,15 +22,15 @@ const Slot = () => {
         { id: 'timestamp', label: 'Inclusion time (Age)', minWidth: 170 },
     ];
 
-    const [sequencerTransactions, setSequencerTransactions] = useState(sequencerTransactionsData?.transactions || []);
+    const [sequencerTransactions, setSequencerTransactions] = useState(sequencerTransactionsData?.message || []);
     const [userTransactions, setUserTransactions] = useState(userTransactionsData?.message || []);
     const [webSocketError, setWebSocketError] = useState<string | null>(null); // State to store WebSocket errors
 
     const { socket } = useWebSocket()!;
 
     useEffect(() => {
-        if (sequencerTransactionsData?.transactions) {
-            setSequencerTransactions(sequencerTransactionsData.transactions);
+        if (sequencerTransactionsData?.message) {
+            setSequencerTransactions(sequencerTransactionsData.message);
         }
         if (userTransactionsData?.message) {
             setUserTransactions(userTransactionsData.message);
@@ -41,7 +41,6 @@ const Slot = () => {
         if (socket) {
             socket.onmessage = (event: MessageEvent) => {
                 const websocketEvent = JSON.parse(event.data) as WebsocketEvent;
-
                 if (websocketEvent.error) {
                     setWebSocketError(`Error: ${websocketEvent.error.message} (Code: ${websocketEvent.error.code})`);
                 } else if (websocketEvent.data) {
@@ -71,14 +70,14 @@ const Slot = () => {
         }
     }, [socket]);
 
-    const sequencerTransactionsWithAge = sequencerTransactions.map((transaction: Transaction) => ({
-        ...transaction,
-        timestamp: getTimeAgo(transaction.timestamp),
+    const sequencerTransactionsWithAge = sequencerTransactions.map((transaction: SequencerTransaction) => ({
+        hash: transaction.SequencerTxHash,
+        timestamp: getTimeAgo(transaction.CreatedAtUnix),
     }));
 
     const userTransactionsWithAge = userTransactions.map((transaction: Transaction) => ({
-        ...transaction,
-        timestamp: getTimeAgo(transaction.timestamp),
+        hash: transaction.TxHash,
+        timestamp: getTimeAgo(transaction.IncludedAtUnix),
     }));
 
     return (

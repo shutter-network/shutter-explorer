@@ -31,7 +31,7 @@ describe('<Slot />', () => {
         cy.intercept('GET', '/api/transaction/latest_user_transactions', {
             statusCode: 200,
             body: {
-                transactions: userTransactions,
+                message: userTransactions,
             },
         }).as('getUserTransactions');
     });

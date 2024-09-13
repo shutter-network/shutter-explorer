@@ -74,7 +74,7 @@ const Transaction = () => {
 
     useEffect(() => {
         if (executedTransactionsData?.message) setExecutedTransactions(executedTransactionsData.message);
-        if (shutterizedTransactionsPerMonthData?.message) setShutterizedTransactionsPerMonth(shutterizedTransactionsPerMonthData.message);
+        if (shutterizedTransactionsPerMonthData?.message) setShutterizedTransactionsPerMonth(shutterizedTransactionsPerMonthData.message[0].TotalTxs);
         if (shutterizedTransactionPercentageData?.percentage) setShutterizedTransactionPercentage(shutterizedTransactionPercentageData.percentage);
     }, [executedTransactionsData, shutterizedTransactionsPerMonthData, shutterizedTransactionPercentageData]);
 
