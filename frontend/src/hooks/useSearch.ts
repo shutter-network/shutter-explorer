@@ -17,7 +17,7 @@ const useSearch = (value: string) => {
             const response = await fetch(`${explorerbackend}/api/transaction/${value}`);
             if (response.ok) {
                 const transactionData = await response.json();
-                navigate('/transaction-details', { state: transactionData });
+                navigate('/transaction-details', { state: transactionData.message });
             } else {
                 setError(new Error('Transaction not found'));
             }
