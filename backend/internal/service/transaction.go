@@ -39,7 +39,7 @@ func (svc *TransactionService) QueryDecryptedTX(ctx *gin.Context) {
 	})
 }
 
-func (svc *TransactionService) QueryPendingShutterizedTX(ctx *gin.Context) {
+func (svc *TransactionService) QueryLatestPendingTransactions(ctx *gin.Context) {
 	limit, ok := ctx.GetQuery("limit")
 	if !ok {
 		err := error.NewHttpError(
@@ -50,7 +50,7 @@ func (svc *TransactionService) QueryPendingShutterizedTX(ctx *gin.Context) {
 		ctx.Error(err)
 		return
 	}
-	erpcTXs, err := svc.TransactionUsecase.QueryPendingShutterizedTX(ctx, limit)
+	erpcTXs, err := svc.TransactionUsecase.QueryLatestPendingTransactions(ctx, limit)
 	if err != nil {
 		ctx.Error(err)
 		return
@@ -82,8 +82,8 @@ func (svc *TransactionService) QueryTotalExecutedTXsForEachTXStatusPerMonth(ctx 
 	})
 }
 
-func (svc *TransactionService) QueryIncludedTransactions(ctx *gin.Context) {
-	limitStringified, ok := ctx.GetQuery("limit")
+func (svc *TransactionService) QueryLatestIncludedTransactions(ctx *gin.Context) {
+	limit, ok := ctx.GetQuery("limit")
 	if !ok {
 		err := error.NewHttpError(
 			"query parameter not found",
@@ -94,7 +94,7 @@ func (svc *TransactionService) QueryIncludedTransactions(ctx *gin.Context) {
 		return
 	}
 
-	txs, err := svc.TransactionUsecase.QueryIncludedTransactions(ctx, limitStringified)
+	txs, err := svc.TransactionUsecase.QueryLatestIncludedTransactions(ctx, limit)
 	if err != nil {
 		ctx.Error(err)
 		return
@@ -122,5 +122,27 @@ func (svc *TransactionService) QueryTransactionDetailsByTxHash(ctx *gin.Context)
 	}
 	ctx.JSON(http.StatusOK, gin.H{
 		"message": txDetail,
+	})
+}
+
+func (svc *TransactionService) QueryLatestSequencerTransactions(ctx *gin.Context) {
+	limit, ok := ctx.GetQuery("limit")
+	if !ok {
+		err := error.NewHttpError(
+			"query parameter not found",
+			"limit query parameter is required",
+			http.StatusBadRequest,
+		)
+		ctx.Error(err)
+		return
+	}
+
+	txs, err := svc.TransactionUsecase.QueryLatestSequencerTransactions(ctx, limit)
+	if err != nil {
+		ctx.Error(err)
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{
+		"message": txs,
 	})
 }

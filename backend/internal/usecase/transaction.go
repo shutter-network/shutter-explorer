@@ -76,8 +76,8 @@ func (uc *TransactionUsecase) QueryDecryptedTX(ctx context.Context, ecTx string)
 	return decryptedTx, nil
 }
 
-func (uc *TransactionUsecase) QueryPendingShutterizedTX(ctx context.Context, limitStringified string) ([]data.QueryTxHashFromTransactionDetailsRow, *error.Http) {
-	limit, err := strconv.Atoi(limitStringified)
+func (uc *TransactionUsecase) QueryLatestPendingTransactions(ctx context.Context, limit string) ([]data.QueryTxHashFromTransactionDetailsRow, *error.Http) {
+	txLimit, err := strconv.Atoi(limit)
 	if err != nil {
 		err := error.NewHttpError(
 			"unable to decode limit",
@@ -86,7 +86,7 @@ func (uc *TransactionUsecase) QueryPendingShutterizedTX(ctx context.Context, lim
 		)
 		return nil, &err
 	}
-	pendingObserverTxs, err := uc.observerDBQuery.QueryLatestTXsWhichArePending(ctx, int32(limit))
+	pendingObserverTxs, err := uc.observerDBQuery.QueryLatestPendingTXs(ctx, int32(txLimit))
 	if err != nil {
 		log.Err(err).Msg("err encountered while querying DB")
 		err := error.NewHttpError(
@@ -143,8 +143,8 @@ func (uc *TransactionUsecase) QueryTotalExecutedTXsForEachTXStatusPerMonth(ctx c
 	return totalTxsPerMonth, nil
 }
 
-func (uc *TransactionUsecase) QueryIncludedTransactions(ctx context.Context, limitStringified string) ([]data.QueryIncludedTransactionsRow, *error.Http) {
-	limit, err := strconv.Atoi(limitStringified)
+func (uc *TransactionUsecase) QueryLatestIncludedTransactions(ctx context.Context, limit string) ([]data.QueryLatestIncludedTXsRow, *error.Http) {
+	txLimit, err := strconv.Atoi(limit)
 	if err != nil {
 		log.Err(err).Msg("err encountered while querying DB")
 		err := error.NewHttpError(
@@ -155,7 +155,7 @@ func (uc *TransactionUsecase) QueryIncludedTransactions(ctx context.Context, lim
 		return nil, &err
 	}
 
-	txs, err := uc.observerDBQuery.QueryIncludedTransactions(ctx, int32(limit))
+	txs, err := uc.observerDBQuery.QueryLatestIncludedTXs(ctx, int32(txLimit))
 	if err != nil {
 		log.Err(err).Msg("err encountered while querying DB")
 		err := error.NewHttpError(
@@ -294,4 +294,29 @@ func (uc *TransactionUsecase) QueryTransactionDetailsByTxHash(ctx context.Contex
 		EstimatedInclusionTime: estimatedInclusionTime,
 	}
 	return resp, nil
+}
+
+func (uc *TransactionUsecase) QueryLatestSequencerTransactions(ctx context.Context, limit string) ([]data.QueryLatestSequencerTransactionsRow, *error.Http) {
+	txLimit, err := strconv.Atoi(limit)
+	if err != nil {
+		log.Err(err).Msg("err encountered while querying DB")
+		err := error.NewHttpError(
+			"unable to decode limit",
+			"valid limit query parameter is required",
+			http.StatusBadRequest,
+		)
+		return nil, &err
+	}
+
+	txs, err := uc.observerDBQuery.QueryLatestSequencerTransactions(ctx, int32(txLimit))
+	if err != nil {
+		log.Err(err).Msg("err encountered while querying DB")
+		err := error.NewHttpError(
+			"error encountered while querying for data",
+			"",
+			http.StatusInternalServerError,
+		)
+		return nil, &err
+	}
+	return txs, nil
 }

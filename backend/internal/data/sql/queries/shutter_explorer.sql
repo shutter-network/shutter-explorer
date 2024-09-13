@@ -50,11 +50,11 @@ SELECT
   lt.latest_created_at AS created_at
 FROM latest_transactions lt;
 
--- name: QueryLatestTXsWhichArePending :many
+-- name: QueryLatestPendingTXs :many
 SELECT
     tse.id,
     encode(tse.event_tx_hash, 'hex') AS sequencer_tx_hash,
-    tse.created_at
+    FLOOR(EXTRACT(EPOCH FROM tse.created_at)) as created_at_unix
 FROM transaction_submitted_event tse
 WHERE NOT EXISTS (
     SELECT 1
@@ -73,11 +73,12 @@ FROM  transaction_details
 WHERE encrypted_tx_hash IN (SELECT UNNEST($1::text[]))
 ORDER BY encrypted_tx_hash, submission_time DESC;
 
--- name: QueryIncludedTransactions :many
-SELECT '0x' || Encode(tx_hash, 'hex') tx_hash, FLOOR(EXTRACT(EPOCH FROM created_at)) AS included_at_unix
-FROM decrypted_tx
-WHERE tx_status = 'included'
-ORDER BY created_at DESC
+-- name: QueryLatestIncludedTXs :many
+SELECT '0x' || Encode(dt.tx_hash, 'hex') tx_hash, '0x' || Encode(tse.event_tx_hash, 'hex') event_tx_hash, FLOOR(EXTRACT(EPOCH FROM dt.created_at)) AS included_at_unix
+FROM decrypted_tx dt
+INNER JOIN transaction_submitted_event tse ON dt.transaction_submitted_event_id = tse.id
+WHERE dt.tx_status = 'included'
+ORDER BY dt.created_at DESC
 LIMIT $1;
 
 -- name: QueryTotalRegisteredValidators :one
@@ -163,3 +164,9 @@ ORDER BY
     dt.created_at DESC NULLS LAST, 
     tse.created_at DESC
 LIMIT 1;
+
+-- name: QueryLatestSequencerTransactions :many
+SELECT encode(event_tx_hash, 'hex') AS sequencer_tx_hash, sender, FLOOR(EXTRACT(EPOCH FROM created_at)) as created_at_unix
+FROM transaction_submitted_event 
+ORDER BY created_at DESC
+LIMIT $1;
