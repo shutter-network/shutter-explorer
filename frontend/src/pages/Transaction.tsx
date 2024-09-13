@@ -17,7 +17,7 @@ interface TransactionDetails {
 
 const Transaction: FC = () => {
     const location = useLocation();
-    const initialTransaction = location.state.message as TransactionDetails | undefined;
+    const initialTransaction = location.state as TransactionDetails | undefined;
     const explorerUrl = process.env.REACT_APP_EXPLORER_URL;
 
     const [transaction, setTransaction] = useState<TransactionDetails | null>(initialTransaction || null);
