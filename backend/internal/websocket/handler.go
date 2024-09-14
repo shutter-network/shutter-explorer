@@ -7,16 +7,52 @@ import (
 	"github.com/shutter-network/shutter-explorer/backend/internal/error"
 )
 
-func (manager *ClientManager) sendLatestPendingTransaction(ctx context.Context, d time.Duration, txLimit string) {
-	callback := func(ctx context.Context) (interface{}, *error.Http) {
-		return manager.usecases.TransactionUsecase.QueryLatestPendingTransactions(ctx, txLimit)
+type WebsocketResponse struct {
+	Type  WebsocketEventType
+	Data  any
+	Error *error.Http
+}
+
+type WebsocketEventType string
+
+const (
+	TotalExecutedTransactions   WebsocketEventType = "total_executed_transactions_updated"
+	LatestSequencerTransactions WebsocketEventType = "latest_sequencer_transactions_updated"
+	LatestUserTransactions      WebsocketEventType = "latest_user_transactions_updated"
+)
+
+func (manager *ClientManager) sendTotalExecutedTransactions(ctx context.Context, d time.Duration, txStatus string) {
+	callback := func(ctx context.Context) WebsocketResponse {
+		totalExecuted, err := manager.usecases.TransactionUsecase.QueryTotalExecutedTXsForEachTXStatus(ctx, txStatus)
+		return WebsocketResponse{
+			Type:  TotalExecutedTransactions,
+			Data:  totalExecuted,
+			Error: err,
+		}
 	}
 	go manager.sendPeriodicMessages(ctx, d, callback)
 }
 
-func (manager *ClientManager) sendTotalExecutedTXs(ctx context.Context, d time.Duration, txStatus string) {
-	callback := func(ctx context.Context) (interface{}, *error.Http) {
-		return manager.usecases.TransactionUsecase.QueryTotalExecutedTXsForEachTXStatus(ctx, txStatus)
+func (manager *ClientManager) sendLatestSequencerTransactions(ctx context.Context, d time.Duration, limit string) {
+	callback := func(ctx context.Context) WebsocketResponse {
+		sequencerTransactions, err := manager.usecases.TransactionUsecase.QueryLatestSequencerTransactions(ctx, limit)
+		return WebsocketResponse{
+			Type:  LatestSequencerTransactions,
+			Data:  sequencerTransactions,
+			Error: err,
+		}
+	}
+	go manager.sendPeriodicMessages(ctx, d, callback)
+}
+
+func (manager *ClientManager) sendLatestUserTransactions(ctx context.Context, d time.Duration, limit string) {
+	callback := func(ctx context.Context) WebsocketResponse {
+		includedTransactions, err := manager.usecases.TransactionUsecase.QueryLatestIncludedTransactions(ctx, limit)
+		return WebsocketResponse{
+			Type:  LatestUserTransactions,
+			Data:  includedTransactions,
+			Error: err,
+		}
 	}
 	go manager.sendPeriodicMessages(ctx, d, callback)
 }
