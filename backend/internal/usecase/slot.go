@@ -48,7 +48,7 @@ func (uc *SlotUsecase) QueryTop5Epochs(ctx context.Context) ([]data.QuerySlotAnd
 		)
 		return nil, &err
 	}
-	slotsPerEpoch, err := strconv.Atoi(os.Getenv("SLOTS_PER_EXPOCH"))
+	slotsPerEpoch, err := strconv.Atoi(os.Getenv("SLOTS_PER_EPOCH"))
 	if err != nil {
 		err := error.NewHttpError(
 			"error encountered while converting",

@@ -5,6 +5,7 @@ const useSearch = (value: string) => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<Error | null>(null);
     const navigate = useNavigate();
+    const explorerbackend = process.env.REACT_APP_BACKEND_API
 
     const searchTx = async () => {
         if (!value) return;
@@ -13,10 +14,10 @@ const useSearch = (value: string) => {
         setError(null);
 
         try {
-            const response = await fetch(`/api/transaction/${value}`);
+            const response = await fetch(`${explorerbackend}/api/transaction/${value}`);
             if (response.ok) {
                 const transactionData = await response.json();
-                navigate('/transaction-details', { state: transactionData });
+                navigate('/transaction-details', { state: transactionData.message });
             } else {
                 setError(new Error('Transaction not found'));
             }

@@ -14,12 +14,19 @@ interface SlotProgression {
 }
 
 export interface Transaction {
-    hash: string;
-    timestamp: number;
+    TxHash: string;
+    IncludedAtUnix: number;
+    EventTxHash: string
+}
+
+export interface SequencerTransaction {
+    SequencerTxHash: string;
+    Sender: string;
+    CreatedAtUnix: number
 }
 
 interface SequencerTransactions {
-    transactions: Array<Transaction>;
+    transactions: Array<SequencerTransaction>;
 }
 
 interface UserTransactions {

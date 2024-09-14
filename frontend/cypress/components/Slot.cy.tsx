@@ -7,31 +7,31 @@ import { getTimeAgo } from '../../src/utils/utils';
 
 describe('<Slot />', () => {
     const sequencerTransactions = [
-        { hash: '0xb93d868f83d56a44d28728e37dfa2fd4866af4acb114c11a04c1d8d264b91508', timestamp: 1725201600 },
-        { hash: '0x140626ddb8cb9c9ac86572c2eb7a57d60a19ae70d3e1853eacb09964c8e4dad2', timestamp: 1725201900 },
-        { hash: '0xd719f5b9671a8e334e1366e9f41d5f05dbe213440a19d2d37ea1c670a0b2773f', timestamp: 1725202200 },
-        { hash: '0xcb30dd4ab702aa72694ec9fa1ff636c9627110ab9ec9570eb06755afd277f750', timestamp: 1725202500 },
+        { SequencerTxHash: '0xb93d868f83d56a44d28728e37dfa2fd4866af4acb114c11a04c1d8d264b91508', CreatedAtUnix: 1725201600 },
+        { SequencerTxHash: '0x140626ddb8cb9c9ac86572c2eb7a57d60a19ae70d3e1853eacb09964c8e4dad2', CreatedAtUnix: 1725201900 },
+        { SequencerTxHash: '0xd719f5b9671a8e334e1366e9f41d5f05dbe213440a19d2d37ea1c670a0b2773f', CreatedAtUnix: 1725202200 },
+        { SequencerTxHash: '0xcb30dd4ab702aa72694ec9fa1ff636c9627110ab9ec9570eb06755afd277f750', CreatedAtUnix: 1725202500 },
     ];
 
     const userTransactions = [
-        { hash: '0xb93d868f83d56a44d28728e37dfa2fd4866af4acb114c11a04c1d8d264b91508', timestamp: 1725202800 },
-        { hash: '0x140626ddb8cb9c9ac86572c2eb7a57d60a19ae70d3e1853eacb09964c8e4dad2', timestamp: 1725203100 },
-        { hash: '0xd719f5b9671a8e334e1366e9f41d5f05dbe213440a19d2d37ea1c670a0b2773f', timestamp: 1725203400 },
-        { hash: '0xcb30dd4ab702aa72694ec9fa1ff636c9627110ab9ec9570eb06755afd277f750', timestamp: 1725203700 },
+        { TxHash: '0xb93d868f83d56a44d28728e37dfa2fd4866af4acb114c11a04c1d8d264b91508', IncludedAtUnix: 1725202800 },
+        { TxHash: '0x140626ddb8cb9c9ac86572c2eb7a57d60a19ae70d3e1853eacb09964c8e4dad2', IncludedAtUnix: 1725203100 },
+        { TxHash: '0xd719f5b9671a8e334e1366e9f41d5f05dbe213440a19d2d37ea1c670a0b2773f', IncludedAtUnix: 1725203400 },
+        { TxHash: '0xcb30dd4ab702aa72694ec9fa1ff636c9627110ab9ec9570eb06755afd277f750', IncludedAtUnix: 1725203700 },
     ];
 
     beforeEach(() => {
-        cy.intercept('GET', '/api/transaction/latest_sequencer_transactions', {
+        cy.intercept('GET', '/api/transaction/latest_sequencer_transactions?limit=10', {
             statusCode: 200,
             body: {
-                transactions: sequencerTransactions,
+                message: sequencerTransactions,
             },
         }).as('getSequencerTransactions');
 
-        cy.intercept('GET', '/api/transaction/latest_user_transactions', {
+        cy.intercept('GET', '/api/transaction/latest_user_transactions?limit=10', {
             statusCode: 200,
             body: {
-                transactions: userTransactions,
+                message: userTransactions,
             },
         }).as('getUserTransactions');
     });
@@ -74,8 +74,8 @@ describe('<Slot />', () => {
 
         cy.get('h6').contains('Sequencer Transactions').should('be.visible');
         sequencerTransactions.forEach(tx => {
-            cy.get('td').contains(tx.hash, { timeout: 10000 }).should('be.visible');
-            const expectedTimeAgo = getTimeAgo(tx.timestamp);
+            cy.get('td').contains(tx.SequencerTxHash, { timeout: 10000 }).should('be.visible');
+            const expectedTimeAgo = getTimeAgo(tx.CreatedAtUnix);
             cy.get('td').contains(expectedTimeAgo, { timeout: 10000 }).should('be.visible');
         });
     });
@@ -99,8 +99,8 @@ describe('<Slot />', () => {
 
         cy.get('h6').contains('User Transactions').should('be.visible');
         userTransactions.forEach(tx => {
-            cy.get('td').contains(tx.hash, { timeout: 10000 }).should('be.visible');
-            const expectedTimeAgo = getTimeAgo(tx.timestamp);
+            cy.get('td').contains(tx.TxHash, { timeout: 10000 }).should('be.visible');
+            const expectedTimeAgo = getTimeAgo(tx.IncludedAtUnix);
             cy.get('td').contains(expectedTimeAgo, { timeout: 10000 }).should('be.visible');
         });
     });
@@ -113,12 +113,12 @@ describe('<Slot />', () => {
             onerror: cy.stub(),
         };
 
-        cy.intercept('GET', '/api/transaction/latest_sequencer_transactions', {
+        cy.intercept('GET', '/api/transaction/latest_sequencer_transactions?limit=10', {
             statusCode: 500,
             body: {},
         }).as('getSequencerTransactionsError');
 
-        cy.intercept('GET', '/api/transaction/latest_user_transactions', {
+        cy.intercept('GET', '/api/transaction/latest_user_transactions?limit=10', {
             statusCode: 500,
             body: {},
         }).as('getUserTransactionsError');
@@ -160,8 +160,8 @@ describe('<Slot />', () => {
             data: JSON.stringify({
                 type: 'sequencer_transactions_updated',
                 data: [
-                    { hash: '0xnewSequencerTransactionHash1', timestamp: 1725204000 },
-                    { hash: '0xnewSequencerTransactionHash2', timestamp: 1725204300 },
+                    { SequencerTxHash: '0xnewSequencerTransactionHash1', CreatedAtUnix: 1725204000 },
+                    { SequencerTxHash: '0xnewSequencerTransactionHash2', CreatedAtUnix: 1725204300 },
                 ],
             }),
         } as MessageEvent);
@@ -175,8 +175,8 @@ describe('<Slot />', () => {
             data: JSON.stringify({
                 type: 'user_transactions_updated',
                 data: [
-                    { hash: '0xnewUserTransactionHash1', timestamp: 1725204600 },
-                    { hash: '0xnewUserTransactionHash2', timestamp: 1725204900 },
+                    { TxHash: '0xnewUserTransactionHash1', IncludedAtUnix: 1725204600 },
+                    { TxHash: '0xnewUserTransactionHash2', IncludedAtUnix: 1725204900 },
                 ],
             }),
         } as MessageEvent);

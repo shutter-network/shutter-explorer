@@ -6,9 +6,8 @@ import {MemoryRouter} from "react-router-dom";
 
 describe('<Validator />', () => {
   beforeEach(() => {
-    cy.intercept('GET', '/api/validator/shutterized_validators', { count: 123 }).as('getShutterizedValidators');
-    cy.intercept('GET', '/api/validator/validator_percentage', { percentage: 25 }).as('getValidatorPercentage');
-    cy.intercept('GET', '/api/validator/total_validators', { total: 456 }).as('getTotalValidators');
+    cy.intercept('GET', '/api/validator/total_registered_validators', { message: 100 }).as('getShutterizedValidators');
+    cy.intercept('GET', '/api/validator/total_gnosis_validators', { message: 400 }).as('getTotalValidators');
   });
 
   it('renders and displays initial API data', () => {
@@ -29,11 +28,11 @@ describe('<Validator />', () => {
 
     cy.contains('Validator Overview').should('be.visible');
     cy.contains('# Shutterized Validators').should('be.visible');
-    cy.contains('123').should('be.visible');
+    cy.contains('100').should('be.visible');
     cy.contains('Validator Percentage').should('be.visible');
     cy.contains('25%').should('be.visible');
     cy.contains('# Validators').should('be.visible');
-    cy.contains('456').should('be.visible');
+    cy.contains('400').should('be.visible');
   });
 
   it('displays loading states initially', () => {
@@ -68,35 +67,27 @@ describe('<Validator />', () => {
     );
 
     cy.wait('@getShutterizedValidators');
-    cy.wait('@getValidatorPercentage');
     cy.wait('@getTotalValidators');
 
     cy.wrap(mockSocket).invoke('onmessage', {
       data: JSON.stringify({
         type: 'shutterized_validators_updated',
-        data: { count: 150 },
+        data: { count: 100 },
       }),
     } as MessageEvent);
 
-    cy.contains('150').should('be.visible');
+    cy.contains('100').should('be.visible');
 
-    cy.wrap(mockSocket).invoke('onmessage', {
-      data: JSON.stringify({
-        type: 'validator_percentage_updated',
-        data: { percentage: 30 },
-      }),
-    } as MessageEvent);
-
-    cy.contains('30%').should('be.visible');
-
+    
     cy.wrap(mockSocket).invoke('onmessage', {
       data: JSON.stringify({
         type: 'total_validators_updated',
-        data: { count: 500 },
+        data: { count: 1000 },
       }),
     } as MessageEvent);
-
-    cy.contains('500').should('be.visible');
+    
+    cy.contains('10%').should('be.visible');
+    cy.contains('1000').should('be.visible');
   });
 
   it('displays error messages if API call fails', () => {
@@ -108,17 +99,12 @@ describe('<Validator />', () => {
     };
 
     // Simulate API errors
-    cy.intercept('GET', '/api/validator/shutterized_validators', {
+    cy.intercept('GET', '/api/validator/total_registered_validators', {
       statusCode: 500,
       body: {},
     }).as('getShutterizedValidatorsError');
 
-    cy.intercept('GET', '/api/validator/validator_percentage', {
-      statusCode: 500,
-      body: {},
-    }).as('getValidatorPercentageError');
-
-    cy.intercept('GET', '/api/validator/total_validators', {
+    cy.intercept('GET', '/api/validator/total_gnosis_validators', {
       statusCode: 500,
       body: {},
     }).as('getTotalValidatorsError');
@@ -130,7 +116,6 @@ describe('<Validator />', () => {
     );
 
     cy.wait('@getShutterizedValidatorsError');
-    cy.wait('@getValidatorPercentageError');
     cy.wait('@getTotalValidatorsError');
 
     cy.get('div').contains('Error fetching shutterized validators').should('be.visible');
@@ -153,7 +138,6 @@ describe('<Validator />', () => {
     );
 
     cy.wait('@getShutterizedValidators');
-    cy.wait('@getValidatorPercentage');
     cy.wait('@getTotalValidators');
 
     // Simulate a WebSocket error
@@ -179,13 +163,12 @@ describe('<Validator />', () => {
     );
 
     cy.wait('@getShutterizedValidators');
-    cy.wait('@getValidatorPercentage');
     cy.wait('@getTotalValidators');
 
     // Simulate a WebSocket event with an error
     cy.wrap(mockSocket).invoke('onmessage', {
       data: JSON.stringify({
-        type: 'shutterized_validators_updated',
+        type: 'total_registered_validators_updated',
         data: null,
         error: { message: 'Invalid data received', code: 400 },
       }),
