@@ -283,6 +283,7 @@ func (q *Queries) QueryLatestSequencerTransactions(ctx context.Context, limit in
 		if err := rows.Scan(&i.SequencerTxHash, &i.Sender, &i.CreatedAtUnix); err != nil {
 			return nil, err
 		}
+		i.SequencerTxHash = "0x"+i.SequencerTxHash
 		items = append(items, i)
 	}
 	if err := rows.Err(); err != nil {
