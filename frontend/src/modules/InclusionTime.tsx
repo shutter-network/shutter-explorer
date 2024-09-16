@@ -9,14 +9,14 @@ import { WebsocketEvent } from '../types/WebsocketEvent';
 import useFetch from '../hooks/useFetch';
 
 const InclusionTime = () => {
-    const { data: estimatedInclusionTimeData, loading: loadingEstimatedInclusionTime, error: errorEstimatedInclusionTime } = useFetch('/inclusion-time/estimated_inclusion_time');
-    const { data: transactionStatsData, loading: loadingTransactionStats, error: errorTransactionStats } = useFetch('/inclusion-time/executed_transactions');
-    const { data: historicalInclusionTimeData, loading: loadingHistoricalInclusionTime, error: errorHistoricalInclusionTime } = useFetch('/inclusion-time/historical_inclusion_time');
+    const { data: estimatedInclusionTimeData, loading: loadingEstimatedInclusionTime, error: errorEstimatedInclusionTime } = useFetch('/api/inclusion_time/estimated_inclusion_time');
+    const { data: transactionStatsData, loading: loadingTransactionStats, error: errorTransactionStats } = useFetch('/api/inclusion_time/executed_transactions');
+    const { data: historicalInclusionTimeData, loading: loadingHistoricalInclusionTime, error: errorHistoricalInclusionTime } = useFetch('/api/inclusion_time/historical_inclusion_time');
 
     const [estimatedInclusionTime, setEstimatedInclusionTime] = useState<string | number>(estimatedInclusionTimeData?.inclusionTime || 'N/A');
     const [successfulTransactions, setSuccessfulTransactions] = useState<number>(transactionStatsData?.successful || 0);
     const [failedTransactions, setFailedTransactions] = useState<number>(transactionStatsData?.failed || 0);
-    const [historicalInclusionTime, setHistoricalInclusionTime] = useState(historicalInclusionTimeData?.times || []);
+    const [historicalInclusionTime, setHistoricalInclusionTime] = useState(historicalInclusionTimeData?.message || []);
     const [webSocketError, setWebSocketError] = useState<string | null>(null);
 
     const { socket } = useWebSocket()!;
@@ -67,10 +67,10 @@ const InclusionTime = () => {
     }, [socket]);
 
     useEffect(() => {
-        if (estimatedInclusionTimeData?.inclusionTime) setEstimatedInclusionTime(estimatedInclusionTimeData.inclusionTime);
-        if (transactionStatsData?.successful) setSuccessfulTransactions(transactionStatsData.successful);
-        if (transactionStatsData?.failed) setFailedTransactions(transactionStatsData.failed);
-        if (historicalInclusionTimeData?.times) setHistoricalInclusionTime(historicalInclusionTimeData.times);
+        if (estimatedInclusionTimeData?.message) setEstimatedInclusionTime(estimatedInclusionTimeData.message);
+        if (transactionStatsData?.message?.Successful) setSuccessfulTransactions(transactionStatsData.message?.Successful);
+        if (transactionStatsData?.Failed) setFailedTransactions(transactionStatsData.Failed);
+        if (historicalInclusionTimeData?.message) setHistoricalInclusionTime(historicalInclusionTimeData.message);
     }, [estimatedInclusionTimeData, transactionStatsData, historicalInclusionTimeData]);
 
     const totalTransactions = successfulTransactions + failedTransactions;

@@ -6,13 +6,15 @@ import { MemoryRouter } from 'react-router-dom';
 
 describe('<InclusionTime />', () => {
     beforeEach(() => {
-        cy.intercept('GET', '/inclusion-time/estimated_inclusion_time', { inclusionTime: 10 }).as('getEstimatedInclusionTime');
-        cy.intercept('GET', '/inclusion-time/executed_transactions', {
-            successful: 25,
-            failed: 5
+        cy.intercept('GET', '/api/inclusion_time/estimated_inclusion_time', { message: 10 }).as('getEstimatedInclusionTime');
+        cy.intercept('GET', '/api/inclusion_time/executed_transactions', {
+            message:{
+                Successful: 25,
+                Failed: 5
+            }
         }).as('getExecutedTransactions');
-        cy.intercept('GET', '/inclusion-time/historical_inclusion_time', {
-            times: [
+        cy.intercept('GET', '/inclusion_time/historical_inclusion_time', {
+            message: [
                 { day: 1625097600, averageInclusionTime: 300 },
                 { day: 1625184000, averageInclusionTime: 320 },
                 { day: 1625270400, averageInclusionTime: 310 },
