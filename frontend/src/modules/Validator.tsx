@@ -9,11 +9,12 @@ import overviewIcon from '../assets/icons/shield_check.svg';
 
 const Validator = () => {
     const { data: shutterizedValidatorsData, loading: loadingShutterized, error: errorShutterized } = useFetch(`/api/validator/total_registered_validators`);
+    const { data: validatorPercentageData, loading: loadingPercentage, error: errorPercentage } = useFetch('/api/validator/validator_percentage');
     const { data: totalValidatorsData, loading: loadingTotal, error: errorTotal } = useFetch('/api/validator/total_gnosis_validators');
 
     const [shutterizedValidators, setShutterizedValidators] = useState(shutterizedValidatorsData?.message || 'N/A');
+    const [validatorPercentage, setValidatorPercentage] = useState(validatorPercentageData?.percentage || 'N/A');
     const [totalValidators, setTotalValidators] = useState(totalValidatorsData?.message || 'N/A');
-    const [validatorPercentage, setValidatorPercentage] = useState((shutterizedValidatorsData?.message*100)/totalValidatorsData?.message || 'N/A');
     const [webSocketError, setWebSocketError] = useState<string | null>(null);
 
     const { socket } = useWebSocket()!;
