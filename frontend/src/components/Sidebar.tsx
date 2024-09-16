@@ -1,13 +1,13 @@
 import React from 'react';
 import { SidebarContainer, SidebarNav, NavItem, NavIcon } from '../styles/sidebar';
-import gridIcon from '../assets/icons/grid.svg';
-import targetIcon from '../assets/icons/target.svg';
-import arrowsIcon from '../assets/icons/arrows_horizontal.svg';
+import { ReactComponent as GridIcon } from '../assets/icons/grid.svg';
+import { ReactComponent as TargetIcon } from '../assets/icons/target.svg';
+import { ReactComponent as ArrowsIcon } from '../assets/icons/arrows_horizontal.svg';
 
 const navItems = [
-    { icon: gridIcon, label: "System Overview" },
-    { icon: targetIcon, label: "Slot Overview" },
-    { icon: arrowsIcon, label: "Transactions" }
+    { icon: GridIcon, label: "System Overview" },
+    { icon: TargetIcon, label: "Slot Overview" },
+    { icon: ArrowsIcon, label: "Transactions" }
 ];
 
 const Sidebar: React.FC = () => {
@@ -16,7 +16,8 @@ const Sidebar: React.FC = () => {
             <SidebarNav>
                 {navItems.map((item, index) => (
                     <NavItem key={index} to={'/' + item.label.toLowerCase().replace(' ', '-')}>
-                        <NavIcon src={item.icon} alt={`${item.label} icon`} />
+                        {/* Use ReactComponent for SVG and apply the fill */}
+                        <NavIcon as={item.icon} style={{ fill: '#0044A4' }} />
                         <span>{item.label}</span>
                     </NavItem>
                 ))}
