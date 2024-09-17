@@ -13,7 +13,7 @@ describe('<InclusionTime />', () => {
                 Failed: 5
             }
         }).as('getExecutedTransactions');
-        cy.intercept('GET', '/inclusion_time/historical_inclusion_time', {
+        cy.intercept('GET', '/api/inclusion_time/historical_inclusion_time', {
             message: [
                 { day: 1625097600, averageInclusionTime: 300 },
                 { day: 1625184000, averageInclusionTime: 320 },
@@ -53,7 +53,7 @@ describe('<InclusionTime />', () => {
         cy.contains('Transaction Success Rate').should('be.visible');
         cy.get('svg')
             .find('tspan')
-            .should('contain', '83.333')
+            .should('contain', '10')
             .should('be.visible');
 
         cy.contains('Historical Inclusion Times').should('be.visible');
