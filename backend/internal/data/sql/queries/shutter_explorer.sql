@@ -50,35 +50,20 @@ SELECT
   lt.latest_created_at AS created_at
 FROM latest_transactions lt;
 
--- name: QueryLatestTXsWhichArentIncluded :many
-WITH latest_events AS (
-    SELECT 
-        id,
-        encrypted_transaction,
-        created_at
-    FROM (
-        SELECT DISTINCT ON (encrypted_transaction)
-            id,
-            encrypted_transaction,
-            created_at
-        FROM 
-            transaction_submitted_event
-        ORDER BY 
-            encrypted_transaction, 
-            created_at DESC
-    ) subquery
-    ORDER BY 
-        created_at DESC
-    LIMIT $1
-)
+-- name: QueryLatestPendingTXs :many
 SELECT
-    le.id,
-    le.encrypted_transaction,
-    le.created_at
-FROM latest_events le
-LEFT JOIN decrypted_tx dt ON le.id = dt.transaction_submitted_event_id
-WHERE dt.tx_status = 'not included' OR dt.tx_status IS NULL
-ORDER BY le.created_at DESC;
+    tse.id,
+    encode(tse.event_tx_hash, 'hex') AS sequencer_tx_hash,
+    FLOOR(EXTRACT(EPOCH FROM tse.created_at)) as created_at_unix
+FROM transaction_submitted_event tse
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM decrypted_tx dt
+    WHERE dt.transaction_submitted_event_id = tse.id
+      AND dt.tx_status IS NOT NULL
+)
+ORDER BY tse.created_at DESC
+LIMIT $1;
 
 -- name: QueryTxHashFromTransactionDetails :many
 SELECT DISTINCT ON (encrypted_tx_hash) 
@@ -88,11 +73,12 @@ FROM  transaction_details
 WHERE encrypted_tx_hash IN (SELECT UNNEST($1::text[]))
 ORDER BY encrypted_tx_hash, submission_time DESC;
 
--- name: QueryIncludedTransactions :many
-SELECT '0x' || Encode(tx_hash, 'hex') tx_hash, FLOOR(EXTRACT(EPOCH FROM created_at)) AS included_at_unix
-FROM decrypted_tx
-WHERE tx_status = 'included'
-ORDER BY created_at DESC
+-- name: QueryLatestIncludedTXs :many
+SELECT '0x' || Encode(dt.tx_hash, 'hex') tx_hash, '0x' || Encode(tse.event_tx_hash, 'hex') event_tx_hash, FLOOR(EXTRACT(EPOCH FROM dt.created_at)) AS included_at_unix
+FROM decrypted_tx dt
+INNER JOIN transaction_submitted_event tse ON dt.transaction_submitted_event_id = tse.id
+WHERE dt.tx_status = 'included'
+ORDER BY dt.created_at DESC
 LIMIT $1;
 
 -- name: QueryTotalRegisteredValidators :one
@@ -155,3 +141,64 @@ ORDER BY
 SELECT tx_hash, EXTRACT(EPOCH FROM created_at)::BIGINT AS included_timestamp  
 FROM decrypted_tx 
 WHERE slot = $1 AND tx_status = 'included';
+
+-- name: QueryFromTransactionDetails :one
+SELECT tx_hash as user_tx_hash, encrypted_tx_hash
+FROM transaction_details 
+WHERE tx_hash = $1 OR encrypted_tx_hash = $1
+ORDER BY submission_time DESC
+LIMIT 1;
+
+-- name: QueryTransactionDetailsByTxHash :one
+SELECT 
+    tse.event_tx_hash, tse.sender, FLOOR(EXTRACT(EPOCH FROM tse.created_at)) as created_at_unix,
+    dt.tx_hash AS user_tx_hash, dt.tx_status, dt.slot, FLOOR(EXTRACT(EPOCH FROM dt.created_at)) AS decrypted_tx_created_at_unix
+FROM transaction_submitted_event tse 
+LEFT JOIN decrypted_tx dt ON tse.id = dt.transaction_submitted_event_id
+WHERE tse.event_tx_hash = $1 OR dt.tx_hash = $1
+ORDER BY 
+    CASE 
+        WHEN dt.tx_status = 'included' THEN 1
+        ELSE 2
+    END,
+    dt.created_at DESC NULLS LAST, 
+    tse.created_at DESC
+LIMIT 1;
+
+-- name: QueryLatestSequencerTransactions :many
+SELECT encode(event_tx_hash, 'hex') AS sequencer_tx_hash, sender, FLOOR(EXTRACT(EPOCH FROM created_at)) as created_at_unix
+FROM transaction_submitted_event 
+ORDER BY created_at DESC
+LIMIT $1;
+
+-- name: QueryExecutedTransactionStats :many
+SELECT COUNT(id), tx_status FROM decrypted_tx
+GROUP BY tx_status;
+
+-- name: QueryHistoricalInclusionTimes :many
+WITH daily_inclusion_times AS (
+    SELECT
+        EXTRACT(EPOCH FROM DATE(tse.created_at)) AS submission_date_unix,
+        FLOOR(EXTRACT(EPOCH FROM (dtx.created_at - tse.created_at))) AS inclusion_time_seconds
+    FROM
+        transaction_submitted_event tse
+    JOIN
+        decrypted_tx dtx
+    ON
+        tse.id = dtx.transaction_submitted_event_id
+    WHERE
+        dtx.tx_status = 'included'
+        AND tse.created_at >= NOW() - INTERVAL '30 days'
+)
+SELECT
+    submission_date_unix::BIGINT,
+    COUNT(*) AS total_transactions,
+    AVG(inclusion_time_seconds)::BIGINT AS avg_inclusion_time_seconds,
+    MIN(inclusion_time_seconds)::BIGINT AS min_inclusion_time_seconds,
+    MAX(inclusion_time_seconds)::BIGINT AS max_inclusion_time_seconds
+FROM
+    daily_inclusion_times
+GROUP BY
+    submission_date_unix
+ORDER BY
+    submission_date_unix DESC;

@@ -5,8 +5,9 @@ import ResponsiveLayout from "../components/ResponsiveLayout";
 import useFetch from "../hooks/useFetch";
 import { useEffect, useState } from 'react';
 import { useWebSocket } from '../context/WebSocketContext';
-import {SequencerTransaction, Transaction, WebsocketEvent} from "../types/WebsocketEvent";
-import {getTimeAgo} from "../utils/utils";
+import { SequencerTransaction, Transaction, WebsocketEvent } from "../types/WebsocketEvent";
+import { getTimeAgo } from "../utils/utils";
+import TitleSection from "../components/TitleSection";
 
 const Slot = () => {
     const { data: sequencerTransactionsData, loading: loadingSequencer, error: errorSequencer } = useFetch('/api/transaction/latest_sequencer_transactions?limit=10');
@@ -71,29 +72,35 @@ const Slot = () => {
     }, [socket]);
 
     const sequencerTransactionsWithAge = sequencerTransactions.map((transaction: SequencerTransaction) => ({
-        hash: transaction.SequencerTxHash,
+        hash: truncateString(transaction.SequencerTxHash, 50),
         timestamp: getTimeAgo(transaction.CreatedAtUnix),
     }));
 
     const userTransactionsWithAge = userTransactions.map((transaction: Transaction) => ({
-        hash: transaction.TxHash,
+        hash: truncateString(transaction.TxHash, 50),
         timestamp: getTimeAgo(transaction.IncludedAtUnix),
     }));
+
+
+    function truncateString(str: string, num: number): string {
+        if (str.length <= num) {
+            return str;
+        }
+        return str.slice(0, num) + '...';
+    }
 
     return (
         <ResponsiveLayout>
             <Box sx={{ flexGrow: 1, marginTop: 4 }}>
-                <Typography variant="h5" align="left">
-                    Slot Overview
-                </Typography>
+                <TitleSection title="Slot Overview" />
                 {webSocketError && <Alert severity="error">{webSocketError}</Alert>}
-                <Grid container spacing={3}>
-                    <Grid size={12}>
+                <Grid container spacing={2} sx={{ marginTop: 4 }}>
+                    <Grid size={{ sm: 12, md: 12, lg: 6 }} >
                         {errorSequencer ? (
                             <Alert severity="error">Error fetching sequencer transactions: {errorSequencer.message}</Alert>
                         ) : (
                             <>
-                                <Typography variant="h6">Sequencer Transactions</Typography>
+                                <Typography variant="h5" align='left' sx={{ fontWeight: 'bold' }} color='black' >Sequencer Transactions</Typography>
                                 {loadingSequencer ? (
                                     <Typography>Loading...</Typography>
                                 ) : (
@@ -102,12 +109,12 @@ const Slot = () => {
                             </>
                         )}
                     </Grid>
-                    <Grid size={12}>
+                    <Grid size={{ sm: 12, md: 12, lg: 6 }}>
                         {errorUser ? (
                             <Alert severity="error">Error fetching user transactions: {errorUser.message}</Alert>
                         ) : (
                             <>
-                                <Typography variant="h6">User Transactions</Typography>
+                                <Typography variant="h5" align='left' sx={{ fontWeight: 'bold' }} color='black' > User Transactions</Typography>
                                 {loadingUser ? (
                                     <Typography>Loading...</Typography>
                                 ) : (
