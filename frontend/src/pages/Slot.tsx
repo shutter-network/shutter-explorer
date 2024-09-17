@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 import { useWebSocket } from '../context/WebSocketContext';
 import {SequencerTransaction, Transaction, WebsocketEvent} from "../types/WebsocketEvent";
 import {getTimeAgo} from "../utils/utils";
+import TitleSection from "../components/TitleSection";
 
 const Slot = () => {
     const { data: sequencerTransactionsData, loading: loadingSequencer, error: errorSequencer } = useFetch('/api/transaction/latest_sequencer_transactions?limit=10');
