@@ -139,17 +139,17 @@ describe('<InclusionTime />', () => {
             onerror: cy.stub(),
         };
 
-        cy.intercept('GET', '/inclusion-time/estimated_inclusion_time', {
+        cy.intercept('GET', '/api/inclusion_time/estimated_inclusion_time', {
             statusCode: 500,
             body: {},
         }).as('getEstimatedInclusionTimeError');
 
-        cy.intercept('GET', '/inclusion-time/executed_transactions', {
+        cy.intercept('GET', '/api/inclusion_time/executed_transactions', {
             statusCode: 500,
             body: {},
         }).as('getExecutedTransactionsError');
 
-        cy.intercept('GET', '/inclusion-time/historical_inclusion_time', {
+        cy.intercept('GET', '/api/inclusion_time/historical_inclusion_time', {
             statusCode: 500,
             body: {},
         }).as('getHistoricalInclusionTimeError');
@@ -183,10 +183,6 @@ describe('<InclusionTime />', () => {
             </WebSocketContext.Provider>
         );
 
-        cy.wait('@getEstimatedInclusionTime');
-        cy.wait('@getExecutedTransactions');
-        cy.wait('@getHistoricalInclusionTime');
-
         // Simulate a WebSocket error
         cy.wrap(mockSocket).invoke('onerror', {
             message: 'WebSocket connection failed',
@@ -208,10 +204,6 @@ describe('<InclusionTime />', () => {
                 <InclusionTime />
             </WebSocketContext.Provider>
         );
-
-        cy.wait('@getEstimatedInclusionTime');
-        cy.wait('@getExecutedTransactions');
-        cy.wait('@getHistoricalInclusionTime');
 
         // Simulate a WebSocket event with an error
         cy.wrap(mockSocket).invoke('onmessage', {

@@ -13,9 +13,9 @@ const InclusionTime = () => {
     const { data: transactionStatsData, loading: loadingTransactionStats, error: errorTransactionStats } = useFetch('/api/inclusion_time/executed_transactions');
     const { data: historicalInclusionTimeData, loading: loadingHistoricalInclusionTime, error: errorHistoricalInclusionTime } = useFetch('/api/inclusion_time/historical_inclusion_time');
 
-    const [estimatedInclusionTime, setEstimatedInclusionTime] = useState<string | number>(estimatedInclusionTimeData?.inclusionTime || 'N/A');
-    const [successfulTransactions, setSuccessfulTransactions] = useState<number>(transactionStatsData?.successful || 0);
-    const [failedTransactions, setFailedTransactions] = useState<number>(transactionStatsData?.failed || 0);
+    const [estimatedInclusionTime, setEstimatedInclusionTime] = useState<string | number>(estimatedInclusionTimeData?.message || 'N/A');
+    const [successfulTransactions, setSuccessfulTransactions] = useState<number>(transactionStatsData?.message?.Successful || 0);
+    const [failedTransactions, setFailedTransactions] = useState<number>(transactionStatsData?.message?.Failed || 0);
     const [historicalInclusionTime, setHistoricalInclusionTime] = useState(historicalInclusionTimeData?.message || []);
     const [webSocketError, setWebSocketError] = useState<string | null>(null);
 
