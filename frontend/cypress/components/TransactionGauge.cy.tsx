@@ -6,9 +6,11 @@ import { MemoryRouter } from 'react-router-dom';
 
 describe('<TransactionSuccessGauge />', () => {
     beforeEach(() => {
-        cy.intercept('GET', '/inclusion_time/executed_transactions', {
-            successful: 25,
-            failed: 5,
+        cy.intercept('GET', '/api/inclusion_time/executed_transactions', {
+            message:{
+                Successful: 25,
+                Failed: 5,
+            }
         }).as('getExecutedTransactions');
     });
 
@@ -27,6 +29,7 @@ describe('<TransactionSuccessGauge />', () => {
                 </MemoryRouter>
             </WebSocketContext.Provider>
         );
+        cy.wait('@getExecutedTransactions');
 
         cy.get('svg')
             .find('tspan')
@@ -56,7 +59,7 @@ describe('<TransactionSuccessGauge />', () => {
         cy.wrap(mockSocket).invoke('onmessage', {
             data: JSON.stringify({
                 type: 'executed_transactions_updated',
-                data: { successful: 30, failed: 5 },
+                data: { message: { Successful: 30, Failed: 5 }},
             }),
         } as MessageEvent);
 
@@ -67,7 +70,7 @@ describe('<TransactionSuccessGauge />', () => {
     });
 
     it('displays an error message if fetching transaction stats fails', () => {
-        cy.intercept('GET', '/inclusion_time/executed_transactions', {
+        cy.intercept('GET', '/api/inclusion_time/executed_transactions', {
             statusCode: 500,
             body: {},
         }).as('getExecutedTransactionsError');

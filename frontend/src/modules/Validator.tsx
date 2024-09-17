@@ -9,11 +9,10 @@ import overviewIcon from '../assets/icons/shield_check.svg';
 
 const Validator = () => {
     const { data: shutterizedValidatorsData, loading: loadingShutterized, error: errorShutterized } = useFetch(`/api/validator/total_registered_validators`);
-    const { data: validatorPercentageData, loading: loadingPercentage, error: errorPercentage } = useFetch('/api/validator/validator_percentage');
     const { data: totalValidatorsData, loading: loadingTotal, error: errorTotal } = useFetch('/api/validator/total_gnosis_validators');
 
     const [shutterizedValidators, setShutterizedValidators] = useState(shutterizedValidatorsData?.message || 'N/A');
-    const [validatorPercentage, setValidatorPercentage] = useState(validatorPercentageData?.percentage || 'N/A');
+    const [validatorPercentage, setValidatorPercentage] = useState((shutterizedValidatorsData?.message * 100) / totalValidatorsData?.message || 'N/A');
     const [totalValidators, setTotalValidators] = useState(totalValidatorsData?.message || 'N/A');
     const [webSocketError, setWebSocketError] = useState<string | null>(null);
 
@@ -93,15 +92,27 @@ const Validator = () => {
                             />
                         )}
 
-                        {errorPercentage ? (
-                            <Alert severity="error">Error fetching validator percentage: {errorPercentage.message}</Alert>
-                        ) : (
-                            <InfoBox
-                                title="Validator Percentage"
-                                tooltip="Percentage amongst all validators"
-                                value={loadingPercentage ? 'Loading...' : `${validatorPercentage}%`}
-                            />
-                        )}
+                        {errorShutterized || errorTotal ? (
+                                errorShutterized ? (
+                                    <Alert severity="error">
+                                    Error fetching validator percentage: {errorShutterized?.message}
+                                    </Alert>
+                                ) : errorTotal ? (
+                                    <Alert severity="error">
+                                    Error fetching validator percentage: {errorTotal?.message}
+                                    </Alert>
+                                ) : null
+                                ) : (
+                                <InfoBox
+                                    title="Validator Percentage"
+                                    tooltip="Percentage amongst all validators"
+                                    value={
+                                    loadingShutterized || loadingTotal
+                                        ? "Loading..."
+                                        : `${validatorPercentage}%`
+                                    }
+                                />
+                                )}
 
                         {errorTotal ? (
                             <Alert severity="error">Error fetching total validators: {errorTotal.message}</Alert>
