@@ -14,7 +14,7 @@ const TransactionGauge = () => {
 
     const [successfulTransactions, setSuccessfulTransactions] = useState<number>(transactionStatsData?.successful || 0);
     const [failedTransactions, setFailedTransactions] = useState<number>(transactionStatsData?.failed || 0);
-    const [webSocketError, setWebSocketError] = useState<string | null>(null);
+    const [, setWebSocketError] = useState<string | null>(null);
 
     const { socket } = useWebSocket()!;
 
@@ -58,7 +58,6 @@ const TransactionGauge = () => {
 
     return (
         <Box sx={{ flexGrow: 1, marginTop: 4 }}>
-            {webSocketError && <Alert severity="error">{webSocketError}</Alert>}
 
             <Grid container spacing={3}>
                 <Grid size={{ xs: 12 }}>

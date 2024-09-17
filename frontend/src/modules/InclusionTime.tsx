@@ -58,7 +58,6 @@ const InclusionTime = () => {
 
     return (
         <Box sx={{ flexGrow: 1, marginTop: 4 }}>
-            {webSocketError && <Alert severity="error">{webSocketError}</Alert>}
 
             <Grid container spacing={3}>
                 <Grid size={{ xs: 12 }}>
