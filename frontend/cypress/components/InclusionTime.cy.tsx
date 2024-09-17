@@ -6,8 +6,16 @@ import { MemoryRouter } from 'react-router-dom';
 
 describe('<InclusionTime />', () => {
     beforeEach(() => {
-        cy.intercept('GET', '/inclusion_time/historical_inclusion_time', {
-            times: [
+        cy.intercept('GET', '/api/inclusion_time/estimated_inclusion_time', { message: 10 }).as('getEstimatedInclusionTime');
+        cy.intercept('GET', '/api/inclusion_time/executed_transactions', {
+            message:{
+                Successful: 25,
+                Failed: 5
+            }
+        }).as('getExecutedTransactions');
+        cy.intercept('GET', '/api/inclusion_time/historical_inclusion_time', {
+            message: [
+
                 { day: 1625097600, averageInclusionTime: 300 },
                 { day: 1625184000, averageInclusionTime: 320 },
                 { day: 1625270400, averageInclusionTime: 310 },
@@ -98,8 +106,25 @@ describe('<InclusionTime />', () => {
         cy.contains('350').should('be.visible');
     });
 
-    it('displays an error message if fetching historical inclusion time fails', () => {
-        cy.intercept('GET', '/inclusion_time/historical_inclusion_time', {
+    it('displays error messages if API call fails', () => {
+        const mockSocket = {
+            onopen: cy.stub(),
+            onmessage: cy.stub(),
+            onclose: cy.stub(),
+            onerror: cy.stub(),
+        };
+
+        cy.intercept('GET', '/api/inclusion_time/estimated_inclusion_time', {
+            statusCode: 500,
+            body: {},
+        }).as('getEstimatedInclusionTimeError');
+
+        cy.intercept('GET', '/api/inclusion_time/executed_transactions', {
+            statusCode: 500,
+            body: {},
+        }).as('getExecutedTransactionsError');
+
+        cy.intercept('GET', '/api/inclusion_time/historical_inclusion_time', {
             statusCode: 500,
             body: {},
         }).as('getHistoricalInclusionTimeError');

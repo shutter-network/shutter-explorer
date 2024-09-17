@@ -65,7 +65,7 @@ const Validator = () => {
                 socket.onerror = null;
             }
         };
-    }, [socket]);
+    }, [socket, shutterizedValidators, totalValidators]);
 
     useEffect(() => {
         if (shutterizedValidatorsData?.message){
