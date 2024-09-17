@@ -4,6 +4,7 @@ import { mount } from "cypress/react18";
 import React from 'react';
 import { WebSocketContext } from '../../src/context/WebSocketContext';
 import { getTimeAgo } from '../../src/utils/utils';
+import { truncateString } from '../utils/transactionUtils';
 
 describe('<Slot />', () => {
     const sequencerTransactions = [
@@ -72,9 +73,9 @@ describe('<Slot />', () => {
         );
         cy.wait('@getSequencerTransactions');
 
-        cy.get('h6').contains('Sequencer Transactions').should('be.visible');
+        cy.get('h5').contains('Sequencer Transactions').should('be.visible');
         sequencerTransactions.forEach(tx => {
-            cy.get('td').contains(tx.SequencerTxHash, { timeout: 10000 }).should('be.visible');
+            cy.get('td').contains(truncateString(tx.SequencerTxHash, 50) , { timeout: 10000 }).should('be.visible');
             const expectedTimeAgo = getTimeAgo(tx.CreatedAtUnix);
             cy.get('td').contains(expectedTimeAgo, { timeout: 10000 }).should('be.visible');
         });
@@ -97,9 +98,9 @@ describe('<Slot />', () => {
         );
         cy.wait('@getUserTransactions');
 
-        cy.get('h6').contains('User Transactions').should('be.visible');
+        cy.get('h5').contains('User Transactions').should('be.visible');
         userTransactions.forEach(tx => {
-            cy.get('td').contains(tx.TxHash, { timeout: 10000 }).should('be.visible');
+            cy.get('td').contains(truncateString(tx.TxHash, 50), { timeout: 10000 }).should('be.visible');
             const expectedTimeAgo = getTimeAgo(tx.IncludedAtUnix);
             cy.get('td').contains(expectedTimeAgo, { timeout: 10000 }).should('be.visible');
         });
