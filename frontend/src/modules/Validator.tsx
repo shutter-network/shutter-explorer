@@ -1,10 +1,11 @@
-import { Alert, Box, Typography } from '@mui/material';
-import Grid from '@mui/material/Grid2';
-import InfoBox from "../components/InfoBox";
+import { Alert, Box } from '@mui/material';
+import InfoBox from '../components/InfoBox';
+import OverviewCard from '../components/OverviewCard';
 import { useEffect, useState } from 'react';
 import { useWebSocket } from '../context/WebSocketContext';
-import { WebsocketEvent } from "../types/WebsocketEvent";
-import useFetch from "../hooks/useFetch";
+import useFetch from '../hooks/useFetch';
+import overviewIcon from '../assets/icons/shield_check.svg';
+
 
 const Validator = () => {
     const { data: shutterizedValidatorsData, loading: loadingShutterized, error: errorShutterized } = useFetch(`/api/validator/total_registered_validators`);
@@ -20,8 +21,7 @@ const Validator = () => {
     useEffect(() => {
         if (socket) {
             socket.onmessage = (event: MessageEvent) => {
-                const websocketEvent = JSON.parse(event.data) as WebsocketEvent;
-
+                const websocketEvent = JSON.parse(event.data);
                 if (websocketEvent.error) {
                     setWebSocketError(`Error: ${websocketEvent.error.message} (Code: ${websocketEvent.error.code})`);
                 } else if (websocketEvent.data) {
@@ -78,9 +78,6 @@ const Validator = () => {
 
     return (
         <Box sx={{ flexGrow: 1, marginTop: 4 }}>
-            <Typography variant="h5" align="left">
-                Validator Overview
-            </Typography>
             {webSocketError && <Alert severity="error">{webSocketError}</Alert>}
             <Grid container spacing={3}>
                 <Grid size={{ xs: 12, sm: 6 }}>

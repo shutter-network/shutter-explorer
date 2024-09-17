@@ -24,6 +24,7 @@ func NewRouter(ctx context.Context, usecases *usecase.Usecases) *gin.Engine {
 	transactionService := service.NewTransactionService(usecases.TransactionUsecase)
 	validatorService := service.NewValidatorService(usecases.ValidatorUsecase)
 	slotService := service.NewSlotService(usecases.SlotUsecase)
+	inclusionTimeService := service.NewInclusionTimeService(usecases.InclusionTimeUsecase)
 
 	api := router.Group("/api")
 	{
@@ -45,6 +46,12 @@ func NewRouter(ctx context.Context, usecases *usecase.Usecases) *gin.Engine {
 		slot := api.Group("slot")
 		slot.GET("/top_5_epochs", slotService.QueryTop5Epochs)
 		slot.GET("/included_transactions", slotService.QueryIncludedTXsInSlot)
+	}
+	{
+		inclusionTime := api.Group("inclusion_time")
+		inclusionTime.GET("/estimated_inclusion_time", inclusionTimeService.QueryEstimatedInclusionTime)
+		inclusionTime.GET("/executed_transactions", inclusionTimeService.QueryExecutedTransactionStats)
+		inclusionTime.GET("/historical_inclusion_time", inclusionTimeService.QueryHistoricalInclusionTimes)
 	}
 	return router
 }

@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { Link as RouterLink } from 'react-router-dom';
+import { NavLink as RouterLink } from 'react-router-dom';
 
 export const SidebarContainer = styled.aside.attrs({
     className: 'sidebar-container',
@@ -34,14 +34,26 @@ export const NavItem = styled(RouterLink).attrs({
   text-decoration: none;
 
   &:hover {
-    color: black;
+    color: #002861;
+    background-color: #e0e0e0;
+  }
+
+  &.active {
+    color: #002861;
     background-color: #e0e0e0;
   }
 `;
 
-export const NavIcon = styled.img.attrs({
-    className: 'nav-icon',
-})`
+export const NavIcon = styled.svg`
   width: 16px;
   height: 16px;
+  filter: brightness(0) saturate(100%) invert(9%) sepia(50%) saturate(750%) hue-rotate(200deg) brightness(95%) contrast(85%);
+
+  ${NavItem}:hover & {
+    filter: brightness(0) saturate(100%) invert(12%) sepia(45%) saturate(1500%) hue-rotate(220deg) brightness(90%) contrast(95%);
+  }
+
+  ${NavItem}.active & {
+    filter: brightness(0) saturate(100%) invert(12%) sepia(45%) saturate(1500%) hue-rotate(220deg) brightness(90%) contrast(95%);
+  }
 `;
