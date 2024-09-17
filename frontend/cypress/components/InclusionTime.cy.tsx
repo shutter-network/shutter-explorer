@@ -107,13 +107,6 @@ describe('<InclusionTime />', () => {
     });
 
     it('displays error messages if API call fails', () => {
-        const mockSocket = {
-            onopen: cy.stub(),
-            onmessage: cy.stub(),
-            onclose: cy.stub(),
-            onerror: cy.stub(),
-        };
-
         cy.intercept('GET', '/api/inclusion_time/estimated_inclusion_time', {
             statusCode: 500,
             body: {},
