@@ -43,3 +43,9 @@ export const verifyTransactionDetails = (data: TransactionData): void => {
     cy.contains(data.InclusionSlot.toString()).should('be.visible');
 };
 
+export function truncateString(str: string, num: number): string {
+    if (str.length <= num) {
+        return str;
+    }
+    return str.slice(0, num) + '...';
+}
