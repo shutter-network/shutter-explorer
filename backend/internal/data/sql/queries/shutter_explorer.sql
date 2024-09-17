@@ -166,7 +166,7 @@ ORDER BY
 LIMIT 1;
 
 -- name: QueryLatestSequencerTransactions :many
-SELECT encode(event_tx_hash, 'hex') AS sequencer_tx_hash, sender, FLOOR(EXTRACT(EPOCH FROM created_at)) as created_at_unix
+SELECT ('0x' || encode(event_tx_hash, 'hex'))::TEXT AS sequencer_tx_hash, FLOOR(EXTRACT(EPOCH FROM created_at)) as created_at_unix
 FROM transaction_submitted_event 
 ORDER BY created_at DESC
 LIMIT $1;

@@ -352,7 +352,7 @@ func (q *Queries) QueryLatestPendingTXsWhichCanBeDecrypted(ctx context.Context, 
 }
 
 const queryLatestSequencerTransactions = `-- name: QueryLatestSequencerTransactions :many
-SELECT encode(event_tx_hash, 'hex') AS sequencer_tx_hash, sender, FLOOR(EXTRACT(EPOCH FROM created_at)) as created_at_unix
+SELECT ('0x' || encode(event_tx_hash, 'hex'))::TEXT AS sequencer_tx_hash, FLOOR(EXTRACT(EPOCH FROM created_at)) as created_at_unix
 FROM transaction_submitted_event 
 ORDER BY created_at DESC
 LIMIT $1
@@ -360,7 +360,6 @@ LIMIT $1
 
 type QueryLatestSequencerTransactionsRow struct {
 	SequencerTxHash string
-	Sender          []byte
 	CreatedAtUnix   float64
 }
 
@@ -373,7 +372,7 @@ func (q *Queries) QueryLatestSequencerTransactions(ctx context.Context, limit in
 	var items []QueryLatestSequencerTransactionsRow
 	for rows.Next() {
 		var i QueryLatestSequencerTransactionsRow
-		if err := rows.Scan(&i.SequencerTxHash, &i.Sender, &i.CreatedAtUnix); err != nil {
+		if err := rows.Scan(&i.SequencerTxHash, &i.CreatedAtUnix); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
