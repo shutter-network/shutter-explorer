@@ -107,7 +107,6 @@ describe('<InclusionTime />', () => {
     });
 
     it('displays error messages if API call fails', () => {
-
         cy.intercept('GET', '/api/inclusion_time/estimated_inclusion_time', {
             statusCode: 500,
             body: {},

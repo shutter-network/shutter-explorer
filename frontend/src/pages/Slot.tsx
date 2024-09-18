@@ -25,7 +25,7 @@ const Slot = () => {
 
     const [sequencerTransactions, setSequencerTransactions] = useState(sequencerTransactionsData?.message || []);
     const [userTransactions, setUserTransactions] = useState(userTransactionsData?.message || []);
-    const [webSocketError, setWebSocketError] = useState<string | null>(null); // State to store WebSocket errors
+    const [, setWebSocketError] = useState<string | null>(null); // State to store WebSocket errors
 
     const { socket } = useWebSocket()!;
 
@@ -93,7 +93,6 @@ const Slot = () => {
         <ResponsiveLayout>
             <Box sx={{ flexGrow: 1, marginTop: 4 }}>
                 <TitleSection title="Slot Overview" />
-                {webSocketError && <Alert severity="error">{webSocketError}</Alert>}
                 <Grid container spacing={2} sx={{ marginTop: 4 }}>
                     <Grid size={{ sm: 12, md: 12, lg: 6 }} >
                         {errorSequencer ? (

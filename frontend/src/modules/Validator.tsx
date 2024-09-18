@@ -14,7 +14,7 @@ const Validator = () => {
     const [shutterizedValidators, setShutterizedValidators] = useState(shutterizedValidatorsData?.message || 'N/A');
     const [validatorPercentage, setValidatorPercentage] = useState((shutterizedValidatorsData?.message * 100) / totalValidatorsData?.message || 'N/A');
     const [totalValidators, setTotalValidators] = useState(totalValidatorsData?.message || 'N/A');
-    const [webSocketError, setWebSocketError] = useState<string | null>(null);
+    const [, setWebSocketError] = useState<string | null>(null);
 
     const { socket } = useWebSocket()!;
 
@@ -78,7 +78,6 @@ const Validator = () => {
 
     return (
         <Box sx={{ flexGrow: 1, marginTop: 4 }}>
-            {webSocketError && <Alert severity="error">{webSocketError}</Alert>}
 
                     <OverviewCard title="Validator Overview" iconSrc={overviewIcon}>
                         {/* Error handling and InfoBox display */}
