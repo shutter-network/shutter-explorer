@@ -1,5 +1,6 @@
 import { FC } from "react";
-import { Paper, Tooltip, Typography } from '@mui/material';
+import { Box, Paper, Tooltip, Typography } from '@mui/material';
+import { ReactComponent as InfoIcon } from '../assets/icons/info.svg';
 
 interface InfoBoxProps {
     title: string;
@@ -22,10 +23,15 @@ const InfoBox: FC<InfoBoxProps> = ({ title, tooltip, value }) => {
                     value
                 )}
             </Typography>
-            <Tooltip title={tooltip}>
+
+            <Box display="flex" alignItems="center" gap={1}>
                 <Typography variant="body1">
-                    {title}</Typography>
-            </Tooltip>
+                    {title}
+                </Typography>
+                <Tooltip title={tooltip}>
+                    <InfoIcon />
+                </Tooltip>
+            </Box>
         </Paper>
     );
 };
