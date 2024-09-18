@@ -7,11 +7,11 @@ import { useWebSocket } from '../context/WebSocketContext';
 import useFetch from '../hooks/useFetch';
 
 const InclusionTime = () => {
-    const { data: estimatedInclusionTimeData, loading: loadingEstimatedInclusionTime, error: errorEstimatedInclusionTime } = useFetch('/api/inclusion_time/estimated_inclusion_time');
-    const { data: transactionStatsData, loading: loadingTransactionStats, error: errorTransactionStats } = useFetch('/api/inclusion_time/executed_transactions');
+    const { data: estimatedInclusionTimeData,} = useFetch('/api/inclusion_time/estimated_inclusion_time');
+    const { data: transactionStatsData, } = useFetch('/api/inclusion_time/executed_transactions');
     const { data: historicalInclusionTimeData, loading: loadingHistoricalInclusionTime, error: errorHistoricalInclusionTime } = useFetch('/api/inclusion_time/historical_inclusion_time');
 
-    const [estimatedInclusionTime, setEstimatedInclusionTime] = useState<string | number>(estimatedInclusionTimeData?.message || 'N/A');
+    const [, setEstimatedInclusionTime] = useState<string | number>(estimatedInclusionTimeData?.message || 'N/A');
     const [successfulTransactions, setSuccessfulTransactions] = useState<number>(transactionStatsData?.message?.Successful || 0);
     const [failedTransactions, setFailedTransactions] = useState<number>(transactionStatsData?.message?.Failed || 0);
     const [historicalInclusionTime, setHistoricalInclusionTime] = useState(historicalInclusionTimeData?.message || []);

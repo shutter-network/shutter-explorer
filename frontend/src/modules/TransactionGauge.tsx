@@ -10,11 +10,9 @@ import { useTheme } from '@mui/material/styles';
 const TransactionGauge = () => {
     const theme = useTheme();
 
-    const { data: transactionStatsData, loading: loadingTransactionStats, error: errorTransactionStats } = useFetch('/inclusion_time/executed_transactions');
-
-    const [successfulTransactions, setSuccessfulTransactions] = useState<number>(transactionStatsData?.successful || 0);
-    const [failedTransactions, setFailedTransactions] = useState<number>(transactionStatsData?.failed || 0);
-    const [, setWebSocketError] = useState<string | null>(null);
+    const { data: transactionStatsData, loading: loadingTransactionStats, error: errorTransactionStats } = useFetch('/api/inclusion_time/executed_transactions');
+    const [successfulTransactions, setSuccessfulTransactions] = useState<number>(transactionStatsData?.message?.Successful || 0);
+    const [failedTransactions, setFailedTransactions] = useState<number>(transactionStatsData?.message?.Failed || 0);
 
     const { socket } = useWebSocket()!;
 
@@ -27,9 +25,9 @@ const TransactionGauge = () => {
                 } else if (websocketEvent.data) {
                     setWebSocketError(null);
                     if (websocketEvent.type === 'executed_transactions_updated') {
-                        if ('successful' in websocketEvent.data && 'failed' in websocketEvent.data) {
-                            setSuccessfulTransactions(websocketEvent.data.successful);
-                            setFailedTransactions(websocketEvent.data.failed);
+                        if ('Successful' in websocketEvent.data.message && 'Failed' in websocketEvent.data.message) {
+                            setSuccessfulTransactions(websocketEvent.data.message.Successful);
+                            setFailedTransactions(websocketEvent.data.message.Failed);
                         }
                     }
                 }
@@ -49,12 +47,12 @@ const TransactionGauge = () => {
     }, [socket]);
 
     useEffect(() => {
-        if (transactionStatsData?.successful) setSuccessfulTransactions(transactionStatsData.successful);
-        if (transactionStatsData?.failed) setFailedTransactions(transactionStatsData.failed);
+        if (transactionStatsData?.message?.Successful) setSuccessfulTransactions(transactionStatsData.message.Successful);
+        if (transactionStatsData?.message?.Failed) setFailedTransactions(transactionStatsData.message.Failed);
     }, [transactionStatsData]);
 
     const totalTransactions = successfulTransactions + failedTransactions;
-    const successRate = totalTransactions > 0 ? (successfulTransactions / totalTransactions) * 100 : 0;
+    const successRate = totalTransactions > 0 ? (successfulTransactions * 100 / totalTransactions) : 0;
 
     return (
         <Box sx={{ flexGrow: 1, marginTop: 4 }}>
