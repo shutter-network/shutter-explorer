@@ -13,6 +13,7 @@ const TransactionGauge = () => {
     const { data: transactionStatsData, loading: loadingTransactionStats, error: errorTransactionStats } = useFetch('/api/inclusion_time/executed_transactions');
     const [successfulTransactions, setSuccessfulTransactions] = useState<number>(transactionStatsData?.message?.Successful || 0);
     const [failedTransactions, setFailedTransactions] = useState<number>(transactionStatsData?.message?.Failed || 0);
+    const [, setWebSocketError] = useState<string | null>(null);
 
     const { socket } = useWebSocket()!;
 
