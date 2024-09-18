@@ -2,7 +2,7 @@ import React from 'react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { mount } from 'cypress/react18';
 import Transaction from '../../src/pages/Transaction';
-import {transactionData, updatedTransactionData, verifyTransactionDetails} from '../utils/transactionUtils';
+import {transactionData, updatedTransactionData, verifyTransactionDetails, verifyTransactionDetailsUpdated} from '../utils/transactionUtils';
 
 describe('<Transaction />', () => {
     it('renders the transaction details correctly', () => {
@@ -44,7 +44,7 @@ describe('<Transaction />', () => {
 
         cy.wait('@getUpdatedTransaction');
 
-        verifyTransactionDetails(updatedTransactionData);
+        verifyTransactionDetailsUpdated(updatedTransactionData);
     });
 
 
