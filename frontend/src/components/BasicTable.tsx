@@ -1,4 +1,5 @@
 import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material";
+import { StyledTableCell, StyledTableRow } from "../styles/table";
 
 interface Column {
     id: string;
@@ -29,16 +30,16 @@ export default function BasicTable<T extends { [key: string]: any }>({
                 </TableHead>
                 <TableBody>
                     {rows.map((row, index) => (
-                        <TableRow
+                        <StyledTableRow
                             key={index}
                             sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                         >
                             {columns.map((column) => (
-                                <TableCell key={column.id}>
+                                <StyledTableCell key={column.id}>
                                     {row[column.id]}
-                                </TableCell>
+                                </StyledTableCell>
                             ))}
-                        </TableRow>
+                        </StyledTableRow>
                     ))}
                 </TableBody>
             </Table>
