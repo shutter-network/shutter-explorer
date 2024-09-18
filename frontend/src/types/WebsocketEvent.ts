@@ -25,6 +25,14 @@ export interface SequencerTransaction {
     CreatedAtUnix: number
 }
 
+export interface HistoricalInclusionTimeResponse {
+    SubmissionDateUnix: number;
+    TotalTransactions: number;
+    AvgInclusionTimeSeconds: number;
+    MinInclusionTimeSeconds: number;
+    MaxInclusionTimeSeconds: number;
+}
+
 interface SequencerTransactions {
     transactions: Array<SequencerTransaction>;
 }

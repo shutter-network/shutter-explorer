@@ -5,6 +5,7 @@ import CustomLineChart from '../components/CustomLineChart';
 import { useEffect, useState } from 'react';
 import { useWebSocket } from '../context/WebSocketContext';
 import useFetch from '../hooks/useFetch';
+import { HistoricalInclusionTimeResponse } from '../types/WebsocketEvent';
 
 const InclusionTime = () => {
     const { data: historicalInclusionTimeData, loading: loadingHistoricalInclusionTime, error: errorHistoricalInclusionTime } = useFetch('/api/inclusion_time/historical_inclusion_time');
@@ -45,6 +46,11 @@ const InclusionTime = () => {
         if (historicalInclusionTimeData?.message) setHistoricalInclusionTime(historicalInclusionTimeData.message);
     }, [historicalInclusionTimeData]);
 
+    const historicalTrasactionData = historicalInclusionTime.map((data: HistoricalInclusionTimeResponse) => ({
+        day: data.SubmissionDateUnix,
+        averageInclusionTime: data.AvgInclusionTimeSeconds,
+    }));
+
     return (
         <Box sx={{ flexGrow: 1, marginTop: 4 }}>
 
@@ -55,7 +61,7 @@ const InclusionTime = () => {
                             <Alert severity="error">Error fetching Historical Inclusion Times: {errorHistoricalInclusionTime.message}</Alert>
                         ) : (
                             <CustomLineChart
-                                data={loadingHistoricalInclusionTime ? [] : historicalInclusionTime}
+                                data={loadingHistoricalInclusionTime ? [] : historicalTrasactionData}
                                 title={loadingHistoricalInclusionTime ? 'Loading Historical Inclusion Times...' : ''}
                             />
                         )}
