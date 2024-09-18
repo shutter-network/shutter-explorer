@@ -25,7 +25,7 @@ export const StyledTransactionDetails = styled(Box).attrs({
   }
 
   .card-label {
-    width: 240px;
+    width: fit-content;
     color: #989ca2;
     font-size: 14px;
     font-weight: 600;
@@ -38,11 +38,14 @@ export const StyledTransactionDetails = styled(Box).attrs({
     font-size: 14px;
     font-weight: 600;
     letter-spacing: -0.7px;
+    text-align: left;
   }
 
   .hash {
     color: #0044a4;
     word-break: break-all;
+    text-align: left;
+    display: block;
   }
 
   .status-pending {
@@ -50,8 +53,23 @@ export const StyledTransactionDetails = styled(Box).attrs({
     color: #645912;
     border-radius: 100px;
     padding: 2px 8px;
-    font-size: 10px;
+    font-size: 12px;
     font-weight: bold;
+    width: fit-content;
+  }
+
+  .status-completed{
+    background: #44CA85;
+    color: #ffffff;
+    border-radius: 100px;
+    padding: 2px 8px;
+    font-size: 12px;
+    font-weight: bold;
+    width: fit-content;
+  }
+
+  .info-icon{
+    fill: green;
   }
 
   @media (max-width: 991px) {
