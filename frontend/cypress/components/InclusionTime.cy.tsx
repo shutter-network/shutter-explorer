@@ -98,8 +98,8 @@ describe('<InclusionTime />', () => {
 
         cy.wrap(mockSocket).invoke('onmessage', {
             data: JSON.stringify({
-                type: 'historical_inclusion_time_updated',
-                data: { times: [{ SubmissionDateUnix: 1625184000, AvgInclusionTimeSeconds: 350 }] },
+                Type: 'historical_inclusion_time_updated',
+                Data: { times: [{ SubmissionDateUnix: 1625184000, AvgInclusionTimeSeconds: 350 }] },
             }),
         } as MessageEvent);
 
