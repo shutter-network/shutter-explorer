@@ -42,25 +42,25 @@ const Slot = () => {
         if (socket) {
             socket.onmessage = (event: MessageEvent) => {
                 const websocketEvent = JSON.parse(event.data) as WebsocketEvent;
-                if (websocketEvent.error) {
-                    setWebSocketError(`Error: ${websocketEvent.error.message} (Code: ${websocketEvent.error.code})`);
-                } else if (websocketEvent.data) {
+                if (websocketEvent.Error) {
+                    setWebSocketError(`Error: ${websocketEvent.Error.message} (Code: ${websocketEvent.Error.code})`);
+                } else if (websocketEvent.Data) {
                     setWebSocketError(null);
-                    switch (websocketEvent.type) {
-                        case 'sequencer_transactions_updated':
-                            setSequencerTransactions(websocketEvent.data);
+                    switch (websocketEvent.Type) {
+                        case 'latest_sequencer_transactions_updated':
+                            setSequencerTransactions(websocketEvent.Data);
                             break;
 
-                        case 'user_transactions_updated':
-                            setUserTransactions(websocketEvent.data);
+                        case 'latest_user_transactions_updated':
+                            setUserTransactions(websocketEvent.Data);
                             break;
 
                         default:
-                            console.warn('Unhandled WebSocket event type:', websocketEvent.type);
+                            console.warn('Unhandled WebSocket event type:', websocketEvent.Type);
                     }
                 } else {
-                    setWebSocketError(`Received null data for event type: ${websocketEvent.type}`);
-                    console.warn('Received null data for event type:', websocketEvent.type);
+                    setWebSocketError(`Received null data for event type: ${websocketEvent.Type}`);
+                    console.warn('Received null data for event type:', websocketEvent.Type);
                 }
             };
 

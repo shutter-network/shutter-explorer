@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { useWebSocket } from '../context/WebSocketContext';
 import useFetch from '../hooks/useFetch';
 import overviewIcon from '../assets/icons/arrows_horizontal.svg';
+import { WebsocketEvent } from '../types/WebsocketEvent';
 
 const Transaction = () => {
     const { data: executedTransactionsData, loading: loadingExecutedTransactions, error: errorExecutedTransactions } = useFetch('/api/transaction/total_executed_transactions');
@@ -21,29 +22,27 @@ const Transaction = () => {
     useEffect(() => {
         if (socket) {
             socket.onmessage = (event: MessageEvent) => {
-                const websocketEvent = JSON.parse(event.data);
-                if (websocketEvent.error) {
-                    setWebSocketError(`Error: ${websocketEvent.error.message} (Code: ${websocketEvent.error.code})`);
-                } else if (websocketEvent.data) {
+                const websocketEvent = JSON.parse(event.data) as WebsocketEvent;
+                if (websocketEvent.Error) {
+                    setWebSocketError(`Error: ${websocketEvent.Error.message} (Code: ${websocketEvent.Error.code})`);
+                } else if (websocketEvent.Data) {
                     setWebSocketError(null);
-                    switch (websocketEvent.type) {
-                        case 'executed_transactions_updated':
-                            if ('count' in websocketEvent.data) {
-                                setExecutedTransactions(websocketEvent.data.count);
-                            }
+                    switch (websocketEvent.Type) {
+                        case 'total_executed_transactions_updated':
+                            setExecutedTransactions(websocketEvent.Data.count);
                             break;
                         case 'shutterized_transactions_per_month_updated':
-                            if ('count' in websocketEvent.data) {
-                                setShutterizedTransactionsPerMonth(websocketEvent.data.count);
+                            if ('count' in websocketEvent.Data) {
+                                setShutterizedTransactionsPerMonth(websocketEvent.Data.count);
                             }
                             break;
                         case 'shutterized_transaction_percentage_updated':
-                            if ('percentage' in websocketEvent.data) {
-                                setShutterizedTransactionPercentage(websocketEvent.data.percentage);
+                            if ('percentage' in websocketEvent.Data) {
+                                setShutterizedTransactionPercentage(websocketEvent.Data.percentage);
                             }
                             break;
                         default:
-                            console.warn('Unhandled WebSocket event type:', websocketEvent.type);
+                            console.warn('Unhandled WebSocket event type:', websocketEvent.Type);
                     }
                 }
             };

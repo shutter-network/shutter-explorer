@@ -73,10 +73,6 @@ interface KeyperThreshold {
     threshold: number;
 }
 
-interface ExecutedTransactions {
-    count: number;
-}
-
 interface ShutterizedTransactionsPerMonth {
     count: number;
 }
@@ -106,11 +102,11 @@ interface CurrentEpoch {
 }
 
 export interface WebsocketEvent {
-    type:
+    Type:
         | 'previous_shutterized_slot_details_updated'
         | 'slot_progression_updated'
-        | 'sequencer_transactions_updated'
-        | 'user_transactions_updated'
+        | 'latest_sequencer_transactions_updated'
+        | 'latest_user_transactions_updated'
         | 'transactions_protected_updated'
         | 'value_protected_updated'
         | 'success_rate_updated'
@@ -119,14 +115,14 @@ export interface WebsocketEvent {
         | 'total_validators_updated'
         | 'gnosis_chain_keypers_updated'
         | 'keyper_threshold_updated'
-        | 'executed_transactions_updated'
+        | 'total_executed_transactions_updated'
         | 'shutterized_transactions_per_month_updated'
         | 'shutterized_transaction_percentage_updated'
         | 'estimated_inclusion_time_updated'
         | 'executed_transaction_stats_updated'
         | 'historical_inclusion_time_updated'
         | 'current_epoch_updated';
-    data:
+    Data:
         | PreviousShutterizedSlotDetails
         | SlotProgression
         | SequencerTransactions
@@ -139,13 +135,13 @@ export interface WebsocketEvent {
         | TotalValidators
         | GnosisChainKeypers
         | KeyperThreshold
-        | ExecutedTransactions
+        | any
         | ShutterizedTransactionsPerMonth
         | ShutterizedTransactionPercentage
         | EstimatedInclusionTime
         | ExecutedTransactionStats
         | HistoricalInclusionTime
         | CurrentEpoch
-        | null;
-    error?: ApiError | null;
+        | null
+    Error?: ApiError | null;
 }
