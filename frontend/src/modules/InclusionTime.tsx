@@ -7,13 +7,8 @@ import { useWebSocket } from '../context/WebSocketContext';
 import useFetch from '../hooks/useFetch';
 
 const InclusionTime = () => {
-    const { data: estimatedInclusionTimeData, loading: loadingEstimatedInclusionTime, error: errorEstimatedInclusionTime } = useFetch('/api/inclusion_time/estimated_inclusion_time');
-    const { data: transactionStatsData, loading: loadingTransactionStats, error: errorTransactionStats } = useFetch('/api/inclusion_time/executed_transactions');
     const { data: historicalInclusionTimeData, loading: loadingHistoricalInclusionTime, error: errorHistoricalInclusionTime } = useFetch('/api/inclusion_time/historical_inclusion_time');
 
-    const [estimatedInclusionTime, setEstimatedInclusionTime] = useState<string | number>(estimatedInclusionTimeData?.message || 'N/A');
-    const [successfulTransactions, setSuccessfulTransactions] = useState<number>(transactionStatsData?.message?.Successful || 0);
-    const [failedTransactions, setFailedTransactions] = useState<number>(transactionStatsData?.message?.Failed || 0);
     const [historicalInclusionTime, setHistoricalInclusionTime] = useState(historicalInclusionTimeData?.message || []);
     const [webSocketError, setWebSocketError] = useState<string | null>(null);
 
@@ -47,14 +42,8 @@ const InclusionTime = () => {
     }, [socket]);
 
     useEffect(() => {
-        if (estimatedInclusionTimeData?.message) setEstimatedInclusionTime(estimatedInclusionTimeData.message);
-        if (transactionStatsData?.message?.Successful) setSuccessfulTransactions(transactionStatsData.message?.Successful);
-        if (transactionStatsData?.Failed) setFailedTransactions(transactionStatsData.Failed);
         if (historicalInclusionTimeData?.message) setHistoricalInclusionTime(historicalInclusionTimeData.message);
-    }, [estimatedInclusionTimeData, transactionStatsData, historicalInclusionTimeData]);
-
-    const totalTransactions = successfulTransactions + failedTransactions;
-    const successRate = totalTransactions > 0 ? (successfulTransactions / totalTransactions) * 100 : 0;
+    }, [historicalInclusionTimeData]);
 
     return (
         <Box sx={{ flexGrow: 1, marginTop: 4 }}>
