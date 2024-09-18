@@ -1,6 +1,5 @@
 import { FC } from "react";
 import { Paper, Tooltip, Typography } from '@mui/material';
-import InfoIcon from '@mui/icons-material/Info';
 
 interface InfoBoxProps {
     title: string;
@@ -23,11 +22,8 @@ const InfoBox: FC<InfoBoxProps> = ({ title, tooltip, value }) => {
                     value
                 )}
             </Typography>
-            {/* Display title with body1 (body small) style */}
             <Tooltip title={tooltip}>
                 <Typography variant="body1">
-                {/* <InfoIcon style={{ cursor: 'pointer' }} /> */}
-
                     {title}</Typography>
             </Tooltip>
         </Paper>
