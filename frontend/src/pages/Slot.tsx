@@ -72,22 +72,14 @@ const Slot = () => {
     }, [socket]);
 
     const sequencerTransactionsWithAge = sequencerTransactions.map((transaction: SequencerTransaction) => ({
-        hash: truncateString(transaction.SequencerTxHash, 50),
+        hash: transaction.SequencerTxHash,
         timestamp: getTimeAgo(transaction.CreatedAtUnix),
     }));
 
     const userTransactionsWithAge = userTransactions.map((transaction: Transaction) => ({
-        hash: truncateString(transaction.TxHash, 50),
+        hash: transaction.TxHash,
         timestamp: getTimeAgo(transaction.IncludedAtUnix),
     }));
-
-
-    function truncateString(str: string, num: number): string {
-        if (str.length <= num) {
-            return str;
-        }
-        return str.slice(0, num) + '...';
-    }
 
     return (
         <ResponsiveLayout>
