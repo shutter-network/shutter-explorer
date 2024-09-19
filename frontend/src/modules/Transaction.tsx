@@ -21,7 +21,7 @@ const Transaction = () => {
 
     useEffect(() => {
         if (socket) {
-            socket.onmessage = (event: MessageEvent) => {
+            const handleMessage = (event: MessageEvent) => {
                 const websocketEvent = JSON.parse(event.data) as WebsocketEvent;
                 if (websocketEvent.Error) {
                     setWebSocketError(`Error: ${websocketEvent.Error.message} (Code: ${websocketEvent.Error.code})`);
@@ -29,7 +29,7 @@ const Transaction = () => {
                     setWebSocketError(null);
                     switch (websocketEvent.Type) {
                         case 'total_executed_transactions_updated':
-                            setExecutedTransactions(websocketEvent.Data.count);
+                            setExecutedTransactions(websocketEvent.Data);
                             break;
                         case 'shutterized_transactions_per_month_updated':
                             if ('count' in websocketEvent.Data) {
@@ -47,17 +47,20 @@ const Transaction = () => {
                 }
             };
 
-            socket.onerror = () => {
+            const handleError = () => {
                 setWebSocketError('WebSocket error: A connection error occurred');
+            };
+
+            socket.addEventListener('message', handleMessage);
+            socket.addEventListener('error', handleError);
+
+            return () => {
+                socket.removeEventListener('message', handleMessage);
+                socket.removeEventListener('error', handleError);
             };
         }
 
-        return () => {
-            if (socket) {
-                socket.onmessage = null;
-                socket.onerror = null;
-            }
-        };
+
     }, [socket]);
 
     useEffect(() => {
