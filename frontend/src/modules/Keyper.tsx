@@ -1,4 +1,4 @@
-import { Box } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import InfoBox from '../components/InfoBox';
 import OverviewCard from '../components/OverviewCard';
 import overviewIcon from '../assets/icons/shutter.svg';
@@ -21,6 +21,7 @@ const Keyper = () => {
                     tooltip="Threshold number of keypers required for operation"
                     value={keyperThreshold}
                 />
+                <Typography sx={{ paddingLeft: 2, textAlign: "left" }} >Shutter DAOs have already selected and approved 22 Keypers to be eligible to operate keyper clients for various Shutter-protected protocols (e.g. Shutter for Gnosis Chain or Shutter for Snapshot Shielded Voting). The current subset of 7 are voluntary Genesis Keypers specifically for Gnosis Chain.</Typography>
             </OverviewCard>
         </Box>
     );
