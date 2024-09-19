@@ -71,8 +71,8 @@ describe('<Validator />', () => {
 
     cy.wrap(mockSocket).invoke('onmessage', {
       data: JSON.stringify({
-        type: 'shutterized_validators_updated',
-        data: { count: 100 },
+        Type: 'shutterized_validators_updated',
+        Data: { count: 100 },
       }),
     } as MessageEvent);
 
@@ -81,8 +81,8 @@ describe('<Validator />', () => {
     
     cy.wrap(mockSocket).invoke('onmessage', {
       data: JSON.stringify({
-        type: 'total_validators_updated',
-        data: { count: 1000 },
+        Type: 'total_validators_updated',
+        Data: { count: 1000 },
       }),
     } as MessageEvent);
     

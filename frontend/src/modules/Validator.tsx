@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { useWebSocket } from '../context/WebSocketContext';
 import useFetch from '../hooks/useFetch';
 import overviewIcon from '../assets/icons/shield_check.svg';
+import { WebsocketEvent } from '../types/WebsocketEvent';
 
 
 const Validator = () => {
@@ -21,34 +22,34 @@ const Validator = () => {
     useEffect(() => {
         if (socket) {
             socket.onmessage = (event: MessageEvent) => {
-                const websocketEvent = JSON.parse(event.data);
-                if (websocketEvent.error) {
-                    setWebSocketError(`Error: ${websocketEvent.error.message} (Code: ${websocketEvent.error.code})`);
-                } else if (websocketEvent.data) {
+                const websocketEvent = JSON.parse(event.data) as WebsocketEvent;
+                if (websocketEvent.Error) {
+                    setWebSocketError(`Error: ${websocketEvent.Error.message} (Code: ${websocketEvent.Error.code})`);
+                } else if (websocketEvent.Data) {
                     setWebSocketError(null);
-                    switch (websocketEvent.type) {
+                    switch (websocketEvent.Type) {
                         case 'shutterized_validators_updated':
-                            if ('count' in websocketEvent.data) {
-                                setShutterizedValidators(websocketEvent.data.count);
-                                setValidatorPercentage((websocketEvent.data.count*100)/totalValidators)
+                            if ('count' in websocketEvent.Data) {
+                                setShutterizedValidators(websocketEvent.Data.count);
+                                setValidatorPercentage((websocketEvent.Data.count*100)/totalValidators)
                             } else {
                                 console.warn('Invalid data format for shutterized_validators_updated');
                             }
                             break;
                         case 'total_validators_updated':
-                            if ('count' in websocketEvent.data) {
-                                setTotalValidators(websocketEvent.data.count);
-                                setValidatorPercentage((shutterizedValidators*100)/websocketEvent.data.count)
+                            if ('count' in websocketEvent.Data) {
+                                setTotalValidators(websocketEvent.Data.count);
+                                setValidatorPercentage((shutterizedValidators*100)/websocketEvent.Data.count)
                             } else {
                                 console.warn('Invalid data format for total_validators_updated');
                             }
                             break;
                         default:
-                            console.warn('Unhandled WebSocket event type:', websocketEvent.type);
+                            console.warn('Unhandled WebSocket event type:', websocketEvent.Type);
                     }
                 } else {
-                    setWebSocketError(`Received null data for event type: ${websocketEvent.type}`);
-                    console.warn('Received null data for event type:', websocketEvent.type);
+                    setWebSocketError(`Received null data for event type: ${websocketEvent.Type}`);
+                    console.warn('Received null data for event type:', websocketEvent.Type);
                 }
             };
 

@@ -5,7 +5,7 @@ import CustomLineChart from '../components/CustomLineChart';
 import { useEffect, useState } from 'react';
 import { useWebSocket } from '../context/WebSocketContext';
 import useFetch from '../hooks/useFetch';
-import { HistoricalInclusionTimeResponse } from '../types/WebsocketEvent';
+import { HistoricalInclusionTimeResponse, WebsocketEvent } from '../types/WebsocketEvent';
 
 const InclusionTime = () => {
     const { data: historicalInclusionTimeData, loading: loadingHistoricalInclusionTime, error: errorHistoricalInclusionTime } = useFetch('/api/inclusion_time/historical_inclusion_time');
@@ -18,13 +18,13 @@ const InclusionTime = () => {
     useEffect(() => {
         if (socket) {
             socket.onmessage = (event: MessageEvent) => {
-                const websocketEvent = JSON.parse(event.data);
-                if (websocketEvent.error) {
-                    setWebSocketError(`Error: ${websocketEvent.error.message} (Code: ${websocketEvent.error.code})`);
-                } else if (websocketEvent.data) {
+                const websocketEvent = JSON.parse(event.data) as WebsocketEvent;
+                if (websocketEvent.Error) {
+                    setWebSocketError(`Error: ${websocketEvent.Error.message} (Code: ${websocketEvent.Error.code})`);
+                } else if (websocketEvent.Data) {
                     setWebSocketError(null);
-                    if (websocketEvent.type === 'historical_inclusion_time_updated' && 'times' in websocketEvent.data) {
-                        setHistoricalInclusionTime(websocketEvent.data.times);
+                    if (websocketEvent.Type === 'historical_inclusion_time_updated' && 'times' in websocketEvent.Data) {
+                        setHistoricalInclusionTime(websocketEvent.Data.times);
                     }
                 }
             };
