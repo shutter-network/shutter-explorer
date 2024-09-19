@@ -74,8 +74,8 @@ describe('<InclusionTime />', () => {
         cy.contains('300').should('be.visible');
         cy.contains('320').should('be.visible');
         cy.contains('340').should('be.visible');
-        cy.contains('Wed 07').should('be.visible');
-        cy.contains('Jul 11').should('be.visible');
+        cy.contains('7 Jul').should('be.visible');
+        cy.contains('11 Jul').should('be.visible');
     });
 
     it('receives updated historical inclusion time data via WebSocket', () => {
