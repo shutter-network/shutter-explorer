@@ -5,7 +5,7 @@ import overviewIcon from '../assets/icons/shutter.svg';
 
 const Keyper = () => {
     const keyperCount = 7;
-    const keyperThreshold = 3;
+    const keyperThreshold = 4;
 
     return (
         <Box sx={{ flexGrow: 1, marginTop: 4 }}>
