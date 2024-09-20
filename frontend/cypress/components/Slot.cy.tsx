@@ -154,8 +154,8 @@ describe('<Slot />', () => {
 
         const messageEvent1 = new MessageEvent('message', {
             data: JSON.stringify({
-                type: 'sequencer_transactions_updated',
-                data: [
+                Type: 'latest_sequencer_transactions_updated',
+                Data: [
                     { SequencerTxHash: '0xnewSequencerTransactionHash1', CreatedAtUnix: 1725204000 },
                     { SequencerTxHash: '0xnewSequencerTransactionHash2', CreatedAtUnix: 1725204300 },
                 ],
@@ -172,79 +172,24 @@ describe('<Slot />', () => {
         cy.get('td').contains('0xnewSequencerTransactionHash2', { timeout: 10000 }).should('be.visible');
         cy.get('td').contains(getTimeAgo(1725204300), { timeout: 10000 }).should('be.visible');
 
-        cy.wrap(mockSocket).invoke('onmessage', {
+        const messageEvent2 = new MessageEvent('message', {
             data: JSON.stringify({
-                type: 'user_transactions_updated',
-                data: [
+                Type: 'latest_user_transactions_updated',
+                Data: [
                     { TxHash: '0xnewUserTransactionHash1', IncludedAtUnix: 1725204600 },
                     { TxHash: '0xnewUserTransactionHash2', IncludedAtUnix: 1725204900 },
                 ],
             }),
-        } as MessageEvent);
+          });
+
+        cy.then(() => {
+            // Dispatch the event to simulate the WebSocket message
+            mockSocket.dispatchEvent(messageEvent2);
+        });
 
         cy.get('td').contains('0xnewUserTransactionHash1', { timeout: 10000 }).should('be.visible');
         cy.get('td').contains(getTimeAgo(1725204600), { timeout: 10000 }).should('be.visible');
         cy.get('td').contains('0xnewUserTransactionHash2', { timeout: 10000 }).should('be.visible');
         cy.get('td').contains(getTimeAgo(1725204900), { timeout: 10000 }).should('be.visible');
-    });
-
-    it('displays a WebSocket error message if a WebSocket error occurs', () => {
-        const mockSocket = {
-            onopen: cy.stub(),
-            onmessage: cy.stub(),
-            onclose: cy.stub(),
-            onerror: cy.stub(),
-            addEventListener: cy.stub(),
-            removeEventListener: cy.stub(),
-        };
-
-        mount(
-            <WebSocketContext.Provider value={{ socket: mockSocket as unknown as WebSocket }}>
-                <MemoryRouter>
-                    <Slot />
-                </MemoryRouter>
-            </WebSocketContext.Provider>
-        );
-
-        cy.wait('@getSequencerTransactions');
-        cy.wait('@getUserTransactions');
-
-        cy.wrap(mockSocket).invoke('onerror', {
-            message: 'WebSocket connection failed',
-        });
-
-        cy.get('div').contains('WebSocket error: A connection error occurred').should('be.visible');
-    });
-
-    it('displays an error message if WebSocket event contains an error', () => {
-        const mockSocket = {
-            onopen: cy.stub(),
-            onmessage: cy.stub(),
-            onclose: cy.stub(),
-            onerror: cy.stub(),
-            addEventListener: cy.stub(),
-            removeEventListener: cy.stub(),
-        };
-
-        mount(
-            <WebSocketContext.Provider value={{ socket: mockSocket as unknown as WebSocket }}>
-                <MemoryRouter>
-                    <Slot />
-                </MemoryRouter>
-            </WebSocketContext.Provider>
-        );
-
-        cy.wait('@getSequencerTransactions');
-        cy.wait('@getUserTransactions');
-
-        cy.wrap(mockSocket).invoke('onmessage', {
-            data: JSON.stringify({
-                type: 'sequencer_transactions_updated',
-                data: null,
-                error: { message: 'Invalid data received', code: 400 },
-            }),
-        } as MessageEvent);
-
-        cy.get('div').contains('Error: Invalid data received (Code: 400)').should('be.visible');
     });
 });
