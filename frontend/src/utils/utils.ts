@@ -63,11 +63,17 @@ export const formatTimestamp = (unixTimestamp: number): string => {
   return `${timeAgo} (${formattedDate})`;
 }
 
-
-
 export const truncateString = (str: string, num: number): string => {
   if (str.length <= num) {
     return str;
   }
   return str.slice(0, num) + '...';
+}
+
+export const truncateDecimals = (num: number): string => {
+  let result =  num.toString().match(/^-?\d+(\.\d{0,2})?/);
+  if (result){
+    return result[0];
+  }
+  return 'N/A'
 }
