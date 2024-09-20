@@ -42,6 +42,8 @@ describe('<Slot />', () => {
             onmessage: cy.stub(),
             onclose: cy.stub(),
             onerror: cy.stub(),
+            addEventListener: cy.stub(),
+            removeEventListener: cy.stub(),
         };
 
         mount(
@@ -56,12 +58,7 @@ describe('<Slot />', () => {
     });
 
     it('displays sequencer transactions after loading', () => {
-        const mockSocket = {
-            onopen: cy.stub(),
-            onmessage: cy.stub(),
-            onclose: cy.stub(),
-            onerror: cy.stub(),
-        };
+        const mockSocket = new EventTarget()
 
         mount(
             <WebSocketContext.Provider value={{ socket: mockSocket as unknown as WebSocket }}>
@@ -86,6 +83,8 @@ describe('<Slot />', () => {
             onmessage: cy.stub(),
             onclose: cy.stub(),
             onerror: cy.stub(),
+            addEventListener: cy.stub(),
+            removeEventListener: cy.stub(),
         };
 
         mount(
@@ -111,6 +110,8 @@ describe('<Slot />', () => {
             onmessage: cy.stub(),
             onclose: cy.stub(),
             onerror: cy.stub(),
+            addEventListener: cy.stub(),
+            removeEventListener: cy.stub(),
         };
 
         cy.intercept('GET', '/api/transaction/latest_sequencer_transactions?limit=10', {
@@ -138,12 +139,7 @@ describe('<Slot />', () => {
     });
 
     it('receives a new array of transactions via WebSocket and updates the table', () => {
-        const mockSocket = {
-            onopen: cy.stub(),
-            onmessage: cy.stub(),
-            onclose: cy.stub(),
-            onerror: cy.stub(),
-        };
+        const mockSocket = new EventTarget();
 
         mount(
             <WebSocketContext.Provider value={{ socket: mockSocket as unknown as WebSocket }}>
@@ -156,7 +152,7 @@ describe('<Slot />', () => {
         cy.wait('@getSequencerTransactions');
         cy.wait('@getUserTransactions');
 
-        cy.wrap(mockSocket).invoke('onmessage', {
+        const messageEvent1 = new MessageEvent('message', {
             data: JSON.stringify({
                 type: 'sequencer_transactions_updated',
                 data: [
@@ -164,7 +160,12 @@ describe('<Slot />', () => {
                     { SequencerTxHash: '0xnewSequencerTransactionHash2', CreatedAtUnix: 1725204300 },
                 ],
             }),
-        } as MessageEvent);
+          });
+
+        cy.then(() => {
+            // Dispatch the event to simulate the WebSocket message
+            mockSocket.dispatchEvent(messageEvent1);
+        });
 
         cy.get('td').contains('0xnewSequencerTransactionHash1', { timeout: 10000 }).should('be.visible');
         cy.get('td').contains(getTimeAgo(1725204000), { timeout: 10000 }).should('be.visible');
@@ -193,6 +194,8 @@ describe('<Slot />', () => {
             onmessage: cy.stub(),
             onclose: cy.stub(),
             onerror: cy.stub(),
+            addEventListener: cy.stub(),
+            removeEventListener: cy.stub(),
         };
 
         mount(
@@ -219,6 +222,8 @@ describe('<Slot />', () => {
             onmessage: cy.stub(),
             onclose: cy.stub(),
             onerror: cy.stub(),
+            addEventListener: cy.stub(),
+            removeEventListener: cy.stub(),
         };
 
         mount(

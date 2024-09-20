@@ -21,7 +21,7 @@ const Validator = () => {
 
     useEffect(() => {
         if (socket) {
-            socket.onmessage = (event: MessageEvent) => {
+            const handleMessage = (event: MessageEvent) => {
                 const websocketEvent = JSON.parse(event.data) as WebsocketEvent;
                 if (websocketEvent.Error) {
                     setWebSocketError(`Error: ${websocketEvent.Error.message} (Code: ${websocketEvent.Error.code})`);
@@ -53,18 +53,21 @@ const Validator = () => {
                 }
             };
 
-            socket.onerror = () => {
+            const handleError = () => {
                 setWebSocketError('WebSocket error: A connection error occurred');
                 console.error('WebSocket error: A connection error occurred');
             };
+
+            socket.addEventListener('message', handleMessage)
+            socket.addEventListener('error', handleError)
+
+            return () => {
+                socket.removeEventListener('message', handleMessage)
+                socket.removeEventListener('error', handleError)
+            };
         }
 
-        return () => {
-            if (socket) {
-                socket.onmessage = null;
-                socket.onerror = null;
-            }
-        };
+
     }, [socket, shutterizedValidators, totalValidators]);
 
     useEffect(() => {
