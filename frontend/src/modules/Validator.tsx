@@ -6,6 +6,7 @@ import { useWebSocket } from '../context/WebSocketContext';
 import useFetch from '../hooks/useFetch';
 import overviewIcon from '../assets/icons/shield_check.svg';
 import { WebsocketEvent } from '../types/WebsocketEvent';
+import { truncateDecimals } from '../utils/utils';
 
 
 const Validator = () => {
@@ -13,7 +14,7 @@ const Validator = () => {
     const { data: totalValidatorsData, loading: loadingTotal, error: errorTotal } = useFetch('/api/validator/total_gnosis_validators');
 
     const [shutterizedValidators, setShutterizedValidators] = useState(shutterizedValidatorsData?.message || 'N/A');
-    const [validatorPercentage, setValidatorPercentage] = useState((shutterizedValidatorsData?.message * 100) / totalValidatorsData?.message || 'N/A');
+    const [validatorPercentage, setValidatorPercentage] = useState(truncateDecimals((shutterizedValidatorsData?.message * 100) / totalValidatorsData?.message) || 'N/A');
     const [totalValidators, setTotalValidators] = useState(totalValidatorsData?.message || 'N/A');
     const [, setWebSocketError] = useState<string | null>(null);
 
@@ -31,7 +32,7 @@ const Validator = () => {
                         case 'shutterized_validators_updated':
                             if ('count' in websocketEvent.Data) {
                                 setShutterizedValidators(websocketEvent.Data.count);
-                                setValidatorPercentage((websocketEvent.Data.count*100)/totalValidators)
+                                setValidatorPercentage(truncateDecimals((websocketEvent.Data.count*100)/totalValidators))
                             } else {
                                 console.warn('Invalid data format for shutterized_validators_updated');
                             }
@@ -39,7 +40,7 @@ const Validator = () => {
                         case 'total_validators_updated':
                             if ('count' in websocketEvent.Data) {
                                 setTotalValidators(websocketEvent.Data.count);
-                                setValidatorPercentage((shutterizedValidators*100)/websocketEvent.Data.count)
+                                setValidatorPercentage(truncateDecimals((shutterizedValidators*100)/websocketEvent.Data.count))
                             } else {
                                 console.warn('Invalid data format for total_validators_updated');
                             }
@@ -77,7 +78,7 @@ const Validator = () => {
         if (totalValidatorsData?.message){
             setTotalValidators(totalValidatorsData.message);
         } 
-        setValidatorPercentage((shutterizedValidatorsData?.message*100)/totalValidatorsData?.message);
+        setValidatorPercentage(truncateDecimals((shutterizedValidatorsData?.message*100)/totalValidatorsData?.message));
     }, [shutterizedValidatorsData, totalValidatorsData]);
 
     return (
