@@ -7,11 +7,6 @@ import { transactionData, verifyTransactionDetails } from '../utils/transactionU
 
 describe('<SearchBar />', () => {
     it('submits a search query and navigates to the transaction detail page', () => {
-        cy.intercept('GET', `/api/transaction/${transactionData.userTransactionHash}`, {
-            statusCode: 200,
-            body: transactionData,
-        }).as('getTransaction');
-
         const TestComponent = () => {
             const [searchQuery, setSearchQuery] = React.useState('');
             const handleSearchChange = (event: { target: { value: React.SetStateAction<string>; }; }) => setSearchQuery(event.target.value);
@@ -42,7 +37,7 @@ describe('<SearchBar />', () => {
         mount(<TestComponent />);
 
         // Simulate user interaction
-        cy.get('input[placeholder="Search by Txn Hash"]').type(`${transactionData.userTransactionHash}{enter}`);
+        cy.get('input[placeholder="Search by Txn Hash"]').type(`${transactionData.UserTxHash}{enter}`);
 
         // Wait for the API call to complete
         cy.wait('@getTransaction');
