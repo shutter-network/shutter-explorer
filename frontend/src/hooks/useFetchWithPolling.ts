@@ -13,10 +13,12 @@ const useFetchWithPolling = (url: string, interval: number) => {
         const fetchData = async () => {
             try {
                 setLoading(true);
-                const response = await axios.get(backendUrl+url);
+                const response = await axios.get(backendUrl + url);
                 setData(response.data);
                 setLoading(false);
+                setError(null)
             } catch (err: any) {
+                setData(null)
                 setError(err);
                 setLoading(false);
             }
