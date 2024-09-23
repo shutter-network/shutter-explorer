@@ -2,6 +2,7 @@ import { Box, Paper, Table, TableBody, TableCell, TableContainer, TableHead, Tab
 import { StyledTableCell, StyledTableRow } from "../styles/table";
 import { ReactComponent as CopyIcon } from '../assets/icons/copy.svg';
 import { truncateString } from "../utils/utils";
+import { NavLink } from "react-router-dom";
 
 interface Column {
     id: string;
@@ -44,7 +45,9 @@ export default function BasicTable<T extends { [key: string]: any }>({
                                     {
                                         column.id === "hash" ?
                                             <Box display="flex" alignItems="center" gap={1}>
-                                                {truncateString(row[column.id], 40)}
+                                                <NavLink to={`/transaction-details/${row[column.id]}`}>
+                                                    {truncateString(row[column.id], 40)}
+                                                </NavLink>
                                                 <Tooltip title="copy" onClick={() => handleCopy(row[column.id])}>
                                                     <CopyIcon />
                                                 </Tooltip>
