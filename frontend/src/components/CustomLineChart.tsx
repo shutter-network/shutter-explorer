@@ -15,7 +15,7 @@ const CustomLineChart: FC<CustomLineChartProps> = ({ data, title = 'Inclusion Ti
     const xAxisData = data.map(point => point.day * 1000);
     const seriesData = data.map(point => point.averageInclusionTime);
 
-    const formatDate = (timestamp: number) => dayjs(timestamp).format('D MMM'); 
+    const formatDate = (timestamp: number) => dayjs(timestamp).format('DD MMM'); 
 
     const xAxis = {
         scaleType: 'time' as const,
@@ -23,12 +23,15 @@ const CustomLineChart: FC<CustomLineChartProps> = ({ data, title = 'Inclusion Ti
         label: 'Date',
         valueFormatter: formatDate
     };
-
-    const series = [{ data: seriesData }];
+    
+    const yAxis = {
+        data: seriesData,
+        label: 'Inclusion time (secs)'
+    }
 
     const chartProps: LineChartProps = {
         xAxis: [xAxis],
-        series,
+        series: [yAxis],
         width: 600,
         height: 400,
     };
