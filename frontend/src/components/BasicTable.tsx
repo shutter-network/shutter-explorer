@@ -1,5 +1,8 @@
-import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material";
+import { Box, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip } from "@mui/material";
 import { StyledTableCell, StyledTableRow } from "../styles/table";
+import { ReactComponent as CopyIcon } from '../assets/icons/copy.svg';
+import { truncateString } from "../utils/utils";
+import { NavLink } from "react-router-dom";
 
 interface Column {
     id: string;
@@ -16,6 +19,9 @@ export default function BasicTable<T extends { [key: string]: any }>({
     rows,
     columns,
 }: BasicTableProps<T>) {
+    const handleCopy = (text: string) => {
+        navigator.clipboard.writeText(text);
+    };
     return (
         <TableContainer component={Paper}>
             <Table aria-label="simple table">
@@ -36,7 +42,18 @@ export default function BasicTable<T extends { [key: string]: any }>({
                         >
                             {columns.map((column) => (
                                 <StyledTableCell key={column.id}>
-                                    {row[column.id]}
+                                    {
+                                        column.id === "hash" ?
+                                            <Box display="flex" alignItems="center" gap={1}>
+                                                <NavLink to={`/transaction-details/${row[column.id]}`}>
+                                                    {truncateString(row[column.id], 40)}
+                                                </NavLink>
+                                                <Tooltip title="copy" onClick={() => handleCopy(row[column.id])}>
+                                                    <CopyIcon />
+                                                </Tooltip>
+                                            </Box>
+                                            : row[column.id]
+                                    }
                                 </StyledTableCell>
                             ))}
                         </StyledTableRow>

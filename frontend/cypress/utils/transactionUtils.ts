@@ -56,10 +56,3 @@ export const verifyTransactionDetailsUpdated = (data: TransactionData): void => 
     cy.contains('Inclusion Slot').should('be.visible');
     cy.contains(data.InclusionSlot.toString()).should('be.visible');
 };
-
-export function truncateString(str: string, num: number): string {
-    if (str.length <= num) {
-        return str;
-    }
-    return str.slice(0, num) + '...';
-}

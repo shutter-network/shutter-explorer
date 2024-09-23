@@ -1,10 +1,10 @@
 import React, { FC, ChangeEvent } from 'react';
-import { InputAdornment, IconButton, CircularProgress, Typography } from '@mui/material';
+import { InputAdornment, IconButton } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
-import useSearch from '../hooks/useSearch';
 import { SearchContainer, ChainSelect, ChainIcon, ChainName, DropdownIcon, StyledTextField } from '../styles/searchBar';
 import chainIcon from '../assets/icons/gnosis.svg';
 import dropdownIcon from '../assets/icons/chevron_down.svg';
+import { useNavigate } from 'react-router-dom';
 
 interface SearchBarProps {
     placeholder: string;
@@ -13,11 +13,16 @@ interface SearchBarProps {
 }
 
 const SearchBar: FC<SearchBarProps> = ({ placeholder, value, onChange }) => {
-    const { searchTx, loading, error } = useSearch(value);
+    const navigate = useNavigate();
+
+    const searchTx = async (txHash: string) => {
+        if (!txHash) return;
+        navigate(`/transaction-details/${txHash}`);
+    };
 
     const handleKeyDown = async (event: React.KeyboardEvent<HTMLInputElement>) => {
         if (event.key === 'Enter') {
-            await searchTx();
+            await searchTx(value);
         }
     };
 
@@ -39,21 +44,14 @@ const SearchBar: FC<SearchBarProps> = ({ placeholder, value, onChange }) => {
                     input: {
                         endAdornment: (
                             <InputAdornment position="end">
-                                <IconButton onClick={searchTx} disabled={loading}>
-                                    {loading ? <CircularProgress size={24} /> : <SearchIcon />}
+                                <IconButton onClick={() => searchTx(value)}>
+                                    <SearchIcon />
                                 </IconButton>
                             </InputAdornment>
                         ),
                     },
                 }}
             />
-
-            {loading && <Typography>Loading...</Typography>}
-            {error && (
-                <Typography color="error" variant="body2">
-                    {error.message}
-                </Typography>
-            )}
         </SearchContainer>
     );
 };

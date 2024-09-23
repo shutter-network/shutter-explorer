@@ -40,7 +40,7 @@ const Slot = () => {
 
     useEffect(() => {
         if (socket) {
-            socket.onmessage = (event: MessageEvent) => {
+            const handleMessage = (event: MessageEvent) => {
                 const websocketEvent = JSON.parse(event.data) as WebsocketEvent;
                 if (websocketEvent.Error) {
                     setWebSocketError(`Error: ${websocketEvent.Error.message} (Code: ${websocketEvent.Error.code})`);
@@ -64,30 +64,30 @@ const Slot = () => {
                 }
             };
 
-            socket.onerror = () => {
+            const handleError = () => {
                 setWebSocketError('WebSocket error: A connection error occurred');
                 console.error('WebSocket error: A connection error occurred');
             };
+
+            socket.addEventListener('message', handleMessage)
+            socket.addEventListener('error', handleError)
+
+            return()=>{
+                socket.removeEventListener('message', handleMessage)
+                socket.removeEventListener('error', handleError)
+            }
         }
     }, [socket]);
 
     const sequencerTransactionsWithAge = sequencerTransactions.map((transaction: SequencerTransaction) => ({
-        hash: truncateString(transaction.SequencerTxHash, 50),
+        hash: transaction.SequencerTxHash,
         timestamp: getTimeAgo(transaction.CreatedAtUnix),
     }));
 
     const userTransactionsWithAge = userTransactions.map((transaction: Transaction) => ({
-        hash: truncateString(transaction.TxHash, 50),
+        hash: transaction.TxHash,
         timestamp: getTimeAgo(transaction.IncludedAtUnix),
     }));
-
-
-    function truncateString(str: string, num: number): string {
-        if (str.length <= num) {
-            return str;
-        }
-        return str.slice(0, num) + '...';
-    }
 
     return (
         <ResponsiveLayout>

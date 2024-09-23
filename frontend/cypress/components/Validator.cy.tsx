@@ -16,6 +16,8 @@ describe('<Validator />', () => {
       onmessage: cy.stub(),
       onclose: cy.stub(),
       onerror: cy.stub(),
+      addEventListener: cy.stub(),
+      removeEventListener: cy.stub(),
     };
 
     mount(
@@ -41,6 +43,8 @@ describe('<Validator />', () => {
       onmessage: cy.stub(),
       onclose: cy.stub(),
       onerror: cy.stub(),
+      addEventListener: cy.stub(),
+      removeEventListener: cy.stub(),
     };
 
     mount(
@@ -53,12 +57,7 @@ describe('<Validator />', () => {
   });
 
   it('receives updated validator data via WebSocket and updates the UI', () => {
-    const mockSocket = {
-      onopen: cy.stub(),
-      onmessage: cy.stub(),
-      onclose: cy.stub(),
-      onerror: cy.stub(),
-    };
+    const mockSocket = new EventTarget();
 
     mount(
         <WebSocketContext.Provider value={{ socket: mockSocket as unknown as WebSocket }}>
@@ -69,23 +68,32 @@ describe('<Validator />', () => {
     cy.wait('@getShutterizedValidators');
     cy.wait('@getTotalValidators');
 
-    cy.wrap(mockSocket).invoke('onmessage', {
+    const messageEvent1 = new MessageEvent('message', {
       data: JSON.stringify({
         Type: 'shutterized_validators_updated',
         Data: { count: 100 },
       }),
-    } as MessageEvent);
+    });
+  
+    cy.then(() => {
+      // Dispatch the event to simulate the WebSocket message
+      mockSocket.dispatchEvent(messageEvent1);
+    });
 
     cy.contains('100').should('be.visible');
-
     
-    cy.wrap(mockSocket).invoke('onmessage', {
+    const messageEvent2 = new MessageEvent('message', {
       data: JSON.stringify({
         Type: 'total_validators_updated',
         Data: { count: 1000 },
       }),
-    } as MessageEvent);
-    
+    });
+  
+    cy.then(() => {
+      // Dispatch the event to simulate the WebSocket message
+      mockSocket.dispatchEvent(messageEvent2);
+    });
+
     cy.contains('10%').should('be.visible');
     cy.contains('1000').should('be.visible');
   });
@@ -96,6 +104,8 @@ describe('<Validator />', () => {
       onmessage: cy.stub(),
       onclose: cy.stub(),
       onerror: cy.stub(),
+      addEventListener: cy.stub(),
+      removeEventListener: cy.stub(),
     };
 
     // Simulate API errors
