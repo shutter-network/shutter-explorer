@@ -13,7 +13,7 @@ const AppRoutes = () => {
                 <Route path="/" element={<System />} />
                 <Route path="/system-overview" element={<System />} />
                 <Route path="/slot-overview" element={<Slot />} />
-                <Route path="/transaction-details" element={<Transaction />} />
+                <Route path="/transaction-details/:txHash" element={<Transaction />} />
                 <Route path="/transactions" element={<Transactions />} />
                 <Route path="*" element={<NotFound />} />
             </Routes>

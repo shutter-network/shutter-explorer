@@ -1,4 +1,3 @@
-import { useLocation } from 'react-router-dom';
 import { Typography, Link, Divider, Box, Tooltip } from '@mui/material';
 import Grid from '@mui/material/Grid2';
 import ResponsiveLayout from "../components/ResponsiveLayout";
@@ -8,6 +7,7 @@ import { StyledTransactionDetails } from '../styles/transactionDetail';
 import TitleSection from "../components/TitleSection";
 import { formatSeconds, formatTimestamp } from '../utils/utils';
 import { ReactComponent as InfoIcon } from '../assets/icons/info.svg';
+import { useParams } from 'react-router-dom';
 
 interface TransactionDetails {
     TxStatus: string;
@@ -20,20 +20,16 @@ interface TransactionDetails {
 }
 
 const Transaction: FC = () => {
-    const location = useLocation();
-    const initialTransaction = location.state as TransactionDetails | undefined;
     const explorerUrl = process.env.REACT_APP_EXPLORER_URL;
-
-    const [transaction, setTransaction] = useState<TransactionDetails | null>(initialTransaction || null);
-
-    const { data: updatedData, loading, error } = useFetchWithPolling(
-        initialTransaction ? `/api/transaction/${initialTransaction.UserTxHash}` : '',
-        10000
-    );
+    let { txHash } = useParams();
+    const [transaction, setTransaction] = useState<TransactionDetails | null>(null);
+    const { data: updatedData, loading, error } = useFetchWithPolling(`/api/transaction/${txHash}`, 10000);
 
     useEffect(() => {
         if (updatedData) {
             setTransaction(updatedData.message as TransactionDetails);
+        } else {
+            setTransaction(null)
         }
     }, [updatedData]);
 
