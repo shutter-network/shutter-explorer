@@ -1,11 +1,9 @@
 import { Alert, Box } from '@mui/material';
-import Grid from '@mui/material/Grid2';
 import OverviewCard from '../components/OverviewCard';
 import BasicGauges from '../components/Gauge';
 import { useEffect, useState } from 'react';
 import { useWebSocket } from '../context/WebSocketContext';
 import useFetch from '../hooks/useFetch';
-import { useTheme } from '@mui/material/styles';
 
 const TransactionGauge = () => {
     const { data: transactionStatsData, loading: loadingTransactionStats, error: errorTransactionStats } = useFetch('/api/inclusion_time/executed_transactions');
@@ -51,19 +49,20 @@ const TransactionGauge = () => {
     }, [transactionStatsData]);
 
     const totalTransactions = successfulTransactions + failedTransactions;
-    const successRate = totalTransactions > 0 ? (successfulTransactions * 100 / totalTransactions) : 0;
 
     return (
         <Box sx={{ flexGrow: 1, marginTop: 4 }}>
-                    <OverviewCard title="Executed Transactions">
-                        {errorTransactionStats ? (
-                            <Alert severity="error">Error fetching Transaction Stats: {errorTransactionStats.message}</Alert>
-                        ) : (
-                            <BasicGauges
-                                value={loadingTransactionStats ? 0 : successRate}
-                            />
-                        )}
-                    </OverviewCard>
+            <OverviewCard title="Executed Transactions">
+                {errorTransactionStats ? (
+                    <Alert severity="error">Error fetching Transaction Stats: {errorTransactionStats.message}</Alert>
+                ) : (
+                    <BasicGauges
+                        success={loadingTransactionStats ? 0 : successfulTransactions}
+                        total={loadingTransactionStats ? 0 : totalTransactions}
+                        failed={loadingTransactionStats ? 0 : failedTransactions}
+                    />
+                )}
+            </OverviewCard>
         </Box>
     );
 };
