@@ -20,14 +20,17 @@ const BasicGauges: FC<BasicGaugesProps> = ({ success, total, failed }) => {
             direction="column"
             justifyContent="space-between"
             alignItems="center"
-            sx={{ width: '100%', height: '100%', padding: 0 }}
+            sx={{ width: '100%', height: '100%', padding: '0 0' }}
         >
-            <Box sx={{ flex: 1, width: '100%', height: '80%', display: 'flex', justifyContent: 'center' }}>
+            {/* Gauge Element */}
+            <Box sx={{ flex: 1, width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '0 0' }}>
                 <Gauge
                     value={value}
                     startAngle={-90}
                     endAngle={90}
                     sx={{
+                        width: '100%',
+                        height: '80%',
                         [`& .${gaugeClasses.valueText}`]: {
                             display: 'none',
                         },
@@ -41,7 +44,14 @@ const BasicGauges: FC<BasicGaugesProps> = ({ success, total, failed }) => {
                 />
             </Box>
 
-            <Box display="flex" justifyContent="space-between" width="100%" height="20%">
+            {/* Line for Successful, Total, Failed */}
+            <Box
+                display="flex"
+                justifyContent="space-between"
+                alignItems="center"
+                width="100%"
+                sx={{ padding: '0 0' }}
+            >
                 <Stack alignItems="center">
                     <Typography variant="body1" sx={{ color: theme.palette.text.secondary }}>
                         Successful
