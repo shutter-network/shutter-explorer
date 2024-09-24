@@ -23,6 +23,8 @@ const (
 	DecryptionKeyGenerated TxStatus = "DecryptionKeyGenerated"
 )
 
+const GnosisTransactionsPerMonth float64 = 3097145
+
 type TransactionUsecase struct {
 	observerDB      *pgxpool.Pool
 	erpcDB          *pgxpool.Pool
@@ -303,4 +305,22 @@ func (uc *TransactionUsecase) QueryLatestSequencerTransactions(ctx context.Conte
 		return nil, &err
 	}
 	return txs, nil
+}
+
+func (uc *TransactionUsecase) QueryTransactionPercentage(ctx context.Context, txStatus string) (float64, *error.Http) {
+	totalTxsPerMonth, err := uc.observerDBQuery.QueryTotalTXsForEachTXStatusPerMonth(ctx, data.TxStatusVal(txStatus))
+	if err != nil {
+		log.Err(err).Msg("err encountered while querying DB")
+		err := error.NewHttpError(
+			"error encountered while querying for data",
+			"",
+			http.StatusInternalServerError,
+		)
+		return 0, &err
+	}
+	if len(totalTxsPerMonth) == 0 {
+		return 0, nil
+	}
+	percentage := (float64(totalTxsPerMonth[0].TotalTxs) / GnosisTransactionsPerMonth) * 100
+	return percentage, nil
 }

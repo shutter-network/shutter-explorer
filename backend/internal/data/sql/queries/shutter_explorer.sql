@@ -22,7 +22,7 @@ SELECT
 FROM decrypted_tx
 WHERE tx_status = $1
 GROUP BY DATE_TRUNC('month', created_at)
-ORDER BY month;
+ORDER BY month DESC;
 
 -- name: QueryLatestPendingTXsWhichCanBeDecrypted :many
 WITH latest_per_hash AS (
