@@ -67,8 +67,8 @@ const TransactionGauge = () => {
                             <BasicGauges
                                 value={loadingTransactionStats ? 0 : successRate}
                                 title=""
-                                gaugeColor={theme.palette.primary.main}
-                                labelColor={theme.palette.text.primary}
+                                gaugeColor={theme.palette.success.main}
+                                labelColor={theme.palette.error.main}
                             />
                         )}
                     </OverviewCard>

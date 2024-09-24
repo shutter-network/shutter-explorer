@@ -15,6 +15,12 @@ const muiTheme = createTheme({
             primary: '#051016',
             secondary: '#656B73',
         },
+        success: {
+            main: '#44CA85',
+        },
+        error: {
+            main: '#D9125B',
+        },
     },
     typography: {
         fontFamily: "'Space Grotesk', sans-serif",
