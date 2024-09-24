@@ -2,6 +2,7 @@ import { LineChart, LineChartProps } from '@mui/x-charts/LineChart';
 import { FC } from 'react';
 import { Typography, Box } from '@mui/material';
 import dayjs from 'dayjs';
+import { LineSeriesType } from '@mui/x-charts';
 
 interface CustomLineChartProps {
     data: {
@@ -15,23 +16,30 @@ const CustomLineChart: FC<CustomLineChartProps> = ({ data, title = 'Inclusion Ti
     const xAxisData = data.map(point => point.day * 1000);
     const seriesData = data.map(point => point.averageInclusionTime);
 
-    const formatDate = (timestamp: number) => dayjs(timestamp).format('DD MMM'); 
+    const formatDate = (timestamp: number) => { 
+        let formattedDate= dayjs(timestamp).format('DD MMM')
+        const parts = formattedDate.split(' ');
+        parts[1] = parts[1].toUpperCase(); 
+        return parts.join(' ');
+    }; 
 
     const xAxis = {
         scaleType: 'time' as const,
         data: xAxisData,
-        label: 'Date',
         valueFormatter: formatDate
     };
     
-    const yAxis = {
+    const yAxis: LineSeriesType[] = [{
+        type: 'line',
         data: seriesData,
-        label: 'Inclusion time (secs)'
-    }
+        curve: "linear",
+        label: 'Inclusion time (secs)',
+        color: '#0044A4'
+    }]
 
     const chartProps: LineChartProps = {
         xAxis: [xAxis],
-        series: [yAxis],
+        series: yAxis,
         width: 600,
         height: 400,
     };
