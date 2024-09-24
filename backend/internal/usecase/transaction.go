@@ -212,7 +212,7 @@ func (uc *TransactionUsecase) QueryTransactionDetailsByTxHash(ctx context.Contex
 	if tse.TxStatus.Valid {
 		if tse.TxStatus.TxStatusVal == data.TxStatusValIncluded {
 			txStatus = Completed
-			effectiveInclusionTime = int64(tse.DecryptedTxCreatedAtUnix)
+			effectiveInclusionTime = tse.DecryptedTxCreatedAtUnix
 			if tse.Slot.Valid {
 				inclusionSlot = tse.Slot.Int64
 			}
@@ -273,7 +273,7 @@ func (uc *TransactionUsecase) QueryTransactionDetailsByTxHash(ctx context.Contex
 		TxStatus:               string(txStatus),
 		InclusionSlot:          inclusionSlot,
 		SequencerTxSubmittedAt: int64(tse.CreatedAtUnix),
-		DecryptedTxCreatedAt:   int64(tse.DecryptedTxCreatedAtUnix),
+		DecryptedTxCreatedAt:   tse.DecryptedTxCreatedAtUnix,
 		EffectiveInclusionTime: effectiveInclusionTime,
 		EstimatedInclusionTime: estimatedInclusionTime,
 	}
