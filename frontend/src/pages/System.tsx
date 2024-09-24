@@ -32,11 +32,7 @@ const System = () => {
                     size={{ xs: 12, sm: 8 }}
                     sx={{
                         display: 'flex',
-                        flexDirection: 'column',
-                        flexGrow: 1,
-                        width: '100%',
-                    }}
-                >
+                        flexDirection: 'column'}}>
                     <InclusionTime />
                 </Grid>
 
@@ -45,11 +41,7 @@ const System = () => {
                     size={{ xs: 12, sm: 4 }}
                     sx={{
                         display: 'flex',
-                        flexDirection: 'column',
-                        flexGrow: 1,
-                        width: '100%',
-                    }}
-                >
+                        flexDirection: 'column'}}>
                     <TransactionGauge />
                 </Grid>
             </Grid>

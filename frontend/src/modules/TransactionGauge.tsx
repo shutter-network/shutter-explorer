@@ -8,8 +8,6 @@ import useFetch from '../hooks/useFetch';
 import { useTheme } from '@mui/material/styles';
 
 const TransactionGauge = () => {
-    const theme = useTheme();
-
     const { data: transactionStatsData, loading: loadingTransactionStats, error: errorTransactionStats } = useFetch('/api/inclusion_time/executed_transactions');
     const [successfulTransactions, setSuccessfulTransactions] = useState<number>(transactionStatsData?.message?.Successful || 0);
     const [failedTransactions, setFailedTransactions] = useState<number>(transactionStatsData?.message?.Failed || 0);
@@ -57,23 +55,15 @@ const TransactionGauge = () => {
 
     return (
         <Box sx={{ flexGrow: 1, marginTop: 4 }}>
-
-            <Grid container spacing={3}>
-                <Grid size={{ xs: 12 }}>
                     <OverviewCard title="Executed Transactions">
                         {errorTransactionStats ? (
                             <Alert severity="error">Error fetching Transaction Stats: {errorTransactionStats.message}</Alert>
                         ) : (
                             <BasicGauges
                                 value={loadingTransactionStats ? 0 : successRate}
-                                title=""
-                                gaugeColor={theme.palette.success.main}
-                                labelColor={theme.palette.error.main}
                             />
                         )}
                     </OverviewCard>
-                </Grid>
-            </Grid>
         </Box>
     );
 };
