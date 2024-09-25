@@ -22,7 +22,7 @@ SELECT
 FROM decrypted_tx
 WHERE tx_status = $1
 GROUP BY DATE_TRUNC('month', created_at)
-ORDER BY month;
+ORDER BY month DESC;
 
 -- name: QueryLatestPendingTXsWhichCanBeDecrypted :many
 WITH latest_per_hash AS (
@@ -152,7 +152,8 @@ LIMIT 1;
 -- name: QueryTransactionDetailsByTxHash :one
 SELECT 
     tse.event_tx_hash, tse.sender, FLOOR(EXTRACT(EPOCH FROM tse.created_at)) as created_at_unix,
-    dt.tx_hash AS user_tx_hash, dt.tx_status, dt.slot, FLOOR(EXTRACT(EPOCH FROM dt.created_at)) AS decrypted_tx_created_at_unix
+    dt.tx_hash AS user_tx_hash, dt.tx_status, dt.slot, 
+    COALESCE(FLOOR(EXTRACT(EPOCH FROM dt.created_at)), 0)::BIGINT AS decrypted_tx_created_at_unix
 FROM transaction_submitted_event tse 
 LEFT JOIN decrypted_tx dt ON tse.id = dt.transaction_submitted_event_id
 WHERE tse.event_tx_hash = $1 OR dt.tx_hash = $1

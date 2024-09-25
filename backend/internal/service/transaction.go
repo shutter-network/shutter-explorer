@@ -146,3 +146,14 @@ func (svc *TransactionService) QueryLatestSequencerTransactions(ctx *gin.Context
 		"message": txs,
 	})
 }
+
+func (svc *TransactionService) QueryTransactionPercentage(ctx *gin.Context) {
+	transactionPercentage, err := svc.TransactionUsecase.QueryTransactionPercentage(ctx, "included")
+	if err != nil {
+		ctx.Error(err)
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{
+		"message": transactionPercentage,
+	})
+}

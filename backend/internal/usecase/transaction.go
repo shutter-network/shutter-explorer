@@ -23,6 +23,8 @@ const (
 	DecryptionKeyGenerated TxStatus = "DecryptionKeyGenerated"
 )
 
+const GnosisTransactionsPerMonth float64 = 3097145
+
 type TransactionUsecase struct {
 	observerDB      *pgxpool.Pool
 	erpcDB          *pgxpool.Pool
@@ -212,7 +214,7 @@ func (uc *TransactionUsecase) QueryTransactionDetailsByTxHash(ctx context.Contex
 	if tse.TxStatus.Valid {
 		if tse.TxStatus.TxStatusVal == data.TxStatusValIncluded {
 			txStatus = Completed
-			effectiveInclusionTime = int64(tse.DecryptedTxCreatedAtUnix)
+			effectiveInclusionTime = tse.DecryptedTxCreatedAtUnix
 			if tse.Slot.Valid {
 				inclusionSlot = tse.Slot.Int64
 			}
@@ -273,7 +275,7 @@ func (uc *TransactionUsecase) QueryTransactionDetailsByTxHash(ctx context.Contex
 		TxStatus:               string(txStatus),
 		InclusionSlot:          inclusionSlot,
 		SequencerTxSubmittedAt: int64(tse.CreatedAtUnix),
-		DecryptedTxCreatedAt:   int64(tse.DecryptedTxCreatedAtUnix),
+		DecryptedTxCreatedAt:   tse.DecryptedTxCreatedAtUnix,
 		EffectiveInclusionTime: effectiveInclusionTime,
 		EstimatedInclusionTime: estimatedInclusionTime,
 	}
@@ -303,4 +305,22 @@ func (uc *TransactionUsecase) QueryLatestSequencerTransactions(ctx context.Conte
 		return nil, &err
 	}
 	return txs, nil
+}
+
+func (uc *TransactionUsecase) QueryTransactionPercentage(ctx context.Context, txStatus string) (float64, *error.Http) {
+	totalTxsPerMonth, err := uc.observerDBQuery.QueryTotalTXsForEachTXStatusPerMonth(ctx, data.TxStatusVal(txStatus))
+	if err != nil {
+		log.Err(err).Msg("err encountered while querying DB")
+		err := error.NewHttpError(
+			"error encountered while querying for data",
+			"",
+			http.StatusInternalServerError,
+		)
+		return 0, &err
+	}
+	if len(totalTxsPerMonth) == 0 {
+		return 0, nil
+	}
+	percentage := (float64(totalTxsPerMonth[0].TotalTxs) / GnosisTransactionsPerMonth) * 100
+	return percentage, nil
 }
