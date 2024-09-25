@@ -1,6 +1,8 @@
 import styled from 'styled-components';
 import { TextField } from '@mui/material';
 import { ReactComponent as DropdownIcon } from '../assets/icons/chevron_down.svg';
+import { ReactComponent as SearchIcon } from '../assets/icons/search.svg';
+
 
 export const SearchContainer = styled.div.attrs({
     className: 'search-container',
@@ -56,6 +58,12 @@ export const StyledDropdownIcon = styled(DropdownIcon)`
 
 `;
 
+export const StyledSearchIcon = styled(SearchIcon)`
+  width: 16px;
+  height: 16px;
+  fill: ${({ theme }) => theme.colors.gray300};
+`;
+
 
 export const StyledTextField = styled(TextField).attrs({
     className: 'styled-text-field',
@@ -75,8 +83,8 @@ export const StyledTextField = styled(TextField).attrs({
     }
 
     .MuiInputBase-input {
-      font: 600 14px/1 'Space Grotesk', sans-serif;
-      color: #989ca2;
+      color: ${({ theme }) => theme.colors.gray300};
+
     }
   }
 

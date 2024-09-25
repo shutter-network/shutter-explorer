@@ -1,6 +1,5 @@
 import React, { FC, useState } from 'react';
 import { InputAdornment, IconButton, Box, Menu, MenuItem } from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
 import { useTheme } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -9,6 +8,7 @@ import {
     ChainIcon,
     StyledTextField,
     StyledDropdownIcon,
+    StyledSearchIcon
 } from '../styles/searchBar';
 import chainIcon from '../assets/icons/gnosis.svg';
 import Typography from '@mui/material/Typography';
@@ -108,7 +108,7 @@ const SearchBar: FC<SearchBarProps> = ({ placeholder, value, onChange }) => {
                         endAdornment: (
                             <InputAdornment position="end">
                                 <IconButton onClick={() => searchTx(value)}>
-                                    <SearchIcon />
+                                    <StyledSearchIcon />
                                 </IconButton>
                             </InputAdornment>
                         ),
