@@ -14,21 +14,35 @@ const Slot = () => {
     const { data: userTransactionsData, loading: loadingUser, error: errorUser } = useFetch('/api/transaction/latest_user_transactions?limit=10');
 
     const sequencerTransactionColumns = [
+        { id: 'timestamp', label: 'Age', minWidth: 120 },
         { id: 'hash', label: 'Sequencer Transaction Hash', minWidth: 170 },
-        { id: 'timestamp', label: 'Submission time (Age)', minWidth: 170 },
     ];
 
     const userTransactionColumns = [
+        { id: 'timestamp', label: 'Age', minWidth: 120 },
         { id: 'hash', label: 'User Transaction Hash', minWidth: 170 },
-        { id: 'timestamp', label: 'Inclusion time (Age)', minWidth: 170 },
     ];
 
     const [sequencerTransactions, setSequencerTransactions] = useState(sequencerTransactionsData?.message || []);
     const [userTransactions, setUserTransactions] = useState(userTransactionsData?.message || []);
     const [, setWebSocketError] = useState<string | null>(null); // State to store WebSocket errors
+    const [isMobile, setIsMobile] = useState(false);
+
+    const handleResize = () => {
+        setIsMobile(window.matchMedia("(max-width: 1199px)").matches);
+    };
 
     const { socket } = useWebSocket()!;
 
+    useEffect(() => {
+        handleResize();
+
+        // Event listener for resizing
+        window.addEventListener("resize", handleResize);
+
+        // Clean up listener on component unmount
+        return () => window.removeEventListener("resize", handleResize);
+    }, [])
     useEffect(() => {
         if (sequencerTransactionsData?.message) {
             setSequencerTransactions(sequencerTransactionsData.message);
@@ -72,7 +86,7 @@ const Slot = () => {
             socket.addEventListener('message', handleMessage)
             socket.addEventListener('error', handleError)
 
-            return()=>{
+            return () => {
                 socket.removeEventListener('message', handleMessage)
                 socket.removeEventListener('error', handleError)
             }
@@ -103,7 +117,7 @@ const Slot = () => {
                                 {loadingSequencer ? (
                                     <Typography>Loading...</Typography>
                                 ) : (
-                                    <BasicTable columns={sequencerTransactionColumns} rows={sequencerTransactionsWithAge} />
+                                    <BasicTable columns={sequencerTransactionColumns} rows={sequencerTransactionsWithAge} isMobile={isMobile} />
                                 )}
                             </>
                         )}
@@ -117,7 +131,7 @@ const Slot = () => {
                                 {loadingUser ? (
                                     <Typography>Loading...</Typography>
                                 ) : (
-                                    <BasicTable columns={userTransactionColumns} rows={userTransactionsWithAge} />
+                                    <BasicTable columns={userTransactionColumns} rows={userTransactionsWithAge} isMobile={isMobile} />
                                 )}
                             </>
                         )}

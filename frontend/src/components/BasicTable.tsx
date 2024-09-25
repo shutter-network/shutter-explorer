@@ -13,17 +13,19 @@ interface Column {
 interface BasicTableProps<T> {
     rows: T[];
     columns: Column[];
+    isMobile: Boolean;
 }
 
 export default function BasicTable<T extends { [key: string]: any }>({
     rows,
     columns,
+    isMobile
 }: BasicTableProps<T>) {
     const handleCopy = (text: string) => {
         navigator.clipboard.writeText(text);
     };
     return (
-        <TableContainer component={Paper}>
+        <TableContainer component={Paper} sx={{ marginTop: 4 }}>
             <Table aria-label="simple table">
                 <TableHead>
                     <TableRow>
@@ -45,8 +47,11 @@ export default function BasicTable<T extends { [key: string]: any }>({
                                     {
                                         column.id === "hash" ?
                                             <Box display="flex" alignItems="center" gap={1}>
-                                                <NavLink to={`/transaction-details/${row[column.id]}`}>
-                                                    {truncateString(row[column.id], 40)}
+                                                <NavLink to={`/transaction-details/${row[column.id]}`} onCopy={event => {
+                                                    event.preventDefault();
+                                                    event.clipboardData.setData("text/plain", row[column.id]);
+                                                }}>
+                                                    {isMobile ? row[column.id] : truncateString(row[column.id], 40)}
                                                 </NavLink>
                                                 <Tooltip title="copy" onClick={() => handleCopy(row[column.id])}>
                                                     <CopyIcon />
