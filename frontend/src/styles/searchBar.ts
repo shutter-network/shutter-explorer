@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import { TextField } from '@mui/material';
+import { ReactComponent as DropdownIcon } from '../assets/icons/chevron_down.svg';
 
 export const SearchContainer = styled.div.attrs({
     className: 'search-container',
@@ -47,11 +48,11 @@ export const ChainName = styled.span.attrs({
   font: 600 14px/1 'Space Grotesk', sans-serif;
 `;
 
-export const DropdownIcon = styled.img.attrs({
-    className: 'dropdown-icon',
-})`
+export const StyledDropdownIcon = styled(DropdownIcon)`
   width: 16px;
   height: 16px;
+  fill: ${({ theme }) => theme.colors.gray300};
+
 `;
 
 export const StyledTextField = styled(TextField).attrs({

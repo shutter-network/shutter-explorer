@@ -1,10 +1,17 @@
 import React, { FC, ChangeEvent } from 'react';
 import { InputAdornment, IconButton } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
-import { SearchContainer, ChainSelect, ChainIcon, ChainName, DropdownIcon, StyledTextField } from '../styles/searchBar';
+import {
+    SearchContainer,
+    ChainSelect,
+    ChainIcon,
+    ChainName,
+    StyledTextField,
+    StyledDropdownIcon
+} from '../styles/searchBar';
 import chainIcon from '../assets/icons/gnosis.svg';
-import dropdownIcon from '../assets/icons/chevron_down.svg';
 import { useNavigate } from 'react-router-dom';
+
 
 interface SearchBarProps {
     placeholder: string;
@@ -31,7 +38,7 @@ const SearchBar: FC<SearchBarProps> = ({ placeholder, value, onChange }) => {
             <ChainSelect>
                 <ChainIcon src={chainIcon} alt="Chain Icon" />
                 <ChainName>Gnosis Chain</ChainName>
-                <DropdownIcon src={dropdownIcon} alt="Dropdown Icon" />
+                <StyledDropdownIcon />
             </ChainSelect>
 
             <StyledTextField

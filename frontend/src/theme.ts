@@ -74,6 +74,7 @@ const customTheme = {
         background: '#FFFFFF',
         textPrimary: '#051016',
         textSecondary: '#656B73',
+        gray300: '#989CA2',
     },
 };
 
