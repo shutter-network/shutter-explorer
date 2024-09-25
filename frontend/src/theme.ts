@@ -59,7 +59,7 @@ const muiTheme = createTheme({
                 root: {
                     textAlign: 'left',
                     marginTop: '16px',
-                    marginBottm: '16px'
+                    marginBottom: '16px'
                 },
             },
         },

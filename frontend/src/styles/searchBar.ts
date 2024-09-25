@@ -22,6 +22,7 @@ export const ChainSelect = styled.div.attrs({
 })`
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 8px;
   background: #fff;
   border: 1px solid #ccced0;
@@ -30,6 +31,7 @@ export const ChainSelect = styled.div.attrs({
   max-width: 240px;
   min-width: 240px;
   height: 40px;
+  cursor: pointer;
 `;
 
 export const ChainIcon = styled.img.attrs({
@@ -43,7 +45,6 @@ export const ChainName = styled.span.attrs({
     className: 'chain-name',
 })`
   flex: 1;
-  padding: 0 4px;
   color: #051016;
   font: 600 14px/1 'Space Grotesk', sans-serif;
 `;
@@ -54,6 +55,7 @@ export const StyledDropdownIcon = styled(DropdownIcon)`
   fill: ${({ theme }) => theme.colors.gray300};
 
 `;
+
 
 export const StyledTextField = styled(TextField).attrs({
     className: 'styled-text-field',
