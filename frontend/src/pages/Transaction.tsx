@@ -84,7 +84,7 @@ const Transaction: FC = () => {
                     <Grid size={{ xs: 12, sm: 4 }}>
                         <Box display="flex" alignItems="center" gap={1}>
                             <Typography variant="body1" fontWeight="bold" className="card-label" textAlign="left">Inclusion Slot</Typography>
-                            <Tooltip title="Slot in which the transaction was included in">
+                            <Tooltip title="Slot in which the transaction was included">
                                 <InfoIcon />
                             </Tooltip>
                         </Box>
@@ -104,7 +104,7 @@ const Transaction: FC = () => {
                                 <Grid size={{ xs: 12, sm: 4 }}>
                                     <Box display="flex" alignItems="center" gap={1}>
                                         <Typography variant="body1" fontWeight="bold" className="card-label" textAlign="left">Estimated Inclusion Time</Typography>
-                                        <Tooltip title="Time in which transaction will be included in">
+                                        <Tooltip title="Estimated time for the transaction to be included">
                                             <InfoIcon />
                                         </Tooltip>
                                     </Box>
@@ -118,7 +118,7 @@ const Transaction: FC = () => {
                                 <Grid size={{ xs: 12, sm: 4 }}>
                                     <Box display="flex" alignItems="center" gap={1}>
                                         <Typography variant="body1" fontWeight="bold" className="card-label" textAlign="left">Effective Inclusion Time</Typography>
-                                        <Tooltip title="Time in which transaction was included in">
+                                        <Tooltip title="Time in which the transaction was included">
                                             <InfoIcon />
                                         </Tooltip>
                                     </Box>

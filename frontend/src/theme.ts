@@ -53,6 +53,17 @@ const muiTheme = createTheme({
             color: '#656B73',
         },
     },
+    components: {
+        MuiAlert: {
+            styleOverrides: {
+                root: {
+                    textAlign: 'left',
+                    marginTop: '16px',
+                    marginBottm: '16px'
+                },
+            },
+        },
+    },
 });
 
 const customTheme = {

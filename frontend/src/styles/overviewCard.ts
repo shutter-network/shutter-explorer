@@ -18,6 +18,7 @@ export const CardHeader = styled.div`
   gap: 16px;
   margin-bottom: 16px;
 
+
   h2 {
     font-size: 24px;
     font-weight: 600;
@@ -38,6 +39,8 @@ export const Icon = styled.img`
   filter: brightness(0) saturate(100%) invert(17%) sepia(100%) saturate(1975%) hue-rotate(199deg) brightness(99%) contrast(101%);
 `;
 
-export const CardContent = styled(Box)`
+export const CardContent = styled(Box).attrs({
+    className: 'card-content',
+})`
   flex-grow: 1;
 `;
