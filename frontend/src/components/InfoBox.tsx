@@ -10,8 +10,7 @@ interface InfoBoxProps {
 
 const InfoBox: FC<InfoBoxProps> = ({ title, tooltip, value }) => {
     return (
-        <Paper elevation={0} sx={{ padding: 2, textAlign: 'left' }}>
-            {/* Display value with subtitle1 style */}
+        <Paper elevation={0} sx={{ textAlign: 'left', paddingTop: 2, paddingBottom: 2 }}>
             <Typography variant="subtitle1">
                 {Array.isArray(value) ? (
                     <ul style={{ listStyleType: "none", padding: 0 }}>

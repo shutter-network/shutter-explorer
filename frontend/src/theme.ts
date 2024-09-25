@@ -15,6 +15,12 @@ const muiTheme = createTheme({
             primary: '#051016',
             secondary: '#656B73',
         },
+        success: {
+            main: '#44CA85',
+        },
+        error: {
+            main: '#D9125B',
+        },
     },
     typography: {
         fontFamily: "'Space Grotesk', sans-serif",
@@ -45,6 +51,17 @@ const muiTheme = createTheme({
             lineHeight: '145%',
             letterSpacing: '-0.7px',
             color: '#656B73',
+        },
+    },
+    components: {
+        MuiAlert: {
+            styleOverrides: {
+                root: {
+                    textAlign: 'left',
+                    marginTop: '16px',
+                    marginBottm: '16px'
+                },
+            },
         },
     },
 });
