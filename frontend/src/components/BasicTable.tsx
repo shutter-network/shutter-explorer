@@ -1,6 +1,7 @@
 import { Box, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip } from "@mui/material";
 import { StyledTableCell, StyledTableRow } from "../styles/table";
-import { ReactComponent as CopyIcon } from '../assets/icons/copy.svg';
+import { ReactComponent as CopyIconBlue } from '../assets/icons/copy_blue.svg';
+import { ReactComponent as CopyIconGrey } from '../assets/icons/copy_grey.svg';
 import { truncateString } from "../utils/utils";
 import { NavLink } from "react-router-dom";
 
@@ -46,18 +47,18 @@ export default function BasicTable<T extends { [key: string]: any }>({
                                 <StyledTableCell key={column.id}>
                                     {
                                         column.id === "hash" ?
-                                            <Box display="flex" alignItems="center" gap={1}>
+                                            <Box display="flex" alignItems="centre" gap={1} justifyContent="space-between">
                                                 <NavLink to={`/transaction-details/${row[column.id]}`} onCopy={event => {
                                                     event.preventDefault();
                                                     event.clipboardData.setData("text/plain", row[column.id]);
-                                                }}>
-                                                    {isMobile ? row[column.id] : truncateString(row[column.id], 40)}
+                                                }} style={index % 2 == 0 ? { color: "#656B73", textDecoration: "none" } : { color: "#0044A4", textDecoration: "none" }}>
+                                                    {isMobile ? row[column.id] : truncateString(row[column.id], 55)}
                                                 </NavLink>
                                                 <Tooltip title="copy" onClick={() => handleCopy(row[column.id])}>
-                                                    <CopyIcon />
+                                                    {index % 2 == 0 ? <CopyIconGrey /> : <CopyIconBlue />}
                                                 </Tooltip>
                                             </Box>
-                                            : row[column.id]
+                                            : <span style={{ fontWeight: "bold" }}> {row[column.id]}</span>
                                     }
                                 </StyledTableCell>
                             ))}
