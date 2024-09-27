@@ -84,7 +84,7 @@ const Transaction = () => {
                 ) : (
                     <InfoBox
                         title="# Successfully Shielded Transactions"
-                        tooltip="Total number of successfully shileded transactions"
+                        tooltip="Total number of successfully shielded transactions"
                         value={loadingExecutedTransactions || executedTransactions === null ? 'Loading...' : executedTransactions}
                     />
                 )}
