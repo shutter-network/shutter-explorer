@@ -10,7 +10,7 @@ import { WebsocketEvent } from '../types/WebsocketEvent';
 const Transaction = () => {
     const { data: executedTransactionsData, loading: loadingExecutedTransactions, error: errorExecutedTransactions } = useFetch('/api/transaction/total_executed_transactions');
     const { data: shutterizedTransactionsPerMonthData, loading: loadingShutterizedTransactionsPerMonth, error: errorShutterizedTransactionsPerMonth } = useFetch('/api/transaction/total_transactions_per_month');
-    const { data: shutterizedTransactionPercentageData, loading: loadingShutterizedTransactionPercentage, error: errorShutterizedTransactionPercentage } = useFetch('/transaction/shutterized_transaction_percentage');
+    const { data: shutterizedTransactionPercentageData, loading: loadingShutterizedTransactionPercentage, error: errorShutterizedTransactionPercentage } = useFetch('/api/transaction/transaction_percentage');
 
     const [executedTransactions, setExecutedTransactions] = useState<string | number>(executedTransactionsData?.message || 'N/A');
     const [shutterizedTransactionsPerMonth, setShutterizedTransactionsPerMonth] = useState<string | number>(shutterizedTransactionsPerMonthData?.message || 'N/A');
