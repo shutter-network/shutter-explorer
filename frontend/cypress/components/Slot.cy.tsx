@@ -4,6 +4,10 @@ import { mount } from "cypress/react18";
 import React from 'react';
 import { WebSocketContext } from '../../src/context/WebSocketContext';
 import { getTimeAgo, truncateString } from '../../src/utils/utils';
+import { ThemeProvider as MUIThemeProvider } from '@mui/material/styles';
+import { ThemeProvider as StyledThemeProvider } from 'styled-components';
+import { muiTheme, customTheme } from '../../src/theme';
+
 
 describe('<Slot />', () => {
     const sequencerTransactions = [
@@ -47,11 +51,15 @@ describe('<Slot />', () => {
         };
 
         mount(
-            <WebSocketContext.Provider value={{ socket: mockSocket as unknown as WebSocket }}>
-                <MemoryRouter>
-                    <Slot />
-                </MemoryRouter>
-            </WebSocketContext.Provider>
+            <MUIThemeProvider theme={muiTheme}>
+                <StyledThemeProvider theme={customTheme}>
+                    <WebSocketContext.Provider value={{ socket: mockSocket as unknown as WebSocket }}>
+                        <MemoryRouter>
+                            <Slot />
+                        </MemoryRouter>
+                    </WebSocketContext.Provider>
+                </StyledThemeProvider>
+            </MUIThemeProvider>
         );
 
         cy.contains('Loading...').should('exist');
@@ -61,11 +69,15 @@ describe('<Slot />', () => {
         const mockSocket = new EventTarget()
 
         mount(
-            <WebSocketContext.Provider value={{ socket: mockSocket as unknown as WebSocket }}>
-                <MemoryRouter>
-                    <Slot />
-                </MemoryRouter>
-            </WebSocketContext.Provider>
+            <MUIThemeProvider theme={muiTheme}>
+                <StyledThemeProvider theme={customTheme}>
+                    <WebSocketContext.Provider value={{ socket: mockSocket as unknown as WebSocket }}>
+                        <MemoryRouter>
+                            <Slot />
+                        </MemoryRouter>
+                    </WebSocketContext.Provider>
+                </StyledThemeProvider>
+            </MUIThemeProvider>
         );
         cy.wait('@getSequencerTransactions');
 
@@ -88,11 +100,15 @@ describe('<Slot />', () => {
         };
 
         mount(
-            <WebSocketContext.Provider value={{ socket: mockSocket as unknown as WebSocket }}>
-                <MemoryRouter>
-                    <Slot />
-                </MemoryRouter>
-            </WebSocketContext.Provider>
+            <MUIThemeProvider theme={muiTheme}>
+                <StyledThemeProvider theme={customTheme}>
+                    <WebSocketContext.Provider value={{ socket: mockSocket as unknown as WebSocket }}>
+                        <MemoryRouter>
+                            <Slot />
+                        </MemoryRouter>
+                    </WebSocketContext.Provider>
+                </StyledThemeProvider>
+            </MUIThemeProvider>
         );
         cy.wait('@getUserTransactions');
 
@@ -125,11 +141,15 @@ describe('<Slot />', () => {
         }).as('getUserTransactionsError');
 
         mount(
-            <WebSocketContext.Provider value={{ socket: mockSocket as unknown as WebSocket }}>
-                <MemoryRouter>
-                    <Slot />
-                </MemoryRouter>
-            </WebSocketContext.Provider>
+            <MUIThemeProvider theme={muiTheme}>
+                <StyledThemeProvider theme={customTheme}>
+                    <WebSocketContext.Provider value={{ socket: mockSocket as unknown as WebSocket }}>
+                        <MemoryRouter>
+                            <Slot />
+                        </MemoryRouter>
+                    </WebSocketContext.Provider>
+                </StyledThemeProvider>
+            </MUIThemeProvider>
         );
         cy.wait('@getSequencerTransactionsError');
         cy.wait('@getUserTransactionsError');
@@ -142,11 +162,15 @@ describe('<Slot />', () => {
         const mockSocket = new EventTarget();
 
         mount(
-            <WebSocketContext.Provider value={{ socket: mockSocket as unknown as WebSocket }}>
-                <MemoryRouter>
-                    <Slot />
-                </MemoryRouter>
-            </WebSocketContext.Provider>
+            <MUIThemeProvider theme={muiTheme}>
+                <StyledThemeProvider theme={customTheme}>
+                    <WebSocketContext.Provider value={{ socket: mockSocket as unknown as WebSocket }}>
+                        <MemoryRouter>
+                            <Slot />
+                        </MemoryRouter>
+                    </WebSocketContext.Provider>
+                </StyledThemeProvider>
+            </MUIThemeProvider>
         );
 
         cy.wait('@getSequencerTransactions');
@@ -160,10 +184,9 @@ describe('<Slot />', () => {
                     { SequencerTxHash: '0xnewSequencerTransactionHash2', CreatedAtUnix: 1725204300 },
                 ],
             }),
-          });
+        });
 
         cy.then(() => {
-            // Dispatch the event to simulate the WebSocket message
             mockSocket.dispatchEvent(messageEvent1);
         });
 
@@ -180,10 +203,9 @@ describe('<Slot />', () => {
                     { TxHash: '0xnewUserTransactionHash2', IncludedAtUnix: 1725204900 },
                 ],
             }),
-          });
+        });
 
         cy.then(() => {
-            // Dispatch the event to simulate the WebSocket message
             mockSocket.dispatchEvent(messageEvent2);
         });
 

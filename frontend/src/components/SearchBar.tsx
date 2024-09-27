@@ -20,6 +20,8 @@ interface SearchBarProps {
 }
 
 const SearchBar: FC<SearchBarProps> = ({ placeholder, value, onChange }) => {
+    console.log("SearchBar component rendered"); // Debugging log
+
     const theme = useTheme();
     const navigate = useNavigate();
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
