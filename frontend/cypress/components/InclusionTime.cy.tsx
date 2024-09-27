@@ -71,11 +71,11 @@ describe('<InclusionTime />', () => {
         cy.get('svg').should('exist').invoke('css', 'width', '1000px').invoke('css', 'height', '600px');
         cy.get('svg').should('be.visible');
 
-        cy.contains('300').should('be.visible');
-        cy.contains('320').should('be.visible');
-        cy.contains('340').should('be.visible');
-        cy.contains('7 Jul').should('be.visible');
-        cy.contains('11 Jul').should('be.visible');
+        cy.contains('5m').should('be.visible');
+        cy.contains('5m').should('be.visible');
+        cy.contains('6m').should('be.visible');
+        cy.contains('7 JUL').should('be.visible');
+        cy.contains('13 JUL').should('be.visible');
     });
 
     it('receives updated historical inclusion time data via WebSocket', () => {
@@ -103,7 +103,7 @@ describe('<InclusionTime />', () => {
             }),
         } as MessageEvent);
 
-        cy.contains('350').should('be.visible');
+        cy.contains('6m').should('be.visible');
     });
 
     it('displays error messages if API call fails', () => {

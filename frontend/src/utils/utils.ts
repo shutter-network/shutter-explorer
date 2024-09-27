@@ -113,3 +113,21 @@ export const truncateDecimals = (num: number): string => {
   }
   return 'N/A'
 }
+
+export const formatTime = (seconds: number | undefined): string => {
+  if (seconds){
+    if (seconds >= 86400){
+      let days = seconds/86400
+      return `${truncateDecimals(days)}d`
+    }else if (seconds >= 3600) {
+        let hours = Math.floor(seconds / 3600);
+        return `${hours}h`;
+    } else if (seconds >= 60) {
+        let minutes = Math.floor(seconds / 60);
+        return `${minutes}m`;
+    } else {
+        return `${seconds}s`;
+    }
+  }
+  return ''
+}

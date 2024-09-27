@@ -2,6 +2,9 @@ import { LineChart, LineChartProps } from '@mui/x-charts/LineChart';
 import { FC } from 'react';
 import { Typography, Box } from '@mui/material';
 import dayjs from 'dayjs';
+import { LineSeriesType } from '@mui/x-charts';
+import RevertedInfoBox from './RevertedInfoBox';
+import { formatTime } from '../utils/utils';
 
 interface CustomLineChartProps {
     data: {
@@ -9,37 +12,54 @@ interface CustomLineChartProps {
         averageInclusionTime: number;
     }[];
     title?: string;
+    estimatedInclusionTime: number;
 }
 
-const CustomLineChart: FC<CustomLineChartProps> = ({ data, title = 'Inclusion Time Chart' }) => {
+const CustomLineChart: FC<CustomLineChartProps> = ({ data, title = 'Inclusion Time Chart', estimatedInclusionTime }) => {
     const xAxisData = data.map(point => point.day * 1000);
     const seriesData = data.map(point => point.averageInclusionTime);
 
-    const formatDate = (timestamp: number) => dayjs(timestamp).format('D MMM'); 
+    const formatDate = (timestamp: number) => { 
+        let formattedDate= dayjs(timestamp).format('DD MMM')
+        const parts = formattedDate.split(' ');
+        parts[1] = parts[1].toUpperCase(); 
+        return parts.join(' ');
+    }; 
 
     const xAxis = {
         scaleType: 'time' as const,
         data: xAxisData,
-        label: 'Date',
         valueFormatter: formatDate
     };
-
-    const series = [{ data: seriesData }];
+    
+    const yAxis: LineSeriesType[] = [{
+        type: 'line',
+        data: seriesData,
+        curve: "linear",
+        color: '#0044A4',
+    }]
 
     const chartProps: LineChartProps = {
         xAxis: [xAxis],
-        series,
+        series: yAxis,
+        yAxis: [{
+            valueFormatter: formatTime
+        }],
         width: 600,
         height: 400,
     };
 
     return (
-        <Box>
-            {/* Display the chart title */}
-            <Typography variant="h6" align="center" gutterBottom>
-                {title}
-            </Typography>
-            {/* Render the LineChart */}
+        <Box position="relative">
+            <Box position="absolute" top={0} right={0}>
+                <Typography variant="h6" align="center" gutterBottom>
+                    {title}
+                </Typography>
+                {estimatedInclusionTime && (
+                    <RevertedInfoBox title="Estimated Inclusion Time" tooltip="in secs" value={formatTime(estimatedInclusionTime)} />
+                )}
+            </Box>
+
             <LineChart {...chartProps} />
         </Box>
     );
