@@ -102,7 +102,7 @@ const Transaction = () => {
                 ) : (
                     <InfoBox
                         title="Percentage of Shielded Transactions"
-                        tooltip="Percentage of monthly shielded transactions amongst monthly gnosis transactions"
+                        tooltip="Percentage of monthly shielded transactions amongst monthly Gnosis transactions"
                         value={loadingTransactionPercentage || transactionPercentage === null ? 'Loading...' : `${(transactionPercentage * 100).toFixed(2)}%`}
                     />
                 )}
