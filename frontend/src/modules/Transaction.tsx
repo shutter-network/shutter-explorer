@@ -83,8 +83,8 @@ const Transaction = () => {
                     <Alert severity="error">Error fetching Executed Transactions: {errorExecutedTransactions.message}</Alert>
                 ) : (
                     <InfoBox
-                        title="# Successfully Executed Transactions"
-                        tooltip="Total number of successfully executed transactions"
+                        title="# Successfully Shielded Transactions"
+                        tooltip="Total number of successfully shileded transactions"
                         value={loadingExecutedTransactions || executedTransactions === null ? 'Loading...' : executedTransactions}
                     />
                 )}
@@ -92,7 +92,7 @@ const Transaction = () => {
                     <Alert severity="error">Error fetching Transactions per Month: {errorTotalTransactionsPerMonth.message}</Alert>
                 ) : (
                     <InfoBox
-                        title="# Shutterized Transactions per Month"
+                        title="# Shielded Transactions per Month"
                         tooltip="Number of shielded transactions in the last 30 days"
                         value={loadingTotalTransactionsPerMonth || transactionsPerMonth === null ? 'Loading...' : transactionsPerMonth}
                     />
@@ -102,7 +102,7 @@ const Transaction = () => {
                 ) : (
                     <InfoBox
                         title="Percentage of Shielded Transactions"
-                        tooltip="Percentage of monthly shielded transactions amongst all gnosis transactions"
+                        tooltip="Percentage of monthly shielded transactions amongst monthly gnosis transactions"
                         value={loadingTransactionPercentage || transactionPercentage === null ? 'Loading...' : `${(transactionPercentage * 100).toFixed(2)}%`}
                     />
                 )}
