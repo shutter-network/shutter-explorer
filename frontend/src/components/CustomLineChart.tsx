@@ -50,18 +50,16 @@ const CustomLineChart: FC<CustomLineChartProps> = ({ data, title = 'Inclusion Ti
     };
 
     return (
-        <Box>
-            <Box position="relative" display="inline-block" width={300} height={200}>
-            {/* Display the chart title */}
+        <Box position="relative">
+            <Box position="absolute" top={0} right={0}>
                 <Typography variant="h6" align="center" gutterBottom>
                     {title}
                 </Typography>
-                {estimatedInclusionTime? 
-                    <RevertedInfoBox title='Estimated Inclusion Time' tooltip='in secs' value={formatTime(estimatedInclusionTime)}/>
-                    : null
-                }
+                {estimatedInclusionTime && (
+                    <RevertedInfoBox title="Estimated Inclusion Time" tooltip="in secs" value={formatTime(estimatedInclusionTime)} />
+                )}
             </Box>
-            {/* Render the LineChart */}
+
             <LineChart {...chartProps} />
         </Box>
     );
