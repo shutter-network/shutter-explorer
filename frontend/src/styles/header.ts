@@ -1,5 +1,11 @@
 import styled from 'styled-components';
+import { ReactComponent as DropdownIcon } from '../assets/icons/chevron_down.svg';
 
+export const StyledDropdownIcon = styled(DropdownIcon)`
+  width: 16px;
+  height: 16px;
+  fill: #FFFFFF;
+`;
 export const NavButton = styled.button.attrs({
     className: 'nav-button',
 })`

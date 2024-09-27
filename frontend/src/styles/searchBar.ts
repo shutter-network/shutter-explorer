@@ -55,7 +55,6 @@ export const StyledDropdownIcon = styled(DropdownIcon)`
   width: 16px;
   height: 16px;
   fill: ${({ theme }) => theme.colors.gray300};
-
 `;
 
 export const StyledSearchIcon = styled(SearchIcon)`

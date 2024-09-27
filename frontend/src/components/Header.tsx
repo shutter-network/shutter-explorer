@@ -1,13 +1,10 @@
 import React, { useState } from 'react';
 import { Box } from '@mui/material';
 import logo from '../assets/shutter-logo.svg';
-import chevronDown from '../assets/icons/chevron_down.svg';
 import chevronRight from '../assets/icons/chevron_right.svg';
-import {NavIcon, NavButton, JoinButton} from "../styles/header";
+import {NavIcon, NavButton, JoinButton, StyledDropdownIcon} from "../styles/header";
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-
-
 
 const Header = () => {
     const [anchorEl, setAnchorEl] = useState(null);
@@ -38,10 +35,7 @@ const Header = () => {
                     <div onMouseEnter={handleProductMenuOpen} onMouseLeave={handleProductMenuClose}>
                         <NavButton>
                             Products
-                            <NavIcon
-                                src={chevronDown}
-                                alt="Chevron Down"
-                            />
+                            <StyledDropdownIcon/>
                         </NavButton>
                         <Menu
                             id="dropdown-menu"
@@ -71,10 +65,7 @@ const Header = () => {
                     <div onMouseEnter={handleLearnMenuOpen} onMouseLeave={handleLearnMenuClose}>
                         <NavButton>
                             Learn
-                            <NavIcon
-                                src={chevronDown}
-                                alt="Chevron Down"
-                            />
+                            <StyledDropdownIcon/>
                         </NavButton>
                         <Menu
                             id="dropdown-menu"
