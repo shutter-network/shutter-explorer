@@ -1,4 +1,3 @@
-import { formatDistanceToNow } from 'date-fns';
 
 /**
  * Converts a Unix timestamp (in seconds) to a "time ago" string.
@@ -6,7 +5,44 @@ import { formatDistanceToNow } from 'date-fns';
  * @returns {string} - Human-readable "time ago" string.
  */
 export const getTimeAgo = (timestamp: number): string => {
-  return formatDistanceToNow(new Date(timestamp * 1000), { addSuffix: true });
+  const now = Math.floor(Date.now() / 1000);
+  const diff = now - timestamp;
+
+  const seconds = diff;
+  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(minutes / 60);
+  const days = Math.floor(hours / 24);
+  const weeks = Math.floor(days / 7);
+  const months = Math.floor(days / 30);
+  const years = Math.floor(days / 365);
+
+  if (seconds < 60) {
+    return `${seconds} seconds ago`;
+  } else if (minutes === 1) {
+    return '1 minute ago';
+  } else if (minutes < 60) {
+    return `${minutes} minutes ago`;
+  } else if (hours === 1) {
+    return '1 hour ago';
+  } else if (hours < 24) {
+    return `${hours} hours ago`;
+  } else if (days === 1) {
+    return '1d ago';
+  } else if (days < 7) {
+    return `${days}d ago`;
+  } else if (weeks === 1) {
+    return '1 week ago';
+  } else if (weeks < 4) {
+    return `${weeks} weeks ago`;
+  } else if (months === 1) {
+    return '1 month ago';
+  } else if (months < 12) {
+    return `${months} months ago`;
+  } else if (years === 1) {
+    return '1 year ago';
+  } else {
+    return `${years} years ago`;
+  }
 };
 
 export const formatSeconds = (seconds: number): string => {
@@ -71,8 +107,8 @@ export const truncateString = (str: string, num: number): string => {
 }
 
 export const truncateDecimals = (num: number): string => {
-  let result =  num.toString().match(/^-?\d+(\.\d{0,2})?/);
-  if (result){
+  let result = num.toString().match(/^-?\d+(\.\d{0,2})?/);
+  if (result) {
     return result[0];
   }
   return 'N/A'

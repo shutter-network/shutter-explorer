@@ -71,7 +71,7 @@ describe('<Slot />', () => {
 
         cy.get('h5').contains('Sequencer Transactions').should('be.visible');
         sequencerTransactions.forEach(tx => {
-            cy.get('td').contains(truncateString(tx.SequencerTxHash, 40) , { timeout: 10000 }).should('be.visible');
+            cy.get('td').contains(truncateString(tx.SequencerTxHash, 55) , { timeout: 10000 }).should('be.visible');
             const expectedTimeAgo = getTimeAgo(tx.CreatedAtUnix);
             cy.get('td').contains(expectedTimeAgo, { timeout: 10000 }).should('be.visible');
         });
@@ -98,7 +98,7 @@ describe('<Slot />', () => {
 
         cy.get('h5').contains('User Transactions').should('be.visible');
         userTransactions.forEach(tx => {
-            cy.get('td').contains(truncateString(tx.TxHash, 40), { timeout: 10000 }).should('be.visible');
+            cy.get('td').contains(truncateString(tx.TxHash, 55), { timeout: 10000 }).should('be.visible');
             const expectedTimeAgo = getTimeAgo(tx.IncludedAtUnix);
             cy.get('td').contains(expectedTimeAgo, { timeout: 10000 }).should('be.visible');
         });
