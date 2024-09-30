@@ -6,18 +6,21 @@ interface OverviewCardProps {
     title: string;
     iconSrc?: string;
     children: React.ReactNode;
+    centerTitle?: boolean;
 }
 
-const OverviewCard: FC<OverviewCardProps> = ({ title, iconSrc, children }) => {
+const OverviewCard: FC<OverviewCardProps> = ({ title, iconSrc, children, centerTitle = false }) => {
     return (
         <CardContainer>
-            <CardHeader>
+            <CardHeader centerTitle={centerTitle}>
                 {iconSrc && (
                     <IconWrapper>
                         <Icon src={iconSrc} alt={`${title} icon`} />
                     </IconWrapper>
                 )}
-                <Typography variant="h2">{title}</Typography>
+                <Typography variant="h2">
+                    {title}
+                </Typography>
             </CardHeader>
             <CardContent>
                 {children}
