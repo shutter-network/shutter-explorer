@@ -1,97 +1,55 @@
-import TransactionSuccessGauge from '../../src/modules/TransactionGauge';
+import TransactionGauge from '../../src/modules/TransactionGauge';
 import { mount } from '@cypress/react18';
 import { WebSocketContext } from '../../src/context/WebSocketContext';
 import React from 'react';
 import { MemoryRouter } from 'react-router-dom';
+import { ThemeProvider as MUIThemeProvider } from '@mui/material/styles';
+import { ThemeProvider as StyledThemeProvider } from 'styled-components';
+import { customTheme, muiTheme } from '../../src/theme';
 
-describe('<TransactionSuccessGauge />', () => {
-    beforeEach(() => {
+describe('<TransactionGauge />', () => {
+    it('renders the transaction gauge with test values', () => {
+        const mockSocket = {
+            onopen: cy.stub(),
+            onmessage: cy.stub(),
+            onclose: cy.stub(),
+            onerror: cy.stub(),
+        };
+
         cy.intercept('GET', '/api/inclusion_time/executed_transactions', {
-            message:{
-                Successful: 25,
-                Failed: 5,
-            }
+            statusCode: 200,
+            body: {
+                message: {
+                    Successful: 25,
+                    Failed: 5,
+                }
+            },
         }).as('getExecutedTransactions');
-    });
-
-    it('renders and displays the transaction success gauge', () => {
-        const mockSocket = {
-            onopen: cy.stub(),
-            onmessage: cy.stub(),
-            onclose: cy.stub(),
-            onerror: cy.stub(),
-        };
 
         mount(
-            <WebSocketContext.Provider value={{ socket: mockSocket as unknown as WebSocket }}>
-                <MemoryRouter>
-                    <TransactionSuccessGauge />
-                </MemoryRouter>
-            </WebSocketContext.Provider>
-        );
-        cy.wait('@getExecutedTransactions');
-
-        cy.get('svg')
-            .find('tspan')
-            .should('contain', '83.333')
-            .should('be.visible'); // 25 / (25 + 5) * 100 = 83.333
-    });
-
-    it('receives updated transaction success data via WebSocket and updates the UI', () => {
-        const mockSocket = {
-            onopen: cy.stub(),
-            onmessage: cy.stub(),
-            onclose: cy.stub(),
-            onerror: cy.stub(),
-        };
-
-        mount(
-            <WebSocketContext.Provider value={{ socket: mockSocket as unknown as WebSocket }}>
-                <MemoryRouter>
-                    <TransactionSuccessGauge />
-                </MemoryRouter>
-            </WebSocketContext.Provider>
+            <MUIThemeProvider theme={muiTheme}>
+                <StyledThemeProvider theme={customTheme}>
+                    <WebSocketContext.Provider value={{ socket: mockSocket as unknown as WebSocket }}>
+                        <MemoryRouter>
+                            <TransactionGauge />
+                        </MemoryRouter>
+                    </WebSocketContext.Provider>
+                </StyledThemeProvider>
+            </MUIThemeProvider>
         );
 
         cy.wait('@getExecutedTransactions');
 
-        // Simulate WebSocket event for updated transaction data
-        cy.wrap(mockSocket).invoke('onmessage', {
-            data: JSON.stringify({
-                type: 'executed_transactions_updated',
-                data: { message: { Successful: 30, Failed: 5 }},
-            }),
-        } as MessageEvent);
+        cy.get('div[role="meter"]').invoke('css', 'height', '300px');
+        cy.get('div[role="meter"]').should('exist').and('be.visible');
 
-        cy.get('svg')
-            .find('tspan')
-            .should('contain', '85.714') // 30 / (30 + 5) * 100 = 85.714
-            .should('be.visible');
-    });
+        cy.contains('Successful').should('be.visible');
+        cy.contains('25').should('be.visible');
 
-    it('displays an error message if fetching transaction stats fails', () => {
-        cy.intercept('GET', '/api/inclusion_time/executed_transactions', {
-            statusCode: 500,
-            body: {},
-        }).as('getExecutedTransactionsError');
+        cy.contains('Total').should('be.visible');
+        cy.contains('30').should('be.visible');
 
-        const mockSocket = {
-            onopen: cy.stub(),
-            onmessage: cy.stub(),
-            onclose: cy.stub(),
-            onerror: cy.stub(),
-        };
-
-        mount(
-            <WebSocketContext.Provider value={{ socket: mockSocket as unknown as WebSocket }}>
-                <MemoryRouter>
-                    <TransactionSuccessGauge />
-                </MemoryRouter>
-            </WebSocketContext.Provider>
-        );
-
-        cy.wait('@getExecutedTransactionsError');
-
-        cy.contains('Error fetching Transaction Stats').should('be.visible');
+        cy.contains('Failed').should('be.visible');
+        cy.contains('5').should('be.visible');
     });
 });

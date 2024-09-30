@@ -1,5 +1,8 @@
 import styled from 'styled-components';
 import { TextField } from '@mui/material';
+import { ReactComponent as DropdownIcon } from '../assets/icons/chevron_down.svg';
+import { ReactComponent as SearchIcon } from '../assets/icons/search.svg';
+
 
 export const SearchContainer = styled.div.attrs({
     className: 'search-container',
@@ -21,6 +24,7 @@ export const ChainSelect = styled.div.attrs({
 })`
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 8px;
   background: #fff;
   border: 1px solid #ccced0;
@@ -29,6 +33,7 @@ export const ChainSelect = styled.div.attrs({
   max-width: 240px;
   min-width: 240px;
   height: 40px;
+  cursor: pointer;
 `;
 
 export const ChainIcon = styled.img.attrs({
@@ -42,17 +47,22 @@ export const ChainName = styled.span.attrs({
     className: 'chain-name',
 })`
   flex: 1;
-  padding: 0 4px;
   color: #051016;
   font: 600 14px/1 'Space Grotesk', sans-serif;
 `;
 
-export const DropdownIcon = styled.img.attrs({
-    className: 'dropdown-icon',
-})`
+export const StyledDropdownIcon = styled(DropdownIcon)`
   width: 16px;
   height: 16px;
+  fill: ${({ theme }) => theme.colors.gray300};
 `;
+
+export const StyledSearchIcon = styled(SearchIcon)`
+  width: 16px;
+  height: 16px;
+  fill: ${({ theme }) => theme.colors.gray300};
+`;
+
 
 export const StyledTextField = styled(TextField).attrs({
     className: 'styled-text-field',
@@ -72,8 +82,8 @@ export const StyledTextField = styled(TextField).attrs({
     }
 
     .MuiInputBase-input {
-      font: 600 14px/1 'Space Grotesk', sans-serif;
-      color: #989ca2;
+      color: ${({ theme }) => theme.colors.gray300};
+
     }
   }
 

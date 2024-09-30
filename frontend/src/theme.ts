@@ -59,7 +59,7 @@ const muiTheme = createTheme({
                 root: {
                     textAlign: 'left',
                     marginTop: '16px',
-                    marginBottm: '16px'
+                    marginBottom: '16px'
                 },
             },
         },
@@ -74,6 +74,7 @@ const customTheme = {
         background: '#FFFFFF',
         textPrimary: '#051016',
         textSecondary: '#656B73',
+        gray300: '#989CA2',
     },
 };
 
