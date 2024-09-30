@@ -56,7 +56,9 @@ const CustomLineChart: FC<CustomLineChartProps> = ({ data, title = 'Inclusion Ti
                     {title}
                 </Typography>
                 {estimatedInclusionTime && (
-                    <RevertedInfoBox title="Estimated Inclusion Time" tooltip="in secs" value={formatTime(estimatedInclusionTime)} />
+                    <RevertedInfoBox title="Estimated Inclusion Time"
+                                     tooltip="Estimated time for a transaction to be included"
+                                     value={formatTime(estimatedInclusionTime)} />
                 )}
             </Box>
 
