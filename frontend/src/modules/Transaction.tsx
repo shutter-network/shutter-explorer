@@ -68,7 +68,7 @@ const Transaction = () => {
         }
 
         if (totalTransactionsPerMonthData && totalTransactionsPerMonthData.message) {
-            setTransactionsPerMonth(Number(totalTransactionsPerMonthData.message[0].TotalTxs));
+            setTransactionsPerMonth(Number(totalTransactionsPerMonthData.message));
         }
 
         if (transactionPercentageData && transactionPercentageData.message !== undefined) {

@@ -15,14 +15,11 @@ WHERE tse.encrypted_transaction = $1;
 -- name: QueryTotalTXsForEachTXStatus :one
 SELECT COUNT(*) FROM public.decrypted_tx where tx_status = $1;
 
--- name: QueryTotalTXsForEachTXStatusPerMonth :many
-SELECT 
-    TO_CHAR(DATE_TRUNC('month', created_at), 'YYYY-MM-DD') AS month, 
-    COUNT(*) AS total_txs
+-- name: QueryTotalTXsForEachTXStatusLast30Days :one
+SELECT COUNT(*) AS transaction_count
 FROM decrypted_tx
 WHERE tx_status = $1
-GROUP BY DATE_TRUNC('month', created_at)
-ORDER BY month DESC;
+  AND created_at >= NOW() - INTERVAL '30 days';
 
 -- name: QueryLatestPendingTXsWhichCanBeDecrypted :many
 WITH latest_per_hash AS (
