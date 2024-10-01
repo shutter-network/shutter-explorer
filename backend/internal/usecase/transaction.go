@@ -132,8 +132,8 @@ func (uc *TransactionUsecase) QueryTotalExecutedTXsForEachTXStatus(ctx context.C
 	return totalTxs, nil
 }
 
-func (uc *TransactionUsecase) QueryTotalExecutedTXsForEachTXStatusPerMonth(ctx context.Context, txStatus string) ([]data.QueryTotalTXsForEachTXStatusPerMonthRow, *error.Http) {
-	totalTxsPerMonth, err := uc.observerDBQuery.QueryTotalTXsForEachTXStatusPerMonth(ctx, data.TxStatusVal(txStatus))
+func (uc *TransactionUsecase) QueryTotalExecutedTXsForEachTXStatusPerMonth(ctx context.Context, txStatus string) (int64, *error.Http) {
+	totalTxs, err := uc.observerDBQuery.QueryTotalTXsForEachTXStatusLast30Days(ctx, data.TxStatusVal(txStatus))
 	if err != nil {
 		log.Err(err).Msg("err encountered while querying DB")
 		err := error.NewHttpError(
@@ -141,9 +141,9 @@ func (uc *TransactionUsecase) QueryTotalExecutedTXsForEachTXStatusPerMonth(ctx c
 			"",
 			http.StatusInternalServerError,
 		)
-		return nil, &err
+		return 0, &err
 	}
-	return totalTxsPerMonth, nil
+	return totalTxs, nil
 }
 
 func (uc *TransactionUsecase) QueryLatestIncludedTransactions(ctx context.Context, limit string) ([]data.QueryLatestIncludedTXsRow, *error.Http) {
@@ -308,7 +308,7 @@ func (uc *TransactionUsecase) QueryLatestSequencerTransactions(ctx context.Conte
 }
 
 func (uc *TransactionUsecase) QueryTransactionPercentage(ctx context.Context, txStatus string) (float64, *error.Http) {
-	totalTxsPerMonth, err := uc.observerDBQuery.QueryTotalTXsForEachTXStatusPerMonth(ctx, data.TxStatusVal(txStatus))
+	totalTxs, err := uc.observerDBQuery.QueryTotalTXsForEachTXStatusLast30Days(ctx, data.TxStatusVal(txStatus))
 	if err != nil {
 		log.Err(err).Msg("err encountered while querying DB")
 		err := error.NewHttpError(
@@ -318,9 +318,7 @@ func (uc *TransactionUsecase) QueryTransactionPercentage(ctx context.Context, tx
 		)
 		return 0, &err
 	}
-	if len(totalTxsPerMonth) == 0 {
-		return 0, nil
-	}
-	percentage := (float64(totalTxsPerMonth[0].TotalTxs) / GnosisTransactionsPerMonth) * 100
+
+	percentage := (float64(totalTxs) / GnosisTransactionsPerMonth) * 100
 	return percentage, nil
 }

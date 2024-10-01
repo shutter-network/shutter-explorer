@@ -496,39 +496,18 @@ func (q *Queries) QueryTotalTXsForEachTXStatus(ctx context.Context, txStatus TxS
 	return count, err
 }
 
-const queryTotalTXsForEachTXStatusPerMonth = `-- name: QueryTotalTXsForEachTXStatusPerMonth :many
-SELECT 
-    TO_CHAR(DATE_TRUNC('month', created_at), 'YYYY-MM-DD') AS month, 
-    COUNT(*) AS total_txs
+const queryTotalTXsForEachTXStatusLast30Days = `-- name: QueryTotalTXsForEachTXStatusLast30Days :one
+SELECT COUNT(*) AS transaction_count
 FROM decrypted_tx
 WHERE tx_status = $1
-GROUP BY DATE_TRUNC('month', created_at)
-ORDER BY month DESC
+  AND created_at >= NOW() - INTERVAL '30 days'
 `
 
-type QueryTotalTXsForEachTXStatusPerMonthRow struct {
-	Month    string
-	TotalTxs int64
-}
-
-func (q *Queries) QueryTotalTXsForEachTXStatusPerMonth(ctx context.Context, txStatus TxStatusVal) ([]QueryTotalTXsForEachTXStatusPerMonthRow, error) {
-	rows, err := q.db.Query(ctx, queryTotalTXsForEachTXStatusPerMonth, txStatus)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []QueryTotalTXsForEachTXStatusPerMonthRow
-	for rows.Next() {
-		var i QueryTotalTXsForEachTXStatusPerMonthRow
-		if err := rows.Scan(&i.Month, &i.TotalTxs); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
+func (q *Queries) QueryTotalTXsForEachTXStatusLast30Days(ctx context.Context, txStatus TxStatusVal) (int64, error) {
+	row := q.db.QueryRow(ctx, queryTotalTXsForEachTXStatusLast30Days, txStatus)
+	var transaction_count int64
+	err := row.Scan(&transaction_count)
+	return transaction_count, err
 }
 
 const queryTransactionDetailsByTxHash = `-- name: QueryTransactionDetailsByTxHash :one
