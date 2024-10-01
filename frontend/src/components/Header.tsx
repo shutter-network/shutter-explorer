@@ -22,9 +22,9 @@ const Header = () => {
         setAnchorLearn(null);
     };
     return (
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', padding:"1rem 2.5rem" }}>
             {/* Left Section */}
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: '20px', md: '80px' }, flexWrap: { xs: 'wrap', md: 'nowrap' } }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: '20px', md: '50px' }, flexWrap: { xs: 'wrap', md: 'nowrap' } }}>
                 <img
                     src={logo}
                     alt="Company Logo"
@@ -96,7 +96,7 @@ const Header = () => {
             </Box>
 
             {/* Right Section */}
-            <JoinButton>Join movement</JoinButton>
+            <JoinButton>Join Movement</JoinButton>
         </Box>
     );
 };
