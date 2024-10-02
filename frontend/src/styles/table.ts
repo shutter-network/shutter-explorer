@@ -22,10 +22,11 @@ export const StyledTableRow = styled(TableRow)(({ theme }) => ({
     }
 }));
 
-export const StyledNavLinkEven = styled(NavLink)`
-  color: blue; // Set the color for even rows
-`;
-
-export const StyledNavLinkOdd = styled(NavLink)`
-  color: black; // Default color for odd rows
+export const StyledNavLink = styled(NavLink)`
+  color: ${({ theme }) => theme.palette.primary.main};
+  font-weight: 600;
+  text-decoration: none;
+  &:hover {
+    text-decoration: underline;
+  }
 `;
