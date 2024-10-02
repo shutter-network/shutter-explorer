@@ -24,7 +24,7 @@ jobs:
                 script: |
                     cd /root/shutter-explorer
                     git pull origin staging
-                    git submodule --init --recursive
+                    git submodule update --init --recursive
                     cd docker
                     docker compose up -d --build
 
@@ -45,6 +45,6 @@ jobs:
                 script: |
                     cd /root/shutter-explorer
                     git pull origin main
-                    git submodule --init --recursive
+                    git submodule update --init --recursive
                     cd docker
                     docker compose up -d --build
