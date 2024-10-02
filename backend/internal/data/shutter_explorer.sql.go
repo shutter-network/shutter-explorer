@@ -512,7 +512,7 @@ func (q *Queries) QueryTotalTXsForEachTXStatusLast30Days(ctx context.Context, tx
 
 const queryTransactionDetailsByTxHash = `-- name: QueryTransactionDetailsByTxHash :one
 SELECT 
-    tse.event_tx_hash, tse.sender, FLOOR(EXTRACT(EPOCH FROM tse.created_at)) as created_at_unix,
+    tse.event_tx_hash, tse.sender, FLOOR(EXTRACT(EPOCH FROM tse.created_at)) as created_at_unix, tse.created_at,
     dt.tx_hash AS user_tx_hash, dt.tx_status, dt.slot, 
     COALESCE(FLOOR(EXTRACT(EPOCH FROM dt.created_at)), 0)::BIGINT AS decrypted_tx_created_at_unix
 FROM transaction_submitted_event tse 
@@ -532,6 +532,7 @@ type QueryTransactionDetailsByTxHashRow struct {
 	EventTxHash              []byte
 	Sender                   []byte
 	CreatedAtUnix            float64
+	CreatedAt                pgtype.Timestamptz
 	UserTxHash               []byte
 	TxStatus                 NullTxStatusVal
 	Slot                     pgtype.Int8
@@ -545,6 +546,7 @@ func (q *Queries) QueryTransactionDetailsByTxHash(ctx context.Context, eventTxHa
 		&i.EventTxHash,
 		&i.Sender,
 		&i.CreatedAtUnix,
+		&i.CreatedAt,
 		&i.UserTxHash,
 		&i.TxStatus,
 		&i.Slot,

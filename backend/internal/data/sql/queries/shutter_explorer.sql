@@ -148,7 +148,7 @@ LIMIT 1;
 
 -- name: QueryTransactionDetailsByTxHash :one
 SELECT 
-    tse.event_tx_hash, tse.sender, FLOOR(EXTRACT(EPOCH FROM tse.created_at)) as created_at_unix,
+    tse.event_tx_hash, tse.sender, FLOOR(EXTRACT(EPOCH FROM tse.created_at)) as created_at_unix, tse.created_at,
     dt.tx_hash AS user_tx_hash, dt.tx_status, dt.slot, 
     COALESCE(FLOOR(EXTRACT(EPOCH FROM dt.created_at)), 0)::BIGINT AS decrypted_tx_created_at_unix
 FROM transaction_submitted_event tse 

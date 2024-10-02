@@ -42,6 +42,7 @@ type QueryTransactionDetailResp struct {
 	DecryptedTxCreatedAt   int64
 	EffectiveInclusionTime int64
 	EstimatedInclusionTime int64
+	InclusionDelay         int64
 }
 
 func NewTransactionUsecase(
@@ -210,11 +211,13 @@ func (uc *TransactionUsecase) QueryTransactionDetailsByTxHash(ctx context.Contex
 
 	var effectiveInclusionTime int64
 	var inclusionSlot int64
+	var inclusionDelay int64
 	txStatus := Pending
 	if tse.TxStatus.Valid {
 		if tse.TxStatus.TxStatusVal == data.TxStatusValIncluded {
 			txStatus = Completed
 			effectiveInclusionTime = tse.DecryptedTxCreatedAtUnix
+			inclusionDelay = effectiveInclusionTime - tse.CreatedAt.Time.Unix()
 			if tse.Slot.Valid {
 				inclusionSlot = tse.Slot.Int64
 			}
@@ -278,6 +281,7 @@ func (uc *TransactionUsecase) QueryTransactionDetailsByTxHash(ctx context.Contex
 		DecryptedTxCreatedAt:   tse.DecryptedTxCreatedAtUnix,
 		EffectiveInclusionTime: effectiveInclusionTime,
 		EstimatedInclusionTime: estimatedInclusionTime,
+		InclusionDelay:         inclusionDelay,
 	}
 	return resp, nil
 }
