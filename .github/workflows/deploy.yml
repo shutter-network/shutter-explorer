@@ -18,12 +18,13 @@ jobs:
             - name: Deploy to Instance 1
               uses: appleboy/ssh-action@v0.1.8
               with:
-                host: ${{ secrets.INSTANCE_1_SERVER_HOST }}
-                username: ${{ secrets.INSTANCE_1_SERVER_USER }}
+                host: ${{ secrets.STAGING_SERVER_HOST }}
+                username: ${{ secrets.STAGING_SERVER_USER }}
                 key: ${{ secrets.SERVER_KEY }}
                 script: |
                     cd /root/shutter-explorer
                     git pull origin staging
+                    git submodule --init --recursive
                     cd docker
                     docker compose up -d --build
 
@@ -38,11 +39,12 @@ jobs:
             - name: Deploy to Instance 2
               uses: appleboy/ssh-action@v0.1.8
               with:
-                host: ${{ secrets.INSTANCE_2_SERVER_HOST }}
-                username: ${{ secrets.INSTANCE_2_SERVER_USER }}
+                host: ${{ secrets.PROD_SERVER_HOST }}
+                username: ${{ secrets.PROD_SERVER_USER }}
                 key: ${{ secrets.SERVER_KEY }}
                 script: |
                     cd /root/shutter-explorer
                     git pull origin main
+                    git submodule --init --recursive
                     cd docker
                     docker compose up -d --build
