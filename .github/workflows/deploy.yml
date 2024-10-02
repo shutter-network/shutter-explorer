@@ -1,0 +1,27 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches:
+      - staging  # Triggers workflow on push to the main branch
+
+jobs:
+  deploy_instance_1:
+    if: github.ref == 'refs/heads/staging'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Deploy to Instance 1
+        uses: appleboy/ssh-action@v0.1.8
+        with:
+          host: ${{ secrets.INSTANCE_1_SERVER_HOST }}
+          username: ${{ secrets.INSTANCE_1_SERVER_USER }}
+          key: ${{ secrets.INSTANCE_1_SERVER_KEY }}
+          script: |
+            cd /root/shutter-explorer
+            git pull origin main
+            cd docker
+            docker compose up -d --build
