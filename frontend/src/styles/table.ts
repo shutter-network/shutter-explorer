@@ -1,22 +1,37 @@
-import { TableCell, TableRow, tableCellClasses } from '@mui/material';
+import {TableCell, TableRow, tableCellClasses, TableContainer} from '@mui/material';
 import { NavLink } from 'react-router-dom';
 import styled from 'styled-components';
 
-export const StyledTableCell = styled(TableCell)(({ theme }) => ({
-    [`&.${tableCellClasses.head}`]: {
-        backgroundColor: "#f5f5f5",
-        color: "#f5f5f5",
-    },
-    [`&.${tableCellClasses.body}`]: {
-        fontSize: 14,
+export const StyledTableContainer = styled(TableContainer)(({ theme }) => ({
+    marginTop: theme.spacing(2),
+    border: `0.5px solid ${theme.colors.gray}`,
+    boxShadow: 'none',
+    borderRadius: '4px',
+}));
+
+export const StyledTableHeadRow = styled(TableRow)(({ theme }) => ({
+    '& th': {
+        borderBottom: 'none',
+        color: theme.colors.gray,
+        fontWeight: 600,
+        paddingTop: theme.spacing(1),
+        paddingBottom: theme.spacing(1),
     },
 }));
 
+export const StyledTableCell = styled(TableCell)(({ theme }) => ({
+    [`&.${tableCellClasses.body}`]: {
+        fontSize: 14,
+        paddingTop: theme.spacing(1),
+        paddingBottom: theme.spacing(1),
+    },
+}));
+
+
 export const StyledTableRow = styled(TableRow)(({ theme }) => ({
     '&:nth-of-type(even)': {
-        backgroundColor: "#F7F9FB",
+        backgroundColor: theme.colors.lightBlue,
     },
-    // hide last border
     '&:last-child td, &:last-child th': {
         border: 0,
     }

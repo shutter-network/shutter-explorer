@@ -86,7 +86,8 @@ const customTheme = {
         background: '#FFFFFF',
         textPrimary: '#051016',
         textSecondary: '#656B73',
-        gray300: '#989CA2',
+        gray: '#989CA2',
+        lightBlue: '#F7F9FB'
     },
 };
 

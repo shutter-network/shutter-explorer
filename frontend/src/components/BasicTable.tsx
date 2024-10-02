@@ -1,8 +1,15 @@
-import { Box, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip } from "@mui/material";
-import {StyledNavLink, StyledTableCell, StyledTableRow} from "../styles/table";
+import { Box, Table, TableBody, TableCell, TableHead, Tooltip } from "@mui/material";
+import {
+    StyledNavLink,
+    StyledTableCell,
+    StyledTableContainer,
+    StyledTableHeadRow,
+    StyledTableRow
+} from "../styles/table";
 import { ReactComponent as CopyIconBlue } from '../assets/icons/copy_blue.svg';
 import { ReactComponent as CopyIconGrey } from '../assets/icons/copy_grey.svg';
 import { truncateString } from "../utils/utils";
+import React from "react";
 
 interface Column {
     id: string;
@@ -17,37 +24,34 @@ interface BasicTableProps<T> {
 }
 
 export default function BasicTable<T extends { [key: string]: any }>({
-    rows,
-    columns,
-    isMobile
-}: BasicTableProps<T>) {
+                                                                         rows,
+                                                                         columns,
+                                                                         isMobile
+                                                                     }: BasicTableProps<T>) {
     const handleCopy = (text: string) => {
         navigator.clipboard.writeText(text);
     };
 
     return (
-        <TableContainer component={Paper} sx={{ marginTop: 4 }}>
+        <StyledTableContainer>
             <Table aria-label="simple table">
                 <TableHead>
-                    <TableRow>
+                    <StyledTableHeadRow>
                         {columns.map((column) => (
-                            <TableCell key={column.id} style={{ minWidth: column.minWidth }}>
+                            <TableCell key={column.id}>
                                 {column.label}
                             </TableCell>
                         ))}
-                    </TableRow>
+                    </StyledTableHeadRow>
                 </TableHead>
                 <TableBody>
                     {rows.map((row, index) => (
-                        <StyledTableRow
-                            key={index}
-                            sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                        >
+                        <StyledTableRow key={index}>
                             {columns.map((column) => (
                                 <StyledTableCell key={column.id}>
                                     {
                                         column.id === "hash" ?
-                                            <Box display="flex" alignItems="centre" gap={1} justifyContent="space-between">
+                                            <Box display="flex" alignItems="center" gap={1} justifyContent="space-between">
                                                 <StyledNavLink to={`/transaction-details/${row[column.id]}`} onCopy={event => {
                                                     event.preventDefault();
                                                     event.clipboardData.setData("text/plain", row[column.id]);
@@ -66,6 +70,6 @@ export default function BasicTable<T extends { [key: string]: any }>({
                     ))}
                 </TableBody>
             </Table>
-        </TableContainer>
+        </StyledTableContainer>
     );
 }
