@@ -1,10 +1,14 @@
-import { LineChart, LineChartProps } from '@mui/x-charts/LineChart';
+import * as React from 'react';
 import { FC } from 'react';
-import { Typography, Box } from '@mui/material';
+import { LinePlot, MarkPlot } from '@mui/x-charts/LineChart';
 import dayjs from 'dayjs';
-import { LineSeriesType } from '@mui/x-charts';
-import RevertedInfoBox from './RevertedInfoBox';
-import { formatTime } from '../utils/utils';
+import { ChartsXAxis, ChartsYAxis, LineSeriesType } from '@mui/x-charts';
+import { ResponsiveChartContainer } from '@mui/x-charts/ResponsiveChartContainer';
+import { CustomAxisTooltip } from "./CustomAxisToolTip";
+import Box from '@mui/material/Box';
+import { Typography } from "@mui/material";
+import RevertedInfoBox from "./RevertedInfoBox";
+import { formatTime } from "../utils/utils";
 
 interface CustomLineChartProps {
     data: {
@@ -16,53 +20,64 @@ interface CustomLineChartProps {
 }
 
 const CustomLineChart: FC<CustomLineChartProps> = ({ data, title = 'Inclusion Time Chart', estimatedInclusionTime }) => {
-    const xAxisData = data.map(point => point.day * 1000);
-    const seriesData = data.map(point => point.averageInclusionTime);
+    const sortedData = data.sort((a, b) => a.day - b.day);
+    const dataset = sortedData.map(point => ({
+        x: point.day * 1000,
+        y: point.averageInclusionTime,
+    }));
 
-    const formatDate = (timestamp: number) => { 
-        let formattedDate= dayjs(timestamp).format('DD MMM')
+    const formatDate = (timestamp: number) => {
+        let formattedDate = dayjs(timestamp).format('DD MMM');
         const parts = formattedDate.split(' ');
-        parts[1] = parts[1].toUpperCase(); 
+        parts[1] = parts[1].toUpperCase();
         return parts.join(' ');
-    }; 
+    };
 
     const xAxis = {
-        scaleType: 'time' as const,
-        data: xAxisData,
-        valueFormatter: formatDate
+        scaleType: 'band' as const,
+        dataKey: 'x',
+        valueFormatter: formatDate,
     };
-    
-    const yAxis: LineSeriesType[] = [{
+
+    const series: LineSeriesType[] = [{
         type: 'line',
-        data: seriesData,
+        dataKey: 'y',
+        label: 'Average Inclusion Time',
         curve: "linear",
         color: '#0044A4',
-    }]
+    }];
 
-    const chartProps: LineChartProps = {
-        xAxis: [xAxis],
-        series: yAxis,
-        yAxis: [{
-            valueFormatter: formatTime
-        }],
-        width: 600,
-        height: 400,
+    const yAxis = {
+        valueFormatter: formatTime,
     };
 
     return (
         <Box position="relative">
-            <Box position="absolute" top={0} right={0}>
+            <Box position="absolute" top={0} right={0} zIndex={2}> {/* Add zIndex to RevertedInfoBox */}
                 <Typography variant="h6" align="center" gutterBottom>
                     {title}
                 </Typography>
                 {estimatedInclusionTime && (
-                    <RevertedInfoBox title="Estimated Inclusion Time"
-                                     tooltip="Estimated time for a transaction to be included"
-                                     value={formatTime(estimatedInclusionTime)} />
+                    <RevertedInfoBox
+                        title="Estimated Inclusion Time"
+                        tooltip="Average time for a transaction to be included"
+                        value={formatTime(estimatedInclusionTime)}
+                    />
                 )}
             </Box>
-
-            <LineChart {...chartProps} />
+            <ResponsiveChartContainer
+                height={300}
+                dataset={dataset}
+                series={series}
+                xAxis={[xAxis]}
+                yAxis={[yAxis]}
+            >
+                <LinePlot />
+                <MarkPlot />
+                <ChartsXAxis />
+                <ChartsYAxis />
+                <CustomAxisTooltip />
+            </ResponsiveChartContainer>
         </Box>
     );
 };

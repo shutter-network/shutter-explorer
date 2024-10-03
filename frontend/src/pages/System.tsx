@@ -34,6 +34,9 @@ const System = () => {
                         display: 'flex',
                         flexDirection: 'column'}}>
                     <InclusionTime />
+
+
+
                 </Grid>
 
                 {/* Transaction Gauge Section */}
