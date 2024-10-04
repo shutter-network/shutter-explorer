@@ -10,14 +10,13 @@ interface InfoBoxProps {
 
 const RevertedInfoBox: FC<InfoBoxProps> = ({ title, tooltip, value }) => {
     return (
-        <Paper elevation={0} sx={{ padding: 2, textAlign: 'left' }}>
+        <Paper elevation={0} sx={{ padding: 2, textAlign: 'left', zIndex: 1 }}> {/* Add zIndex */}
             {/* Display value with subtitle1 style */}
-
             <Box display="flex" alignItems="center" gap={1}>
                 <Typography variant="body1">
                     {title}
                 </Typography>
-                <Tooltip title={tooltip}>
+                <Tooltip title={tooltip} placement="top" arrow>
                     <InfoIcon />
                 </Tooltip>
             </Box>
