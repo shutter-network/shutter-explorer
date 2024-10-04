@@ -54,6 +54,18 @@ const muiTheme = createTheme({
         },
     },
     components: {
+        MuiLink: {
+            styleOverrides: {
+                root: {
+                    color: '#0044A4',
+                    fontWeight: 600,
+                    textDecoration: 'none',
+                    '&:hover': {
+                        textDecoration: 'underline',
+                    },
+                },
+            },
+        },
         MuiAlert: {
             styleOverrides: {
                 root: {
@@ -74,7 +86,8 @@ const customTheme = {
         background: '#FFFFFF',
         textPrimary: '#051016',
         textSecondary: '#656B73',
-        gray300: '#989CA2',
+        gray: '#989CA2',
+        lightBlue: '#F7F9FB'
     },
 };
 

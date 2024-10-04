@@ -54,13 +54,13 @@ export const ChainName = styled.span.attrs({
 export const StyledDropdownIcon = styled(DropdownIcon)`
   width: 16px;
   height: 16px;
-  fill: ${({ theme }) => theme.colors.gray300};
+  fill: ${({ theme }) => theme.colors.gray};
 `;
 
 export const StyledSearchIcon = styled(SearchIcon)`
   width: 16px;
   height: 16px;
-  fill: ${({ theme }) => theme.colors.gray300};
+  fill: ${({ theme }) => theme.colors.gray};
 `;
 
 
@@ -82,7 +82,7 @@ export const StyledTextField = styled(TextField).attrs({
     }
 
     .MuiInputBase-input {
-      color: ${({ theme }) => theme.colors.gray300};
+      color: ${({ theme }) => theme.colors.gray};
 
     }
   }

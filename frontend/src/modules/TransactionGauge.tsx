@@ -52,7 +52,7 @@ const TransactionGauge = () => {
 
     return (
         <Box sx={{ flexGrow: 1, marginTop: 4 }}>
-            <OverviewCard title="Executed Transactions">
+            <OverviewCard title="Included Transactions" centerTitle>
                 {errorTransactionStats ? (
                     <Alert severity="error">Error fetching Transaction Stats: {errorTransactionStats.message}</Alert>
                 ) : (

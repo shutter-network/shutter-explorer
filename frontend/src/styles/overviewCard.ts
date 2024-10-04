@@ -11,20 +11,12 @@ export const CardContainer = styled(Paper)`
   height: 100%;
 `;
 
-export const CardHeader = styled.div`
+export const CardHeader = styled.div<{ centerTitle?: boolean }>`
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: ${({ centerTitle }) => (centerTitle ? 'center' : 'flex-start')};
   gap: 16px;
   margin-bottom: 16px;
-
-
-  h2 {
-    font-size: 24px;
-    font-weight: 600;
-    color: #051016;
-    letter-spacing: -1.2px;
-  }
 `;
 
 export const IconWrapper = styled.div`
