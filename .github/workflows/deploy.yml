@@ -1,0 +1,50 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches:
+        - main
+        - staging
+
+jobs:
+    deploy_instance_1:
+        if: github.ref == 'refs/heads/staging'
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v3
+
+            - name: Deploy to Instance 1
+              uses: appleboy/ssh-action@v1.0.3
+              with:
+                host: ${{ secrets.STAGING_SERVER_HOST }}
+                username: ${{ secrets.STAGING_SERVER_USER }}
+                key: ${{ secrets.SERVER_KEY }}
+                script: |
+                    cd /root/shutter-explorer
+                    git pull origin staging
+                    git submodule update --init --recursive
+                    cd docker
+                    docker compose up -d --build
+
+    deploy_instance_2:
+        if: github.ref == 'refs/heads/main'
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v3
+
+            - name: Deploy to Instance 2
+              uses: appleboy/ssh-action@v1.0.3
+              with:
+                host: ${{ secrets.PROD_SERVER_HOST }}
+                username: ${{ secrets.PROD_SERVER_USER }}
+                key: ${{ secrets.SERVER_KEY }}
+                script: |
+                    cd /root/shutter-explorer
+                    git pull origin main
+                    git submodule update --init --recursive
+                    cd docker
+                    docker compose up -d --build
