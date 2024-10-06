@@ -74,7 +74,7 @@ ORDER BY encrypted_tx_hash, submission_time DESC;
 SELECT '0x' || Encode(dt.tx_hash, 'hex') tx_hash, '0x' || Encode(tse.event_tx_hash, 'hex') event_tx_hash, FLOOR(EXTRACT(EPOCH FROM dt.created_at)) AS included_at_unix
 FROM decrypted_tx dt
 INNER JOIN transaction_submitted_event tse ON dt.transaction_submitted_event_id = tse.id
-WHERE dt.tx_status = 'included'
+WHERE dt.tx_status = 'shielded inclusion'
 ORDER BY dt.created_at DESC
 LIMIT $1;
 
@@ -137,7 +137,7 @@ ORDER BY
 -- name: QueryIncludedTxsInSlot :many
 SELECT tx_hash, EXTRACT(EPOCH FROM created_at)::BIGINT AS included_timestamp  
 FROM decrypted_tx 
-WHERE slot = $1 AND tx_status = 'included';
+WHERE slot = $1 AND tx_status = 'shielded inclusion';
 
 -- name: QueryFromTransactionDetails :one
 SELECT tx_hash as user_tx_hash, encrypted_tx_hash
@@ -178,7 +178,7 @@ WITH daily_inclusion_times AS (
     ON
         tse.id = dtx.transaction_submitted_event_id
     WHERE
-        dtx.tx_status = 'included'
+        dtx.tx_status = 'shielded inclusion'
         AND tse.created_at >= NOW() - INTERVAL '30 days'
 )
 SELECT
