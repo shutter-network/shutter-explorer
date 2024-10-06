@@ -154,13 +154,6 @@ SELECT
 FROM transaction_submitted_event tse 
 LEFT JOIN decrypted_tx dt ON tse.id = dt.transaction_submitted_event_id
 WHERE tse.event_tx_hash = $1 OR dt.tx_hash = $1
-ORDER BY 
-    CASE 
-        WHEN dt.tx_status = 'included' THEN 1
-        ELSE 2
-    END,
-    dt.created_at DESC NULLS LAST, 
-    tse.created_at DESC
 LIMIT 1;
 
 -- name: QueryLatestSequencerTransactions :many
