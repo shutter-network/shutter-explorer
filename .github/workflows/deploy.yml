@@ -26,7 +26,7 @@ jobs:
                     git pull origin staging
                     git submodule update --init --recursive
                     cd docker
-                    docker compose -f docker-compose.staging.yml up -d --build
+                    docker compose --profile staging up -d --build
 
     deploy_instance_2:
         if: github.ref == 'refs/heads/main'
@@ -47,4 +47,4 @@ jobs:
                     git pull origin main
                     git submodule update --init --recursive
                     cd docker
-                    docker compose up -d --build
+                    docker compose --profile production up -d --build
