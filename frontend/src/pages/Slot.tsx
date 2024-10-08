@@ -14,12 +14,12 @@ const Slot = () => {
     const { data: userTransactionsData, loading: loadingUser, error: errorUser } = useFetch('/api/transaction/latest_user_transactions?limit=10');
 
     const sequencerTransactionColumns = [
-        { id: 'timestamp', label: 'Age', minWidth: 120 },
+        { id: 'timestamp', label: 'Tx Age', minWidth: 120 },
         { id: 'hash', label: 'Sequencer Transaction Hash', minWidth: 170 },
     ];
 
     const userTransactionColumns = [
-        { id: 'timestamp', label: 'Age', minWidth: 120 },
+        { id: 'timestamp', label: 'Tx Age', minWidth: 120 },
         { id: 'hash', label: 'User Transaction Hash', minWidth: 170 },
     ];
 
@@ -113,7 +113,7 @@ const Slot = () => {
                             <Alert severity="error">Error fetching sequencer transactions: {errorSequencer.message}</Alert>
                         ) : (
                             <>
-                                <Typography variant="h5" align='left' sx={{ fontWeight: 'bold' }} color='black' >Sequencer Transactions</Typography>
+                                <Typography variant="h5" align='left' sx={{ fontWeight: 'bold'}} color='black' >Sequencer Transactions</Typography>
                                 {loadingSequencer ? (
                                     <Typography>Loading...</Typography>
                                 ) : (

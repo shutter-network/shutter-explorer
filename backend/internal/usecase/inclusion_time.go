@@ -84,7 +84,7 @@ func (uc *InclusionTimeUsecase) QueryExecutedTransactionStats(ctx context.Contex
 
 	resp := &QueryExectuedTransactionStatsResp{}
 	for i := 0; i < len(stats); i++ {
-		if stats[i].TxStatus == data.TxStatusValIncluded {
+		if stats[i].TxStatus == data.TxStatusValShieldedinclusion {
 			resp.Successful = stats[i].Count
 		} else if stats[i].TxStatus == data.TxStatusValNotincluded {
 			resp.Failed = stats[i].Count
