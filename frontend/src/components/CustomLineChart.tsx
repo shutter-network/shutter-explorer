@@ -65,7 +65,7 @@ const CustomLineChart: FC<CustomLineChartProps> = ({ data, title = 'Inclusion Ti
 
     return (
         <Box position="relative">
-            <Box position="absolute" top={0} right={0} zIndex={2}> {/* Add zIndex to RevertedInfoBox */}
+            <Box position={isMobile? "relative":"absolute"} top={0} right={0} zIndex={2}> {/* Add zIndex to RevertedInfoBox */}
                 <Typography variant="h6" align="center" gutterBottom>
                     {title}
                 </Typography>
