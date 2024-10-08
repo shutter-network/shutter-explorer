@@ -61,7 +61,7 @@ func (svc *TransactionService) QueryLatestPendingTransactions(ctx *gin.Context) 
 }
 
 func (svc *TransactionService) QueryTotalExecutedTXsForEachTXStatus(ctx *gin.Context) {
-	totalTxs, err := svc.TransactionUsecase.QueryTotalExecutedTXsForEachTXStatus(ctx, "included")
+	totalTxs, err := svc.TransactionUsecase.QueryTotalExecutedTXsForEachTXStatus(ctx, "shielded inclusion")
 	if err != nil {
 		ctx.Error(err)
 		return
@@ -72,7 +72,7 @@ func (svc *TransactionService) QueryTotalExecutedTXsForEachTXStatus(ctx *gin.Con
 }
 
 func (svc *TransactionService) QueryTotalExecutedTXsForEachTXStatusPerMonth(ctx *gin.Context) {
-	totalTxsPerMonth, err := svc.TransactionUsecase.QueryTotalExecutedTXsForEachTXStatusPerMonth(ctx, "included")
+	totalTxsPerMonth, err := svc.TransactionUsecase.QueryTotalExecutedTXsForEachTXStatusPerMonth(ctx, "shielded inclusion")
 	if err != nil {
 		ctx.Error(err)
 		return
@@ -148,7 +148,7 @@ func (svc *TransactionService) QueryLatestSequencerTransactions(ctx *gin.Context
 }
 
 func (svc *TransactionService) QueryTransactionPercentage(ctx *gin.Context) {
-	transactionPercentage, err := svc.TransactionUsecase.QueryTransactionPercentage(ctx, "included")
+	transactionPercentage, err := svc.TransactionUsecase.QueryTransactionPercentage(ctx, "shielded inclusion")
 	if err != nil {
 		ctx.Error(err)
 		return
