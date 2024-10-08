@@ -17,29 +17,37 @@ const Transaction = () => {
     const [transactionPercentage, setTransactionPercentage] = useState<number | null>(null);
     const [, setWebSocketError] = useState<string | null>(null);
 
-
     const { socket } = useWebSocket()!;
 
     useEffect(() => {
         if (socket) {
             const handleMessage = (event: MessageEvent) => {
                 const websocketEvent = JSON.parse(event.data) as WebsocketEvent;
+
                 if (websocketEvent.Error) {
                     setWebSocketError(`Error: ${websocketEvent.Error.message} (Code: ${websocketEvent.Error.code})`);
                 } else if (websocketEvent.Data) {
                     setWebSocketError(null);
                     switch (websocketEvent.Type) {
                         case 'total_executed_transactions_updated':
-                            setExecutedTransactions(websocketEvent.Data);
+                            if (typeof websocketEvent.Data === 'number') {
+                                setExecutedTransactions(websocketEvent.Data);
+                            } else {
+                                console.warn('Unexpected data type for total_executed_transactions_updated');
+                            }
                             break;
                         case 'transactions_per_month_updated':
-                            if ('count' in websocketEvent.Data) {
+                            if ('count' in websocketEvent.Data && typeof websocketEvent.Data.count === 'number') {
                                 setTransactionsPerMonth(websocketEvent.Data.count);
+                            } else {
+                                console.warn('Unexpected data structure for transactions_per_month_updated');
                             }
                             break;
                         case 'transaction_percentage_updated':
-                            if ('message' in websocketEvent.Data) {
-                                setTransactionPercentage(websocketEvent.Data.message);
+                            if (typeof websocketEvent.Data === 'number') {
+                                setTransactionPercentage(websocketEvent.Data);
+                            } else {
+                                console.warn('Unexpected data type for transaction_percentage_updated');
                             }
                             break;
                         default:
@@ -72,7 +80,7 @@ const Transaction = () => {
         }
 
         if (transactionPercentageData && transactionPercentageData.message !== undefined) {
-            setTransactionPercentage(Number(transactionPercentageData.message)); // Fix here
+            setTransactionPercentage(Number(transactionPercentageData.message));
         }
     }, [executedTransactionsData, totalTransactionsPerMonthData, transactionPercentageData]);
 

@@ -8,6 +8,7 @@ import { useWebSocket } from '../context/WebSocketContext';
 import { SequencerTransaction, Transaction, WebsocketEvent } from "../types/WebsocketEvent";
 import { getTimeAgo } from "../utils/utils";
 import TitleSection from "../components/TitleSection";
+import SlotProgression from "../modules/SlotProgression";
 
 const Slot = () => {
     const { data: sequencerTransactionsData, loading: loadingSequencer, error: errorSequencer } = useFetch('/api/transaction/latest_sequencer_transactions?limit=10');
@@ -107,6 +108,7 @@ const Slot = () => {
         <ResponsiveLayout>
             <Box sx={{ flexGrow: 1, marginTop: 4 }}>
                 <TitleSection title="Slot Overview" />
+                <SlotProgression/>
                 <Grid container spacing={2} sx={{ marginTop: 4 }}>
                     <Grid size={{ sm: 12, md: 12, lg: 6 }} >
                         {errorSequencer ? (

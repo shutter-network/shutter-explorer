@@ -3,26 +3,26 @@ interface ApiError {
     code: number;
 }
 
-interface PreviousShutterizedSlotDetails {
-    slot_number: number;
-    timestamp: number;
-    included_transactions: number;
-}
-
-interface SlotProgression {
-    epochs: any; // todo
+export interface Top5Epochs {
+    epochs: Array<{
+        slots: Array<{
+            Slot: number;
+            ValidatorIndex: number;
+            IsRegistration: boolean | null;
+        }>
+    }>
 }
 
 export interface Transaction {
     TxHash: string;
     IncludedAtUnix: number;
-    EventTxHash: string
+    EventTxHash: string;
 }
 
 export interface SequencerTransaction {
     SequencerTxHash: string;
     Sender: string;
-    CreatedAtUnix: number
+    CreatedAtUnix: number;
 }
 
 export interface HistoricalInclusionTimeResponse {
@@ -103,8 +103,7 @@ interface CurrentEpoch {
 
 export interface WebsocketEvent {
     Type:
-        | 'previous_shutterized_slot_details_updated'
-        | 'slot_progression_updated'
+        | 'top_5_epochs_updated'
         | 'latest_sequencer_transactions_updated'
         | 'latest_user_transactions_updated'
         | 'transactions_protected_updated'
@@ -123,8 +122,7 @@ export interface WebsocketEvent {
         | 'historical_inclusion_time_updated'
         | 'current_epoch_updated';
     Data:
-        | PreviousShutterizedSlotDetails
-        | SlotProgression
+        | Top5Epochs
         | SequencerTransactions
         | UserTransactions
         | TransactionsProtected
@@ -135,13 +133,12 @@ export interface WebsocketEvent {
         | TotalValidators
         | GnosisChainKeypers
         | KeyperThreshold
-        | any
         | ShutterizedTransactionsPerMonth
         | ShutterizedTransactionPercentage
         | EstimatedInclusionTime
         | ExecutedTransactionStats
         | HistoricalInclusionTime
         | CurrentEpoch
-        | null
+        | null;
     Error?: ApiError | null;
 }
