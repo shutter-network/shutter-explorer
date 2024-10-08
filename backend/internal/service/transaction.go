@@ -72,7 +72,7 @@ func (svc *TransactionService) QueryTotalExecutedTXsForEachTXStatus(ctx *gin.Con
 }
 
 func (svc *TransactionService) QueryTotalExecutedTXsForEachTXStatusPerMonth(ctx *gin.Context) {
-	totalTxsPerMonth, err := svc.TransactionUsecase.QueryTotalExecutedTXsForEachTXStatusPerMonth(ctx, "shielded inc")
+	totalTxsPerMonth, err := svc.TransactionUsecase.QueryTotalExecutedTXsForEachTXStatusPerMonth(ctx, "shielded inclusion")
 	if err != nil {
 		ctx.Error(err)
 		return
