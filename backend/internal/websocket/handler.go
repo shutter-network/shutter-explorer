@@ -58,7 +58,7 @@ func (manager *ClientManager) sendLatestUserTransactions(ctx context.Context, d 
 	go manager.sendPeriodicMessages(ctx, d, callback)
 }
 
-func (manager *ClientManager) sendTotalTXsForEachTXStatusLast30Days(ctx context.Context, d time.Duration, txStatus string) {
+func (manager *ClientManager) sendTotalTXsByTXStatusLast30Days(ctx context.Context, d time.Duration, txStatus string) {
 	callback := func(ctx context.Context) WebsocketResponse {
 		totalTxs, err := manager.usecases.TransactionUsecase.QueryTotalExecutedTXsForEachTXStatusPerMonth(ctx, txStatus)
 		return WebsocketResponse{
