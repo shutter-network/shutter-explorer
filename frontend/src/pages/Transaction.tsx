@@ -138,7 +138,7 @@ const Transaction: FC = () => {
                         <Typography variant="body1" fontWeight="bold" className="card-label" textAlign="left">Transaction Status</Typography>
                     </Grid>
                     <Grid size={{ xs: 12, sm: 8 }}>
-                        <Typography variant="body1" className={transaction.TxStatus === "Completed" ? "status-completed" : "status-pending"}>{transaction.TxStatus}</Typography>
+                        <Typography variant="body1" className={`tx-status status-${transaction.TxStatus.replace(" ", "-")}`}>{transaction.TxStatus}</Typography>
                     </Grid>
 
                     <Grid size={{ lg: 12 }}>

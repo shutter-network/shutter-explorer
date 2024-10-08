@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import { Box } from '@mui/material';
 
 export const StyledTransactionDetails = styled(Box).attrs({
-    className: 'transaction-details',
+  className: 'transaction-details',
 })`
   .transaction-section {
     display: flex;
@@ -48,19 +48,42 @@ export const StyledTransactionDetails = styled(Box).attrs({
     display: block;
   }
 
-  .status-pending {
-    background-color: #fef3a9;
-    color: #645912;
-    border-radius: 100px;
-    padding: 2px 8px;
-    font-size: 12px;
-    font-weight: bold;
-    width: fit-content;
+  .status-Invalid {
+    background-color: #FDD1DC;
+    color: #C5486D;
   }
 
-  .status-completed{
-    background: #44CA85;
-    color: #ffffff;
+  .status-Not-included {
+    background-color: #FAE1EA;
+    color: #7F0A35;
+  }
+
+  .status-Cannot-be-decrypted {
+    background-color: #FCC2D3;
+    color: #A71245;
+  }
+
+  .status-Submitted{
+    background-color: #E1F5F5;
+    color: #005C5C;
+  }
+
+  .status-Shielded-inclusion {
+    background-color: #DBF5E8;
+    color: #2A7A50;
+  }
+
+  .status-Unshielded-inclusion {
+    background-color: #A8E6CF;
+    color: #5CAB78;
+  }
+
+  .status-Pending-user-transaction {
+    background-color: #FDF6C8;
+    color: #645912;
+  }
+
+  .tx-status{
     border-radius: 100px;
     padding: 2px 8px;
     font-size: 12px;

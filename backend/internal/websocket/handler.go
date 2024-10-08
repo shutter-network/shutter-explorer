@@ -19,6 +19,7 @@ const (
 	TotalExecutedTransactions   WebsocketEventType = "total_executed_transactions_updated"
 	LatestSequencerTransactions WebsocketEventType = "latest_sequencer_transactions_updated"
 	LatestUserTransactions      WebsocketEventType = "latest_user_transactions_updated"
+	TotalTransactionsPerMonth   WebsocketEventType = "total_transactions_per_month_updated"
 )
 
 func (manager *ClientManager) sendTotalExecutedTransactions(ctx context.Context, d time.Duration, txStatus string) {
@@ -51,6 +52,18 @@ func (manager *ClientManager) sendLatestUserTransactions(ctx context.Context, d 
 		return WebsocketResponse{
 			Type:  LatestUserTransactions,
 			Data:  includedTransactions,
+			Error: err,
+		}
+	}
+	go manager.sendPeriodicMessages(ctx, d, callback)
+}
+
+func (manager *ClientManager) sendTotalTXsByTXStatusLast30Days(ctx context.Context, d time.Duration, txStatus string) {
+	callback := func(ctx context.Context) WebsocketResponse {
+		totalTxs, err := manager.usecases.TransactionUsecase.QueryTotalExecutedTXsForEachTXStatusPerMonth(ctx, txStatus)
+		return WebsocketResponse{
+			Type:  TotalTransactionsPerMonth,
+			Data:  totalTxs,
 			Error: err,
 		}
 	}

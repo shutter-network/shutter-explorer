@@ -41,6 +41,7 @@ func (manager *ClientManager) Run(ctx context.Context) {
 	manager.sendTotalExecutedTransactions(ctx, 60*time.Second, "included")
 	manager.sendLatestSequencerTransactions(ctx, 30*time.Second, "10")
 	manager.sendLatestUserTransactions(ctx, 60*time.Second, "10")
+	manager.sendTotalTXsByTXStatusLast30Days(ctx, 60*time.Second, "included")
 
 	for {
 		select {
