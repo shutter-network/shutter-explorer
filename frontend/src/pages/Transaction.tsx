@@ -47,7 +47,7 @@ const Transaction: FC = () => {
                 <TitleSection title="Transaction Details" />
                 <Grid container spacing={2} sx={{ marginTop: 4 }}>
                     {/* Transaction Hash */}
-                    <Grid size={{ xs: 12, sm: 4 }}>
+                    <Grid size={{ xs: 'auto', sm: 4 }}>
                         <Box display="flex" alignItems="center" gap={1}>
                             <Typography variant="body1" fontWeight="bold" className="card-label" textAlign="left">
                                 Transaction Hash
@@ -65,7 +65,7 @@ const Transaction: FC = () => {
                     </Grid>
 
                     {/* Sequencer Transaction */}
-                    <Grid size={{ xs: 12, sm: 4 }}>
+                    <Grid size={{ xs: 'auto', sm: 4 }}>
                         <Box display="flex" alignItems="center" gap={1}>
                             <Typography variant="body1" fontWeight="bold" className="card-label" textAlign="left">Sequencer Transaction</Typography>
                             <Tooltip title="Transaction hash submitted to sequencer contract">
@@ -81,7 +81,7 @@ const Transaction: FC = () => {
 
 
                     {/* Inclusion Slot */}
-                    <Grid size={{ xs: 12, sm: 4 }}>
+                    <Grid size={{ xs: 'auto', sm: 4 }}>
                         <Box display="flex" alignItems="center" gap={1}>
                             <Typography variant="body1" fontWeight="bold" className="card-label" textAlign="left">Inclusion Slot</Typography>
                             <Tooltip title="Slot in which the transaction was included">
@@ -101,7 +101,7 @@ const Transaction: FC = () => {
                         transaction.EffectiveInclusionTime === 0 ?
                             /* Estimated Inclusion Time */
                             <>
-                                <Grid size={{ xs: 12, sm: 4 }}>
+                                <Grid size={{ xs: 'auto', sm: 4 }}>
                                     <Box display="flex" alignItems="center" gap={1}>
                                         <Typography variant="body1" fontWeight="bold" className="card-label" textAlign="left">Estimated Inclusion Time</Typography>
                                         <Tooltip title="Estimated time for the transaction to be included">
@@ -115,7 +115,7 @@ const Transaction: FC = () => {
                             </> :
                             /* Effective Inclusion Time */
                             <>
-                                <Grid size={{ xs: 12, sm: 4 }}>
+                                <Grid size={{ xs: 'auto', sm: 4 }}>
                                     <Box display="flex" alignItems="center" gap={1}>
                                         <Typography variant="body1" fontWeight="bold" className="card-label" textAlign="left">Effective Inclusion Time</Typography>
                                         <Tooltip title="Time in which the transaction was included">
@@ -134,7 +134,7 @@ const Transaction: FC = () => {
                     }
 
                     {/* Transaction Status */}
-                    <Grid size={{ xs: 12, sm: 4 }}>
+                    <Grid size={{ xs: 'auto', sm: 4 }}>
                         <Typography variant="body1" fontWeight="bold" className="card-label" textAlign="left">Transaction Status</Typography>
                     </Grid>
                     <Grid size={{ xs: 12, sm: 8 }}>
@@ -146,7 +146,7 @@ const Transaction: FC = () => {
                     </Grid>
 
                     {/* From */}
-                    <Grid size={{ xs: 12, sm: 4 }}>
+                    <Grid size={{ xs: 'auto', sm: 4 }}>
                         <Box display="flex" alignItems="center" gap={1}>
                             <Typography variant="body1" fontWeight="bold" className="card-label" textAlign="left">From</Typography>
                             <Tooltip title="Transaction submitted by">
