@@ -18,6 +18,7 @@ interface TransactionDetails {
     InclusionSlot: number;
     Sender: string;
     InclusionDelay: number;
+    BlockNumber: number;
 }
 
 const Transaction: FC = () => {
@@ -93,6 +94,23 @@ const Transaction: FC = () => {
                     <Grid size={{ xs: 12, sm: 8 }}>
                         <Typography variant="body1" className="card-value">{transaction.InclusionSlot}</Typography>
                     </Grid>
+                    {transaction.BlockNumber!==0?
+                    <>
+                    <Grid size={{ xs: 'auto', sm: 4 }}>
+                        <Box display="flex" alignItems="center" gap={1}>
+                            <Typography variant="body1" fontWeight="bold" className="card-label" textAlign="left">Block Number</Typography>
+                            <Tooltip title="Block in which the transaction was included">
+                                <InfoIcon />
+                            </Tooltip>
+                        </Box>
+                    </Grid>
+                    <Grid size={{ xs: 12, sm: 8 }}>
+                        <Link href={`${explorerUrl}/block/${transaction.BlockNumber}`} target="_blank" rel="noopener noreferrer" className="hash">
+                            {transaction.BlockNumber}
+                        </Link>
+                    </Grid>
+                    </>:<></>
+                    }
 
                     <Grid size={{ lg: 12 }}>
                         <Divider></Divider>

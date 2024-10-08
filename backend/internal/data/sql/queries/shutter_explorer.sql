@@ -150,9 +150,11 @@ LIMIT 1;
 SELECT 
     tse.event_tx_hash, tse.sender, FLOOR(EXTRACT(EPOCH FROM tse.created_at)) as created_at_unix, tse.created_at,
     dt.tx_hash AS user_tx_hash, dt.tx_status, dt.slot, 
-    COALESCE(FLOOR(EXTRACT(EPOCH FROM dt.created_at)), 0)::BIGINT AS decrypted_tx_created_at_unix
+    COALESCE(FLOOR(EXTRACT(EPOCH FROM dt.created_at)), 0)::BIGINT AS decrypted_tx_created_at_unix,
+    bk.block_number as block_number
 FROM transaction_submitted_event tse 
 LEFT JOIN decrypted_tx dt ON tse.id = dt.transaction_submitted_event_id
+LEFT JOIN block bk ON dt.slot = bk.slot
 WHERE tse.event_tx_hash = $1 OR dt.tx_hash = $1
 LIMIT 1;
 
