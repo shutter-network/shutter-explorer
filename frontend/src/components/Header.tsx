@@ -29,7 +29,7 @@ const Header = () => {
     };
 
     const handleMobileToggle = () => {
-        setMobileOpen(!mobileOpen); // Toggle mobile menu open state
+        setMobileOpen(!mobileOpen);
     };
 
     return (
