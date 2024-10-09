@@ -16,7 +16,9 @@ interface TransactionDetails {
     UserTxHash: string;
     SequencerTxHash: string;
     InclusionSlot: number;
-    Sender: string
+    Sender: string;
+    InclusionDelay: number;
+    BlockNumber: number;
 }
 
 const Transaction: FC = () => {
@@ -47,7 +49,7 @@ const Transaction: FC = () => {
                 <TitleSection title="Transaction Details" />
                 <Grid container spacing={2} sx={{ marginTop: 4 }}>
                     {/* Transaction Hash */}
-                    <Grid size={{ xs: 12, sm: 4 }}>
+                    <Grid size={{ xs: 'auto', sm: 4 }}>
                         <Box display="flex" alignItems="center" gap={1}>
                             <Typography variant="body1" fontWeight="bold" className="card-label" textAlign="left">
                                 Transaction Hash
@@ -59,13 +61,16 @@ const Transaction: FC = () => {
 
                     </Grid>
                     <Grid size={{ xs: 12, sm: 8 }}>
+                        {transaction.UserTxHash!==""?
                         <Link href={`${explorerUrl}/tx/${transaction.UserTxHash}`} target="_blank" rel="noopener noreferrer" className="hash">
                             {transaction.UserTxHash}
-                        </Link>
+                        </Link>:
+                            <Typography variant="body1" className="card-value">N/A</Typography>}
+
                     </Grid>
 
                     {/* Sequencer Transaction */}
-                    <Grid size={{ xs: 12, sm: 4 }}>
+                    <Grid size={{ xs: 'auto', sm: 4 }}>
                         <Box display="flex" alignItems="center" gap={1}>
                             <Typography variant="body1" fontWeight="bold" className="card-label" textAlign="left">Sequencer Transaction</Typography>
                             <Tooltip title="Transaction hash submitted to sequencer contract">
@@ -81,7 +86,7 @@ const Transaction: FC = () => {
 
 
                     {/* Inclusion Slot */}
-                    <Grid size={{ xs: 12, sm: 4 }}>
+                    <Grid size={{ xs: 'auto', sm: 4 }}>
                         <Box display="flex" alignItems="center" gap={1}>
                             <Typography variant="body1" fontWeight="bold" className="card-label" textAlign="left">Inclusion Slot</Typography>
                             <Tooltip title="Slot in which the transaction was included">
@@ -90,10 +95,27 @@ const Transaction: FC = () => {
                         </Box>
                     </Grid>
                     <Grid size={{ xs: 12, sm: 8 }}>
-                        <Typography variant="body1" className="card-value">{transaction.InclusionSlot}</Typography>
+                        <Typography variant="body1" className="card-value">{transaction.InclusionSlot!==0? transaction.InclusionSlot : "N/A"}</Typography>
                     </Grid>
+                    {transaction.BlockNumber!==0?
+                    <>
+                    <Grid size={{ xs: 'auto', sm: 4 }}>
+                        <Box display="flex" alignItems="center" gap={1}>
+                            <Typography variant="body1" fontWeight="bold" className="card-label" textAlign="left">Block Number</Typography>
+                            <Tooltip title="Block in which the transaction was included">
+                                <InfoIcon />
+                            </Tooltip>
+                        </Box>
+                    </Grid>
+                    <Grid size={{ xs: 12, sm: 8 }}>
+                        <Link href={`${explorerUrl}/block/${transaction.BlockNumber}`} target="_blank" rel="noopener noreferrer" className="hash">
+                            {transaction.BlockNumber}
+                        </Link>
+                    </Grid>
+                    </>:<></>
+                    }
 
-                    <Grid size={{ lg: 12 }}>
+                    <Grid size={{ lg: 12 }}  sx={{display: { xs: 'none', md: 'block' }, }}>
                         <Divider></Divider>
                     </Grid>
 
@@ -101,10 +123,10 @@ const Transaction: FC = () => {
                         transaction.EffectiveInclusionTime === 0 ?
                             /* Estimated Inclusion Time */
                             <>
-                                <Grid size={{ xs: 12, sm: 4 }}>
+                                <Grid size={{ xs: 'auto', sm: 4 }}>
                                     <Box display="flex" alignItems="center" gap={1}>
-                                        <Typography variant="body1" fontWeight="bold" className="card-label" textAlign="left">Estimated Inclusion Time</Typography>
-                                        <Tooltip title="Estimated time for the transaction to be included">
+                                        <Typography variant="body1" fontWeight="bold" className="card-label" textAlign="left">Estimated Inclusion Delay</Typography>
+                                        <Tooltip title="Estimated delay for the transaction to be included">
                                             <InfoIcon />
                                         </Tooltip>
                                     </Box>
@@ -115,7 +137,7 @@ const Transaction: FC = () => {
                             </> :
                             /* Effective Inclusion Time */
                             <>
-                                <Grid size={{ xs: 12, sm: 4 }}>
+                                <Grid size={{ xs: 'auto', sm: 4 }}>
                                     <Box display="flex" alignItems="center" gap={1}>
                                         <Typography variant="body1" fontWeight="bold" className="card-label" textAlign="left">Effective Inclusion Time</Typography>
                                         <Tooltip title="Time in which the transaction was included">
@@ -127,26 +149,38 @@ const Transaction: FC = () => {
                                     <Typography variant="body1" className="card-value">{formatTimestamp(transaction.EffectiveInclusionTime)}</Typography>
                                 </Grid>
 
-                                <Grid size={{ lg: 12 }}>
+                                <Grid size={{ xs: 12, sm: 4 }}>
+                                    <Box display="flex" alignItems="center" gap={1}>
+                                        <Typography variant="body1" fontWeight="bold" className="card-label" textAlign="left">Inclusion Delay</Typography>
+                                        <Tooltip title="Time taken for tx to be included">
+                                            <InfoIcon />
+                                        </Tooltip>
+                                    </Box>
+                                </Grid>
+                                <Grid size={{ xs: 12, sm: 8 }}>
+                                    <Typography variant="body1" className="card-value">{formatSeconds(transaction.InclusionDelay)}</Typography>
+                                </Grid>
+
+                                <Grid size={{ lg: 12 }}  sx={{display: { xs: 'none', md: 'block' }, }}>
                                     <Divider></Divider>
                                 </Grid>
                             </>
                     }
 
                     {/* Transaction Status */}
-                    <Grid size={{ xs: 12, sm: 4 }}>
+                    <Grid size={{ xs: 'auto', sm: 4 }}>
                         <Typography variant="body1" fontWeight="bold" className="card-label" textAlign="left">Transaction Status</Typography>
                     </Grid>
                     <Grid size={{ xs: 12, sm: 8 }}>
-                        <Typography variant="body1" className={transaction.TxStatus === "Completed" ? "status-completed" : "status-pending"}>{transaction.TxStatus}</Typography>
+                        <Typography variant="body1" className={`tx-status status-${transaction.TxStatus.replace(" ", "-")}`}>{transaction.TxStatus}</Typography>
                     </Grid>
 
-                    <Grid size={{ lg: 12 }}>
+                    <Grid size={{ lg: 12 }}  sx={{display: { xs: 'none', md: 'block' }, }}>
                         <Divider></Divider>
                     </Grid>
 
                     {/* From */}
-                    <Grid size={{ xs: 12, sm: 4 }}>
+                    <Grid size={{ xs: 'auto', sm: 4 }}>
                         <Box display="flex" alignItems="center" gap={1}>
                             <Typography variant="body1" fontWeight="bold" className="card-label" textAlign="left">From</Typography>
                             <Tooltip title="Transaction submitted by">

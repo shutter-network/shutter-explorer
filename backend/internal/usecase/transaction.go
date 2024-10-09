@@ -18,9 +18,13 @@ import (
 type TxStatus string
 
 const (
-	Pending                TxStatus = "Pending"
-	Completed              TxStatus = "Completed"
-	DecryptionKeyGenerated TxStatus = "DecryptionKeyGenerated"
+	Submitted              TxStatus = "Submitted"
+	PendingUserTransaction TxStatus = "Pending user transaction"
+	Invalid                TxStatus = "Invalid"
+	CannotBeDecrypted      TxStatus = "Cannot be decrypted"
+	ShieldedInclusion      TxStatus = "Shielded inclusion"
+	UnshieldedInclusion    TxStatus = "Unshielded inclusion"
+	NotIncluded            TxStatus = "Not included"
 )
 
 const GnosisTransactionsPerMonth float64 = 3097145
@@ -42,6 +46,8 @@ type QueryTransactionDetailResp struct {
 	DecryptedTxCreatedAt   int64
 	EffectiveInclusionTime int64
 	EstimatedInclusionTime int64
+	InclusionDelay         int64
+	BlockNumber            int64
 }
 
 func NewTransactionUsecase(
@@ -210,16 +216,31 @@ func (uc *TransactionUsecase) QueryTransactionDetailsByTxHash(ctx context.Contex
 
 	var effectiveInclusionTime int64
 	var inclusionSlot int64
-	txStatus := Pending
+	var inclusionDelay int64
+	txStatus := PendingUserTransaction
 	if tse.TxStatus.Valid {
-		if tse.TxStatus.TxStatusVal == data.TxStatusValIncluded {
-			txStatus = Completed
+		if tse.TxStatus.TxStatusVal == data.TxStatusValShieldedinclusion {
+			txStatus = ShieldedInclusion
 			effectiveInclusionTime = tse.DecryptedTxCreatedAtUnix
+			inclusionDelay = effectiveInclusionTime - tse.CreatedAt.Time.Unix()
 			if tse.Slot.Valid {
 				inclusionSlot = tse.Slot.Int64
 			}
+		} else if tse.TxStatus.TxStatusVal == data.TxStatusValUnshieldedinclusion {
+			txStatus = UnshieldedInclusion
+			effectiveInclusionTime = tse.DecryptedTxCreatedAtUnix
+			inclusionDelay = effectiveInclusionTime - tse.CreatedAt.Time.Unix()
+			if tse.Slot.Valid {
+				inclusionSlot = tse.Slot.Int64
+			}
+		} else if tse.TxStatus.TxStatusVal == data.TxStatusValInvalid {
+			txStatus = Invalid
+		} else if tse.TxStatus.TxStatusVal == data.TxStatusValPending {
+			txStatus = PendingUserTransaction
+		} else if tse.TxStatus.TxStatusVal == data.TxStatusValNotdecrypted {
+			txStatus = CannotBeDecrypted
 		} else if tse.TxStatus.TxStatusVal == data.TxStatusValNotincluded {
-			txStatus = DecryptionKeyGenerated
+			txStatus = NotIncluded
 		}
 	}
 
@@ -278,6 +299,8 @@ func (uc *TransactionUsecase) QueryTransactionDetailsByTxHash(ctx context.Contex
 		DecryptedTxCreatedAt:   tse.DecryptedTxCreatedAtUnix,
 		EffectiveInclusionTime: effectiveInclusionTime,
 		EstimatedInclusionTime: estimatedInclusionTime,
+		InclusionDelay:         inclusionDelay,
+		BlockNumber:            tse.BlockNumber.Int64,
 	}
 	return resp, nil
 }

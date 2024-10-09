@@ -74,7 +74,7 @@ ORDER BY encrypted_tx_hash, submission_time DESC;
 SELECT '0x' || Encode(dt.tx_hash, 'hex') tx_hash, '0x' || Encode(tse.event_tx_hash, 'hex') event_tx_hash, FLOOR(EXTRACT(EPOCH FROM dt.created_at)) AS included_at_unix
 FROM decrypted_tx dt
 INNER JOIN transaction_submitted_event tse ON dt.transaction_submitted_event_id = tse.id
-WHERE dt.tx_status = 'included'
+WHERE dt.tx_status = 'shielded inclusion'
 ORDER BY dt.created_at DESC
 LIMIT $1;
 
@@ -137,7 +137,7 @@ ORDER BY
 -- name: QueryIncludedTxsInSlot :many
 SELECT tx_hash, EXTRACT(EPOCH FROM created_at)::BIGINT AS included_timestamp  
 FROM decrypted_tx 
-WHERE slot = $1 AND tx_status = 'included';
+WHERE slot = $1 AND tx_status = 'shielded inclusion';
 
 -- name: QueryFromTransactionDetails :one
 SELECT tx_hash as user_tx_hash, encrypted_tx_hash
@@ -148,19 +148,14 @@ LIMIT 1;
 
 -- name: QueryTransactionDetailsByTxHash :one
 SELECT 
-    tse.event_tx_hash, tse.sender, FLOOR(EXTRACT(EPOCH FROM tse.created_at)) as created_at_unix,
+    tse.event_tx_hash, tse.sender, FLOOR(EXTRACT(EPOCH FROM tse.created_at)) as created_at_unix, tse.created_at,
     dt.tx_hash AS user_tx_hash, dt.tx_status, dt.slot, 
-    COALESCE(FLOOR(EXTRACT(EPOCH FROM dt.created_at)), 0)::BIGINT AS decrypted_tx_created_at_unix
+    COALESCE(FLOOR(EXTRACT(EPOCH FROM dt.created_at)), 0)::BIGINT AS decrypted_tx_created_at_unix,
+    bk.block_number as block_number
 FROM transaction_submitted_event tse 
 LEFT JOIN decrypted_tx dt ON tse.id = dt.transaction_submitted_event_id
+LEFT JOIN block bk ON dt.slot = bk.slot
 WHERE tse.event_tx_hash = $1 OR dt.tx_hash = $1
-ORDER BY 
-    CASE 
-        WHEN dt.tx_status = 'included' THEN 1
-        ELSE 2
-    END,
-    dt.created_at DESC NULLS LAST, 
-    tse.created_at DESC
 LIMIT 1;
 
 -- name: QueryLatestSequencerTransactions :many
@@ -185,7 +180,7 @@ WITH daily_inclusion_times AS (
     ON
         tse.id = dtx.transaction_submitted_event_id
     WHERE
-        dtx.tx_status = 'included'
+        dtx.tx_status = 'shielded inclusion'
         AND tse.created_at >= NOW() - INTERVAL '30 days'
 )
 SELECT

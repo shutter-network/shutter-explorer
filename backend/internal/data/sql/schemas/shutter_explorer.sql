@@ -78,8 +78,12 @@ CREATE TABLE IF NOT EXISTS block
 
 CREATE TYPE tx_status_val AS ENUM 
 (
-    'included', 
-    'not included'
+    'not included',
+    'not decrypted',
+    'invalid',
+    'pending',
+    'shielded inclusion',
+    'unshielded inclusion'
 );
 
 CREATE TABLE IF NOT EXISTS decrypted_tx

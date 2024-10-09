@@ -38,9 +38,11 @@ func NewClientManager(usecases *usecase.Usecases) *ClientManager {
 // Run starts the manager to handle register/unregister clients and broadcasting messages
 func (manager *ClientManager) Run(ctx context.Context) {
 	// Start the periodic message sender and query the db via usecases
-	manager.sendTotalExecutedTransactions(ctx, 60*time.Second, "included")
+	manager.sendTotalExecutedTransactions(ctx, 60*time.Second, "shielded inclusion")
 	manager.sendLatestSequencerTransactions(ctx, 30*time.Second, "10")
 	manager.sendLatestUserTransactions(ctx, 60*time.Second, "10")
+	manager.sendTotalTXsByTXStatusLast30Days(ctx, 60*time.Second, "shielded inclusion")
+	manager.sendTop5Epochs(ctx, 80*time.Second)
 
 	for {
 		select {
