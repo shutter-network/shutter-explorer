@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { FC } from 'react';
+import { FC, useState, useEffect } from 'react';
 import { LinePlot, MarkPlot } from '@mui/x-charts/LineChart';
 import dayjs from 'dayjs';
 import { ChartsXAxis, ChartsYAxis, LineSeriesType } from '@mui/x-charts';
@@ -20,8 +20,20 @@ interface CustomLineChartProps {
 }
 
 const CustomLineChart: FC<CustomLineChartProps> = ({ data, title = 'Inclusion Time Chart', estimatedInclusionTime }) => {
+    const [isMobile, setIsMobile] = useState(false);
+    
+    const handleResize = () => {
+        setIsMobile(window.innerWidth <= 768); // Adjust breakpoint as needed
+    };
+
+    useEffect(() => {
+        handleResize(); // Set initial value
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
     const sortedData = data.sort((a, b) => a.day - b.day);
-    const dataset = sortedData.map(point => ({
+    const dataset = (isMobile ? sortedData.slice(-10) : sortedData).map(point => ({
         x: point.day * 1000,
         y: point.averageInclusionTime,
     }));
@@ -53,7 +65,7 @@ const CustomLineChart: FC<CustomLineChartProps> = ({ data, title = 'Inclusion Ti
 
     return (
         <Box position="relative">
-            <Box position="absolute" top={0} right={0} zIndex={2}> {/* Add zIndex to RevertedInfoBox */}
+            <Box position={isMobile? "relative":"absolute"} top={0} right={0} zIndex={2}> {/* Add zIndex to RevertedInfoBox */}
                 <Typography variant="h6" align="center" gutterBottom>
                     {title}
                 </Typography>
