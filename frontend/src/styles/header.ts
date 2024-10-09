@@ -1,11 +1,32 @@
 import styled from 'styled-components';
 import { ReactComponent as DropdownIcon } from '../assets/icons/chevron_down.svg';
+import { MenuItem } from '@mui/material';
+import { Link } from 'react-router-dom';
 
 export const StyledDropdownIcon = styled(DropdownIcon)`
   width: 16px;
   height: 16px;
   fill: #FFFFFF;
 `;
+
+export const MobileMenuItem = styled.a.attrs({
+  className: 'mobile-menu-item',
+})`
+  color: #000;
+  letter-spacing: -.05625rem;
+  background-color: #f5f5f5;
+  justify-content: space-between;
+  align-item: center;
+  width: 100%;
+  margin-bottom: .25rem;
+  padding: .75rem 1rem;
+  font-size: 1.13rem;
+  font-weight: 600;
+  line-height: 145%;
+  display: flex;
+  text-decoration: none;
+`;
+
 export const NavButton = styled.button.attrs({
   className: 'nav-button',
 })`
@@ -32,9 +53,9 @@ export const NavIcon = styled.img.attrs({
   object-fit: contain;
 `;
 
-export const JoinButton = styled.a.attrs({
-  className: 'join-button',
-  href: "https://surveys.shutter.network/takebackcrypto",
+export const ScheduleDemo = styled.a.attrs({
+  className: 'shedule-a-demo-button',
+  href: "mailto:contact@shutter.network?subject=Schedule%20a%20Demo",
   target: '_blank',
 })`
   background-color: #fde12d;
