@@ -46,6 +46,8 @@ type QueryTransactionDetailResp struct {
 	DecryptedTxCreatedAt   int64
 	EffectiveInclusionTime int64
 	EstimatedInclusionTime int64
+	InclusionDelay         int64
+	BlockNumber            int64
 }
 
 func NewTransactionUsecase(
@@ -214,16 +216,20 @@ func (uc *TransactionUsecase) QueryTransactionDetailsByTxHash(ctx context.Contex
 
 	var effectiveInclusionTime int64
 	var inclusionSlot int64
-	txStatus := Submitted
+	var inclusionDelay int64
+	txStatus := PendingUserTransaction
 	if tse.TxStatus.Valid {
 		if tse.TxStatus.TxStatusVal == data.TxStatusValShieldedinclusion {
 			txStatus = ShieldedInclusion
 			effectiveInclusionTime = tse.DecryptedTxCreatedAtUnix
+			inclusionDelay = effectiveInclusionTime - tse.CreatedAt.Time.Unix()
 			if tse.Slot.Valid {
 				inclusionSlot = tse.Slot.Int64
 			}
 		} else if tse.TxStatus.TxStatusVal == data.TxStatusValUnshieldedinclusion {
 			txStatus = UnshieldedInclusion
+			effectiveInclusionTime = tse.DecryptedTxCreatedAtUnix
+			inclusionDelay = effectiveInclusionTime - tse.CreatedAt.Time.Unix()
 			if tse.Slot.Valid {
 				inclusionSlot = tse.Slot.Int64
 			}
@@ -293,6 +299,8 @@ func (uc *TransactionUsecase) QueryTransactionDetailsByTxHash(ctx context.Contex
 		DecryptedTxCreatedAt:   tse.DecryptedTxCreatedAtUnix,
 		EffectiveInclusionTime: effectiveInclusionTime,
 		EstimatedInclusionTime: estimatedInclusionTime,
+		InclusionDelay:         inclusionDelay,
+		BlockNumber:            tse.BlockNumber.Int64,
 	}
 	return resp, nil
 }
