@@ -16,7 +16,6 @@ const Sidebar: React.FC = () => {
             <SidebarNav>
                 {navItems.map((item, index) => (
                     <NavItem key={index} to={'/' + item.label.toLowerCase().replace(' ', '-')}>
-                        {/* Use ReactComponent for SVG and apply the fill */}
                         <NavIcon as={item.icon} style={{ fill: '#0044A4' }} />
                         <span>{item.label}</span>
                     </NavItem>
