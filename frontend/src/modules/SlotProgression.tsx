@@ -1,6 +1,6 @@
 import { Alert, Box, Typography } from '@mui/material';
 import { FC, useEffect, useState } from 'react';
-import useRefetchableData from '../hooks/useRefetchableData';
+import useFetch from '../hooks/useFetch';
 import {
     SlotDetailsWrapper,
     SlotVisualizer,
@@ -22,22 +22,24 @@ const calculateCurrentSlotAndEpoch = (genesisTime: number, slotDuration: number)
 };
 
 const SlotProgression = () => {
-    const { data: slotData, loading: loadingSlots, error: errorSlots, refetch } = useRefetchableData('/api/slot/top_5_epochs');
+    const [forceRefetch, setForceRefetch] = useState(false);
+    const { data: slotData, loading: loadingSlots, error: errorSlots } = useFetch('/api/slot/top_5_epochs', forceRefetch);
     const [currentEpochSlots, setCurrentEpochSlots] = useState<any[]>([]);
     const [nextEpochSlots, setNextEpochSlots] = useState<any[]>([]);
     const [currentEpoch, setCurrentEpoch] = useState<number>(0);
     const [currentSlotIndex, setCurrentSlotIndex] = useState<number>(0);
+
     const gnosisGenesisTime = 1638993340;
     const slotDuration = 5;
 
+    // useEffect for Initial Data Fetching and Slot/Epoch Setup
     useEffect(() => {
-        console.log('Initial slot data received from API:', slotData);
-
-        // Check the correct structure of the slot data and extract relevant information
         if (slotData && Array.isArray(slotData.message)) {
-            const sortedSlots = slotData.message.sort((a: any, b: any) => a.Slot - b.Slot);
+            console.log('Initial slot data received from API:', slotData);
 
+            const sortedSlots = slotData.message.sort((a: any, b: any) => a.Slot - b.Slot);
             const { currentEpoch, relativeSlotIndex } = calculateCurrentSlotAndEpoch(gnosisGenesisTime, slotDuration);
+
             const currentEpochSlotsData = sortedSlots.filter(
                 (slot: any) => slot.Slot >= currentEpoch * 16 && slot.Slot < (currentEpoch + 1) * 16
             );
@@ -47,7 +49,6 @@ const SlotProgression = () => {
 
             setCurrentEpochSlots(currentEpochSlotsData); // Load current epoch slots
             setNextEpochSlots(nextEpochSlotsData); // Preload next epoch slots
-
             setCurrentEpoch(currentEpoch);
             setCurrentSlotIndex(relativeSlotIndex);
 
@@ -58,6 +59,7 @@ const SlotProgression = () => {
         }
     }, [slotData]);
 
+    // useEffect for Slot Progression and Epoch Transitions
     useEffect(() => {
         const slotInterval = setInterval(() => {
             setCurrentSlotIndex((prevIndex) => {
@@ -68,13 +70,10 @@ const SlotProgression = () => {
                     return prevIndex + 1; // Move to the next slot within the current epoch
                 } else {
                     console.log('Transitioning to the next epoch');
-
-                    // Move to the next epoch and update slot data accordingly
                     setCurrentEpoch((prevEpoch) => prevEpoch + 1);
                     setCurrentEpochSlots(nextEpochSlots); // Use the preloaded next epoch slots as the current epoch slots
                     setNextEpochSlots([]); // Clear the next epoch slots temporarily
-
-                    refetch(); // Fetch data to refill the next epoch slots
+                    setForceRefetch((prev) => !prev); // Toggle the forceRefetch state to trigger a data refetch
 
                     return 0; // Reset slot index to the beginning of the new epoch
                 }
@@ -82,29 +81,11 @@ const SlotProgression = () => {
         }, slotDuration * 1000);
 
         return () => clearInterval(slotInterval);
-    }, [nextEpochSlots, refetch]);
-
-    useEffect(() => {
-        // When new data is fetched, update only the next epoch slots without affecting the current epoch slots
-        if (slotData && Array.isArray(slotData.message)) {
-            const sortedSlots = slotData.message.sort((a: any, b: any) => a.Slot - b.Slot);
-            const { currentEpoch } = calculateCurrentSlotAndEpoch(gnosisGenesisTime, slotDuration);
-
-            const updatedNextEpochSlots = sortedSlots.filter(
-                (slot: any) => slot.Slot >= (currentEpoch + 1) * 16 && slot.Slot < (currentEpoch + 2) * 16
-            );
-
-            setNextEpochSlots(updatedNextEpochSlots); // Update only the next epoch slots
-
-            console.log('Updated Next Epoch Slots:', updatedNextEpochSlots);
-        }
-    }, [slotData]);
+    }, [nextEpochSlots]);
 
     const slotsToDisplay = currentEpochSlots;
 
     const renderSlotBlock = (slot: any) => {
-        console.log('Rendering Slot:', slot);
-
         const isCurrentSlot = slot.Slot === currentSlotIndex + currentEpoch * 16;
         const isShutterized = slot.IsRegisteration === true;
         const isPassed = slot.Slot < currentSlotIndex + currentEpoch * 16;

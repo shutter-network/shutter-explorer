@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const useFetch = (url: string) => {
+const useFetch = (url: string, refetchTrigger?: any) => {
     const explorerbackend = process.env.REACT_APP_BACKEND_API;
     const [data, setData] = useState<any>(null);
     const [loading, setLoading] = useState<boolean>(true);
@@ -24,7 +24,7 @@ const useFetch = (url: string) => {
         };
 
         fetchData();
-    }, [url, explorerbackend]);
+    }, [url, explorerbackend, refetchTrigger]);
 
     return { data, loading, error };
 };
