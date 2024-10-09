@@ -14,5 +14,6 @@ export const mainStyles = {
     
     '@media (max-width: 768px)': {
         paddingBottom: '100px',
+        paddingTop: '40px'
     },
 };
