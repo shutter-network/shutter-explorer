@@ -93,7 +93,7 @@ const Transaction: FC = () => {
                         <Typography variant="body1" className="card-value">{transaction.InclusionSlot}</Typography>
                     </Grid>
 
-                    <Grid size={{ lg: 12 }}>
+                    <Grid size={{ lg: 12 }}  sx={{display: { xs: 'none', md: 'block' }, }}>
                         <Divider></Divider>
                     </Grid>
 
@@ -127,7 +127,7 @@ const Transaction: FC = () => {
                                     <Typography variant="body1" className="card-value">{formatTimestamp(transaction.EffectiveInclusionTime)}</Typography>
                                 </Grid>
 
-                                <Grid size={{ lg: 12 }}>
+                                <Grid size={{ lg: 12 }}  sx={{display: { xs: 'none', md: 'block' }, }}>
                                     <Divider></Divider>
                                 </Grid>
                             </>
@@ -141,7 +141,7 @@ const Transaction: FC = () => {
                         <Typography variant="body1" className={transaction.TxStatus === "Completed" ? "status-completed" : "status-pending"}>{transaction.TxStatus}</Typography>
                     </Grid>
 
-                    <Grid size={{ lg: 12 }}>
+                    <Grid size={{ lg: 12 }}  sx={{display: { xs: 'none', md: 'block' }, }}>
                         <Divider></Divider>
                     </Grid>
 
