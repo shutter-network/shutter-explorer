@@ -7,6 +7,19 @@ export const SidebarContainer = styled.aside.attrs({
   background: #f7f9fb;
   padding: 16px 20px;
   min-width: 240px;
+
+  @media (max-width: 768px) {
+    width: 100%;
+    height: 60px;
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    top: auto;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    z-index: 1000; 
+  }
 `;
 
 export const SidebarNav = styled.nav.attrs({
@@ -15,6 +28,13 @@ export const SidebarNav = styled.nav.attrs({
   display: flex;
   flex-direction: column;
   gap: 4px;
+
+  @media (max-width: 768px) {
+      flex-direction: row;
+      justify-content: space-around;
+      align-items: center;
+      width: 100%;
+  }
 `;
 
 export const NavItem = styled(RouterLink).attrs({
@@ -42,6 +62,12 @@ export const NavItem = styled(RouterLink).attrs({
     color: #002861;
     background-color: #e0e0e0;
   }
+
+  @media (max-width: 768px) {
+      justify-content: center;
+      width: auto;
+      height: auto;
+  }
 `;
 
 export const NavIcon = styled.svg`
@@ -55,5 +81,9 @@ export const NavIcon = styled.svg`
 
   ${NavItem}.active & {
     filter: brightness(0) saturate(100%) invert(12%) sepia(45%) saturate(1500%) hue-rotate(220deg) brightness(90%) contrast(95%);
+  }
+
+  @media (max-width: 768px) {
+      margin-right: 0;
   }
 `;
