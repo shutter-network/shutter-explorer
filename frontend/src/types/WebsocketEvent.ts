@@ -8,7 +8,7 @@ export interface Top5Epochs {
         slots: Array<{
             Slot: number;
             ValidatorIndex: number;
-            IsRegistration: boolean | null;
+            IsRegisteration: boolean | null;
         }>
     }>
 }

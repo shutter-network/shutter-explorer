@@ -103,8 +103,10 @@ const SlotProgression = () => {
     const slotsToDisplay = currentEpochSlots;
 
     const renderSlotBlock = (slot: any) => {
+        console.log('Rendering Slot:', slot);
+
         const isCurrentSlot = slot.Slot === currentSlotIndex + currentEpoch * 16;
-        const isShutterized = slot.IsRegistration === true;
+        const isShutterized = slot.IsRegisteration === true;
         const isPassed = slot.Slot < currentSlotIndex + currentEpoch * 16;
 
         return (
@@ -139,7 +141,7 @@ const SlotProgression = () => {
                         <DetailsGrid>
                             <DetailCard title="Slot number" value={slotsToDisplay[currentSlotIndex]?.Slot || 'N/A'} />
                             <DetailCard title="Validator Index" value={slotsToDisplay[currentSlotIndex]?.ValidatorIndex || 'N/A'} />
-                            <DetailCard title="Shutterized" value={slotsToDisplay[currentSlotIndex]?.IsRegistration ? 'Yes' : 'No'} />
+                            <DetailCard title="Shutterized" value={slotsToDisplay[currentSlotIndex]?.IsRegisteration ? 'Yes' : 'No'} />
                         </DetailsGrid>
                     </PreviousSlotDetails>
                 </SlotDetailsWrapper>
