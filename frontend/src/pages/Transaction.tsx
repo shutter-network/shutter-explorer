@@ -61,9 +61,12 @@ const Transaction: FC = () => {
 
                     </Grid>
                     <Grid size={{ xs: 12, sm: 8 }}>
+                        {transaction.UserTxHash!==""?
                         <Link href={`${explorerUrl}/tx/${transaction.UserTxHash}`} target="_blank" rel="noopener noreferrer" className="hash">
                             {transaction.UserTxHash}
-                        </Link>
+                        </Link>:
+                            <Typography variant="body1" className="card-value">N/A</Typography>}
+
                     </Grid>
 
                     {/* Sequencer Transaction */}
@@ -92,7 +95,7 @@ const Transaction: FC = () => {
                         </Box>
                     </Grid>
                     <Grid size={{ xs: 12, sm: 8 }}>
-                        <Typography variant="body1" className="card-value">{transaction.InclusionSlot}</Typography>
+                        <Typography variant="body1" className="card-value">{transaction.InclusionSlot!==0? transaction.InclusionSlot : "N/A"}</Typography>
                     </Grid>
                     {transaction.BlockNumber!==0?
                     <>
