@@ -149,7 +149,7 @@ const Transaction: FC = () => {
                                     <Typography variant="body1" className="card-value">{formatTimestamp(transaction.EffectiveInclusionTime)}</Typography>
                                 </Grid>
 
-                                <Grid size={{ xs: 12, sm: 4 }}>
+                                <Grid size={{ xs: 'auto', sm: 4 }}>
                                     <Box display="flex" alignItems="center" gap={1}>
                                         <Typography variant="body1" fontWeight="bold" className="card-label" textAlign="left">Inclusion Delay</Typography>
                                         <Tooltip title="Time taken for tx to be included">
