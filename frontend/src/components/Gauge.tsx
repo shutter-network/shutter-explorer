@@ -38,7 +38,7 @@ const BasicGauges: FC<BasicGaugesProps> = ({ success, total, failed }) => {
                             fill: theme.palette.success.main,
                         },
                         [`& .${gaugeClasses.referenceArc}`]: {
-                            fill: theme.palette.error.main,
+                            fill: theme.palette.warning.light,
                         },
                         '@media (max-width: 900px)': {
                             height: '150px',
@@ -57,7 +57,7 @@ const BasicGauges: FC<BasicGaugesProps> = ({ success, total, failed }) => {
             >
                 <Stack alignItems="center">
                     <Typography variant="body1" sx={{ color: theme.palette.text.secondary }}>
-                        Successful
+                        Shielded
                     </Typography>
                     <Typography variant="subtitle1" sx={{ color: theme.palette.text.primary }}>
                         {success}
@@ -73,7 +73,7 @@ const BasicGauges: FC<BasicGaugesProps> = ({ success, total, failed }) => {
                 </Stack>
                 <Stack alignItems="center">
                     <Typography variant="body1" sx={{ color: theme.palette.text.secondary }}>
-                        Failed
+                        Unshielded
                     </Typography>
                     <Typography variant="subtitle1" sx={{ color: theme.palette.text.primary }}>
                         {failed}
