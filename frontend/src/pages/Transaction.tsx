@@ -38,7 +38,7 @@ const Transaction: FC = () => {
     if (!transaction) {
         return (
             <ResponsiveLayout>
-                <Typography variant="h6">No transaction data found.</Typography>
+                <Typography variant="h6">No transaction data found. The transaction may not be decrypted yet. Please try again in some time.</Typography>
             </ResponsiveLayout>
         );
     }

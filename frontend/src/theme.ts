@@ -52,6 +52,13 @@ const muiTheme = createTheme({
             letterSpacing: '-0.7px',
             color: '#656B73',
         },
+        body2: {
+            fontSize: '14px',
+            fontWeight: 600,
+            lineHeight: '145%',
+            letterSpacing: '-0.7px',
+            color: 'black',
+        },
     },
     components: {
         MuiLink: {

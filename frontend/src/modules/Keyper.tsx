@@ -21,7 +21,7 @@ const Keyper = () => {
                     tooltip="Threshold number of keypers required for operation"
                     value={keyperThreshold}
                 />
-                <Typography sx={{ textAlign: "left", paddingRight: 2 }} >Shutter DAOs have already selected and approved 22 Keypers to be eligible to operate keyper clients for various Shutter-protected protocols (e.g. Shutter for Gnosis Chain or Shutter for Snapshot Shielded Voting). The current subset of 7 are voluntary Genesis Keypers specifically for Gnosis Chain.</Typography>
+                <Typography sx={{ textAlign: "left", paddingRight: 2 }} >Shutter DAOs have already selected and approved 22 keypers to be eligible to operate keyper clients for various Shutter-protected protocols (e.g. Shutter for Gnosis Chain or Shutter for Snapshot Shielded Voting). The current subset of 7 are voluntary Genesis keypers specifically for Gnosis Chain.</Typography>
             </OverviewCard>
         </Box>
     );

@@ -7,7 +7,7 @@ import { ReactComponent as ArrowsIcon } from '../assets/icons/arrows_horizontal.
 const navItems = [
     { icon: GridIcon, label: "System Overview" },
     { icon: TargetIcon, label: "Slot Overview" },
-    { icon: ArrowsIcon, label: "Transactions" }
+    { icon: ArrowsIcon, label: "Transaction Lookup" }
 ];
 
 const Sidebar: React.FC = () => {
