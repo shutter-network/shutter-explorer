@@ -27,9 +27,13 @@ const TransactionLookup: FC = () => {
                         <li>
                             <b>View the Status:</b> The tool will show one of the following statuses:
                             <ul>
-                            <li> Pending User Transaction: Your transaction has been sent but hasn’t been included yet.</li>
-                            <li> Shielded Inclusion: Your transaction has been decrypted and included by the sequencer or the inclusion service and is now visible on Gnosisscan.</li>
-                            <li> Unshielded Inclusion: Your transaction was resent by the inclusion service, temporarily unshielded, before being fully included.</li>
+                                <li> Submitted: Your transaction was submitted to the sequencer.</li>
+                                <li> Pending User Transaction: Your transaction has been decrypted but has not been included yet.</li>
+                                <li> Shielded Inclusion: Your transaction has been decrypted and included by the sequencer is now visible on Gnosisscan.</li>
+                                <li> Unshielded Inclusion: Your transaction was resent by the inclusion service, temporarily unshielded, before being fully included.</li>
+                                <li> Invalid: Your transaction is invalid.</li>
+                                <li> Cannot be decrypted: Your transaction cannot be decrypted.</li>
+                                <li> Not included: Your transaction couldn't be included even through the unshielded inclusion. </li>
                             </ul>
                         </li>
 
