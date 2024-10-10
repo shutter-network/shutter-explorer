@@ -17,8 +17,14 @@ export const SlotBlock = styled.div<{ isActive: boolean; isShutterized: boolean;
     flex: 1;
     overflow: hidden;
 
-    @media (max-width: 768px) {
-        width: 15px; /* Reduce width on mobile screens */
+    @media (max-width: 900px) {
+        width: 40px; /* Reduce width on mobile screens */
+        height: 36px; /* Reduce height on mobile screens */
+        flex: none; /* Prevent flex from expanding the block in mobile view */
+    }
+
+    @media (max-width: 786px) {
+        width: 30px; /* Reduce width on mobile screens */
         height: 36px; /* Reduce height on mobile screens */
         flex: none; /* Prevent flex from expanding the block in mobile view */
     }
@@ -78,7 +84,7 @@ export const DetailsGrid = styled.div`
     flex-wrap: wrap;
 
 
-    @media (max-width: 768px) {
+    @media (max-width: 900px) {
         flex-direction: column;
     }
 `;
@@ -94,7 +100,7 @@ export const Card = styled.div`
     flex: 1;
     padding: 16px 20px;
 
-    @media (max-width: 768px) {
+    @media (max-width: 900px) {
         min-width: 200px; /* Reduce min-width on tablets and smaller screens */
         padding: 12px 16px; /* Adjust padding */
     }
@@ -112,7 +118,7 @@ export const CardValue = styled.div`
     line-height: 1;
     font-weight: 600;
 
-    @media (max-width: 768px) {
+    @media (max-width: 900px) {
         font-size: 18px; /* Adjust font size for tablets */
     }
 

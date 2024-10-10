@@ -30,7 +30,7 @@ const Slot = () => {
     const [isMobile, setIsMobile] = useState(false);
 
     const handleResize = () => {
-        setIsMobile(window.matchMedia("(max-width: 1199px)").matches);
+        setIsMobile(window.matchMedia("(max-width: 900px)").matches);
     };
 
     const { socket } = useWebSocket()!;
