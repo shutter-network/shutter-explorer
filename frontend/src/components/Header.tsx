@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { Box, IconButton, Drawer, List, ListItem, ListItemText } from '@mui/material';
+import React, { useState } from 'react';
+import { Box, IconButton, Drawer, List } from '@mui/material';
 import logo from '../assets/shutter-logo.svg';
 import chevronRight from '../assets/icons/chevron_right.svg';
 import menuIcon from '../assets/icons/burger.svg'; // Add your burger icon here

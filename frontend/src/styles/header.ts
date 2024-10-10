@@ -1,7 +1,5 @@
 import styled from 'styled-components';
 import { ReactComponent as DropdownIcon } from '../assets/icons/chevron_down.svg';
-import { MenuItem } from '@mui/material';
-import { Link } from 'react-router-dom';
 
 export const StyledDropdownIcon = styled(DropdownIcon)`
   width: 16px;
