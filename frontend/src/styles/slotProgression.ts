@@ -49,7 +49,12 @@ export const StyledShutterLogoIcon = styled(ShutterLogoIcon)<{ isActive: boolean
         : props.isPassed
             ? '#ffffff' /* White when the slot is passed */
             : '#555555' /* Dark grey when the slot is not passed yet */
-};
+
+        };
+    @media (max-width: 786px) {
+        width: 10px; /* Reduce width on mobile screens */
+        height: 10px; /* Reduce height on mobile screens */
+    }
 `;
 
 export const SlotDetailsWrapper = styled.section`
