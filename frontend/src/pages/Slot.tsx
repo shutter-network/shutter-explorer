@@ -108,6 +108,12 @@ const Slot = () => {
         <ResponsiveLayout>
             <Box sx={{ flexGrow: 1, marginTop: 4 }}>
                 <TitleSection title="Slot Overview" />
+                <Typography variant="body1" textAlign="left" paddingTop="20px" color="#051016" lineHeight="180%">
+                    The slot overview is designed to give you information about the activity around the current blockchain's state.
+                    It gives a look ahead to the next 16 slots and shows when a registered validator is scheduled.
+                    A green background means that the slot has passed. The Shutter logo means the corresponding proposer will include encrypted transactions.
+                    Additionally, it shows the 10 recent sequencer and successfully executed user transactions which were included through the encrypted mempool.
+                </Typography>
                 <SlotProgression/>
                 <Grid container spacing={2} sx={{ marginTop: 4 }}>
                     <Grid size={{ sm: 12, md: 12, lg: 6, xs: 'auto' }} >
@@ -129,7 +135,7 @@ const Slot = () => {
                             <Alert severity="error">Error fetching user transactions: {errorUser.message}</Alert>
                         ) : (
                             <>
-                                <Typography variant="h5" align='left' sx={{ fontWeight: 'bold' }} color='black' > User Transactions</Typography>
+                                <Typography variant="h5" align='left' sx={{ fontWeight: 'bold' }} color='black' >Shielded User Transactions</Typography>
                                 {loadingUser ? (
                                     <Typography>Loading...</Typography>
                                 ) : (
