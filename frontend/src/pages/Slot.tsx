@@ -129,7 +129,7 @@ const Slot = () => {
                             <Alert severity="error">Error fetching user transactions: {errorUser.message}</Alert>
                         ) : (
                             <>
-                                <Typography variant="h5" align='left' sx={{ fontWeight: 'bold' }} color='black' > User Transactions</Typography>
+                                <Typography variant="h5" align='left' sx={{ fontWeight: 'bold' }} color='black' >Shielded User Transactions</Typography>
                                 {loadingUser ? (
                                     <Typography>Loading...</Typography>
                                 ) : (
