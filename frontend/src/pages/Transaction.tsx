@@ -35,6 +35,9 @@ const Transaction: FC = () => {
         }
     }, [updatedData]);
 
+    const statusesWithBlockNumber = ['Shielded inclusion', 'Unshielded inclusion'];
+
+
     if (!transaction) {
         return (
             <ResponsiveLayout>
@@ -62,9 +65,9 @@ const Transaction: FC = () => {
                     </Grid>
                     <Grid size={{ xs: 12, sm: 8 }}>
                         {transaction.UserTxHash!==""?
-                        <Link href={`${explorerUrl}/tx/${transaction.UserTxHash}`} target="_blank" rel="noopener noreferrer" className="hash">
-                            {transaction.UserTxHash}
-                        </Link>:
+                            <Link href={`${explorerUrl}/tx/${transaction.UserTxHash}`} target="_blank" rel="noopener noreferrer" className="hash">
+                                {transaction.UserTxHash}
+                            </Link>:
                             <Typography variant="body1" className="card-value">N/A</Typography>}
 
                     </Grid>
@@ -97,23 +100,32 @@ const Transaction: FC = () => {
                     <Grid size={{ xs: 12, sm: 8 }}>
                         <Typography variant="body1" className="card-value">{transaction.InclusionSlot!==0? transaction.InclusionSlot : "N/A"}</Typography>
                     </Grid>
-                    {transaction.BlockNumber!==0?
-                    <>
-                    <Grid size={{ xs: 'auto', sm: 4 }}>
-                        <Box display="flex" alignItems="center" gap={1}>
-                            <Typography variant="body1" fontWeight="bold" className="card-label" textAlign="left">Block Number</Typography>
-                            <Tooltip title="Block in which the transaction was included">
-                                <InfoIcon />
-                            </Tooltip>
-                        </Box>
-                    </Grid>
-                    <Grid size={{ xs: 12, sm: 8 }}>
-                        <Link href={`${explorerUrl}/block/${transaction.BlockNumber}`} target="_blank" rel="noopener noreferrer" className="hash">
-                            {transaction.BlockNumber}
-                        </Link>
-                    </Grid>
-                    </>:<></>
-                    }
+
+                    {/* Block Number (conditionally rendered) */}
+                    {(transaction.BlockNumber !== 0) && statusesWithBlockNumber.includes(transaction.TxStatus) && (
+                        <>
+                            <Grid size={{ xs: 'auto', sm: 4 }}>
+                                <Box display="flex" alignItems="center" gap={1}>
+                                    <Typography variant="body1" fontWeight="bold" className="card-label" textAlign="left">
+                                        Block Number
+                                    </Typography>
+                                    <Tooltip title="Block in which the transaction was included">
+                                        <InfoIcon />
+                                    </Tooltip>
+                                </Box>
+                            </Grid>
+                            <Grid size={{ xs: 12, sm: 8 }}>
+                                <Link
+                                    href={`${explorerUrl}/block/${transaction.BlockNumber}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="hash"
+                                >
+                                    {transaction.BlockNumber}
+                                </Link>
+                            </Grid>
+                        </>
+                    )}
 
                     <Grid size={{ lg: 12 }}  sx={{display: { xs: 'none', sm: 'none', md: 'none', lg: 'block' }, }}>
                         <Divider></Divider>
