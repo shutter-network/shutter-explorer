@@ -35,7 +35,7 @@ const Transaction: FC = () => {
         }
     }, [updatedData]);
 
-    const statusesWithBlockNumber = ['Shielded inclusion', 'Unshielded inclusion'];
+    const statusesWithBlockNumber = ['Shielded inclusion'];
 
 
     if (!transaction) {
