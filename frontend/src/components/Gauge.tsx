@@ -40,7 +40,7 @@ const BasicGauges: FC<BasicGaugesProps> = ({ success, total, failed }) => {
                         [`& .${gaugeClasses.referenceArc}`]: {
                             fill: theme.palette.error.main,
                         },
-                        '@media (max-width: 768px)': {
+                        '@media (max-width: 900px)': {
                             height: '150px',
                         },
                     }}

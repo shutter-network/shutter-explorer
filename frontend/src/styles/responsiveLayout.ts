@@ -12,7 +12,7 @@ export const mainStyles = {
     bgcolor: 'background.default',
     p: 3,
     
-    '@media (max-width: 768px)': {
+    '@media (max-width: 900px)': {
         paddingBottom: '100px',
         paddingTop: '40px'
     },

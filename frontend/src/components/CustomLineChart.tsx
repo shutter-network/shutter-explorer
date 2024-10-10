@@ -23,7 +23,7 @@ const CustomLineChart: FC<CustomLineChartProps> = ({ data, title = 'Inclusion Ti
     const [isMobile, setIsMobile] = useState(false);
     
     const handleResize = () => {
-        setIsMobile(window.innerWidth <= 768); // Adjust breakpoint as needed
+        setIsMobile(window.innerWidth <= 900); // Adjust breakpoint as needed
     };
 
     useEffect(() => {

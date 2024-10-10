@@ -8,7 +8,7 @@ export const SidebarContainer = styled.aside.attrs({
   padding: 16px 20px;
   min-width: 240px;
 
-  @media (max-width: 768px) {
+  @media (max-width: 900px) {
     width: 100%;
     height: 60px;
     position: fixed;
@@ -29,7 +29,7 @@ export const SidebarNav = styled.nav.attrs({
   flex-direction: column;
   gap: 4px;
 
-  @media (max-width: 768px) {
+  @media (max-width: 900px) {
       flex-direction: row;
       justify-content: space-around;
       align-items: center;
@@ -63,7 +63,7 @@ export const NavItem = styled(RouterLink).attrs({
     background-color: #e0e0e0;
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: 900px) {
       justify-content: center;
       width: auto;
       height: auto;
@@ -83,7 +83,7 @@ export const NavIcon = styled.svg`
     filter: brightness(0) saturate(100%) invert(12%) sepia(45%) saturate(1500%) hue-rotate(220deg) brightness(90%) contrast(95%);
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: 900px) {
       margin-right: 0;
   }
 `;

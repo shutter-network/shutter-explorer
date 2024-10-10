@@ -21,7 +21,7 @@ func NewSlotService(slotUsecase *usecase.SlotUsecase) *SlotService {
 }
 
 func (svc *SlotService) QueryTop5Epochs(ctx *gin.Context) {
-	epochsData, err := svc.SlotUsecase.QueryTop5Epochs(ctx)
+	epochsData, _, err := svc.SlotUsecase.QueryTop5Epochs(ctx)
 	if err != nil {
 		ctx.Error(err)
 		return

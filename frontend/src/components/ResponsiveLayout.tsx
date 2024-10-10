@@ -26,7 +26,7 @@ const ResponsiveLayout: FC<ResponsiveLayoutProps> = ({ children }) => {
                 </Toolbar>
             </AppBar>
 
-            <Box sx={{ display: 'flex', flexGrow: 1, paddingTop: '64px' }}>
+            <Box sx={{ display: 'flex', flexGrow: 1, paddingTop: '78px' }}>
                 <Sidebar />
 
                 <Box component="main" sx={mainStyles}>
