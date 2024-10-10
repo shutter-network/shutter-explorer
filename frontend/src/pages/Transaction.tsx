@@ -180,7 +180,7 @@ const Transaction: FC = () => {
                     </Grid>
 
                     {/* From */}
-                    <Grid size={{ xs: 'auto', sm: 4 }}>
+                    {/* <Grid size={{ xs: 'auto', sm: 4 }}>
                         <Box display="flex" alignItems="center" gap={1}>
                             <Typography variant="body1" fontWeight="bold" className="card-label" textAlign="left">From</Typography>
                             <Tooltip title="Transaction submitted by">
@@ -192,7 +192,7 @@ const Transaction: FC = () => {
                         <Link href={`${explorerUrl}/address/${transaction.Sender}`} target="_blank" rel="noopener noreferrer" className="hash">
                             {transaction.Sender}
                         </Link>
-                    </Grid>
+                    </Grid> */}
                 </Grid>
 
                 {error && (

@@ -110,7 +110,7 @@ const Slot = () => {
                 <TitleSection title="Slot Overview" />
                 <SlotProgression/>
                 <Grid container spacing={2} sx={{ marginTop: 4 }}>
-                    <Grid size={{ sm: 12, md: 12, lg: 6 }} >
+                    <Grid size={{ sm: 12, md: 12, lg: 6, xs: 'auto' }} >
                         {errorSequencer ? (
                             <Alert severity="error">Error fetching sequencer transactions: {errorSequencer.message}</Alert>
                         ) : (
@@ -124,7 +124,7 @@ const Slot = () => {
                             </>
                         )}
                     </Grid>
-                    <Grid size={{ sm: 12, md: 12, lg: 6 }}>
+                    <Grid size={{ sm: 12, md: 12, lg: 6, xs: 'auto' }}>
                         {errorUser ? (
                             <Alert severity="error">Error fetching user transactions: {errorUser.message}</Alert>
                         ) : (

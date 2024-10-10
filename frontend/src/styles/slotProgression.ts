@@ -16,6 +16,17 @@ export const SlotBlock = styled.div<{ isActive: boolean; isShutterized: boolean;
     height: 48px;
     flex: 1;
     overflow: hidden;
+
+    @media (max-width: 768px) {
+        width: 15px; /* Reduce width on mobile screens */
+        height: 36px; /* Reduce height on mobile screens */
+        flex: none; /* Prevent flex from expanding the block in mobile view */
+    }
+
+    @media (max-width: 480px) {
+        width: 15px; /* Further reduce width on smaller mobile screens */
+        height: 30px; /* Further reduce height on smaller mobile screens */
+    }
 `;
 
 export const StyledShutterLogoIcon = styled(ShutterLogoIcon)<{ isActive: boolean; isPassed: boolean }>`
@@ -65,6 +76,11 @@ export const DetailsGrid = styled.div`
     width: 100%;
     gap: 20px;
     flex-wrap: wrap;
+
+
+    @media (max-width: 768px) {
+        flex-direction: column;
+    }
 `;
 
 export const Card = styled.div`
@@ -77,6 +93,16 @@ export const Card = styled.div`
     min-width: 240px;
     flex: 1;
     padding: 16px 20px;
+
+    @media (max-width: 768px) {
+        min-width: 200px; /* Reduce min-width on tablets and smaller screens */
+        padding: 12px 16px; /* Adjust padding */
+    }
+
+    @media (max-width: 480px) {
+        min-width: 160px; /* Further reduce width for mobile */
+        padding: 8px 12px; /* Further adjust padding */
+    }
 `;
 
 export const CardValue = styled.div`
@@ -85,6 +111,14 @@ export const CardValue = styled.div`
     letter-spacing: -0.2px;
     line-height: 1;
     font-weight: 600;
+
+    @media (max-width: 768px) {
+        font-size: 18px; /* Adjust font size for tablets */
+    }
+
+    @media (max-width: 480px) {
+        font-size: 16px; /* Adjust font size for smaller mobile screens */
+    }
 `;
 
 export const CardTitle = styled.div`

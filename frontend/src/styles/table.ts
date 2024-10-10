@@ -7,6 +7,11 @@ export const StyledTableContainer = styled(TableContainer)(({ theme }) => ({
     border: `0.5px solid ${theme.colors.gray}`,
     boxShadow: 'none',
     borderRadius: '4px',
+
+    [theme.breakpoints.down('sm')]: {
+        marginTop: theme.spacing(1), // Reduce margin for smaller screens
+        borderRadius: '2px', // Smaller border radius for mobile
+    },
 }));
 
 export const StyledTableHeadRow = styled(TableRow)(({ theme }) => ({
@@ -16,6 +21,13 @@ export const StyledTableHeadRow = styled(TableRow)(({ theme }) => ({
         fontWeight: 600,
         paddingTop: theme.spacing(1),
         paddingBottom: theme.spacing(1),
+
+        [theme.breakpoints.down('sm')]: {
+            paddingTop: theme.spacing(0.5), // Reduce padding for mobile
+            paddingBottom: theme.spacing(0.5), // Reduce padding for mobile
+            fontSize: '12px', // Smaller font size for mobile
+            width: '50px'
+        },
     },
 }));
 
@@ -24,6 +36,12 @@ export const StyledTableCell = styled(TableCell)(({ theme }) => ({
         fontSize: 14,
         paddingTop: theme.spacing(1),
         paddingBottom: theme.spacing(1),
+
+        [theme.breakpoints.down('sm')]: {
+            fontSize: '12px', // Reduce font size for mobile
+            paddingTop: theme.spacing(0.5), // Reduce padding for mobile
+            paddingBottom: theme.spacing(0.5), // Reduce padding for mobile
+        },
     },
 }));
 
