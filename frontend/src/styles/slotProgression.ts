@@ -18,19 +18,19 @@ export const SlotBlock = styled.div<{ isActive: boolean; isShutterized: boolean;
     overflow: hidden;
 
     @media (max-width: 900px) {
-        width: 40px; /* Reduce width on mobile screens */
+        width: 38px; /* Reduce width on mobile screens */
         height: 36px; /* Reduce height on mobile screens */
         flex: none; /* Prevent flex from expanding the block in mobile view */
     }
 
     @media (max-width: 786px) {
-        width: 30px; /* Reduce width on mobile screens */
+        width: 28px; /* Reduce width on mobile screens */
         height: 36px; /* Reduce height on mobile screens */
         flex: none; /* Prevent flex from expanding the block in mobile view */
     }
 
     @media (max-width: 480px) {
-        width: 15px; /* Further reduce width on smaller mobile screens */
+        width: 13px; /* Further reduce width on smaller mobile screens */
         height: 30px; /* Further reduce height on smaller mobile screens */
     }
 `;
