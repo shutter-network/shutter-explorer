@@ -72,8 +72,27 @@ func (manager *ClientManager) sendTotalTXsByTXStatusLast30Days(ctx context.Conte
 }
 
 func (manager *ClientManager) sendTop5Epochs(ctx context.Context, d time.Duration) {
+	var previousEpoch uint64
+
 	callback := func(ctx context.Context) WebsocketResponse {
-		epochsData, err := manager.usecases.SlotUsecase.QueryTop5Epochs(ctx)
+		epochsData, futureEpoch, err := manager.usecases.SlotUsecase.QueryTop5Epochs(ctx)
+		if err != nil {
+			return WebsocketResponse{
+				Type:  Top5Epochs,
+				Data:  nil,
+				Error: err,
+			}
+		}
+		// data hasnt changed
+		if futureEpoch == previousEpoch {
+			return WebsocketResponse{
+				Type:  Top5Epochs,
+				Data:  nil,
+				Error: nil,
+			}
+		}
+		previousEpoch = futureEpoch
+
 		return WebsocketResponse{
 			Type:  Top5Epochs,
 			Data:  epochsData,

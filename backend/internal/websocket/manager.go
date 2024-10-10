@@ -42,7 +42,7 @@ func (manager *ClientManager) Run(ctx context.Context) {
 	manager.sendLatestSequencerTransactions(ctx, 30*time.Second, "10")
 	manager.sendLatestUserTransactions(ctx, 60*time.Second, "10")
 	manager.sendTotalTXsByTXStatusLast30Days(ctx, 60*time.Second, "shielded inclusion")
-	manager.sendTop5Epochs(ctx, 80*time.Second)
+	manager.sendTop5Epochs(ctx, 5*time.Second)
 
 	for {
 		select {
@@ -101,6 +101,9 @@ func (manager *ClientManager) sendPeriodicMessages(ctx context.Context, d time.D
 		time.Sleep(d)
 		message := callback(ctx)
 
+		if message.Data == nil && message.Error == nil {
+			continue
+		}
 		log.Debug().Str("eventType", string(message.Type)).Msg("streamed websocket periodic message")
 		messageJSON, err := json.Marshal(message)
 		if err != nil {

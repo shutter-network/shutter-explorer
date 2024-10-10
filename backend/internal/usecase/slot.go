@@ -28,7 +28,7 @@ func NewSlotUsecase(
 	}
 }
 
-func (uc *SlotUsecase) QueryTop5Epochs(ctx context.Context) ([]data.QuerySlotAndValidatorDataRow, *error.Http) {
+func (uc *SlotUsecase) QueryTop5Epochs(ctx context.Context) ([]data.QuerySlotAndValidatorDataRow, uint64, *error.Http) {
 	currentTimestamp := time.Now().Unix()
 	genesisTimestamp, err := strconv.Atoi(os.Getenv("GENESIS_TIMESTAMP"))
 	if err != nil {
@@ -37,7 +37,7 @@ func (uc *SlotUsecase) QueryTop5Epochs(ctx context.Context) ([]data.QuerySlotAnd
 			"",
 			http.StatusInternalServerError,
 		)
-		return nil, &err
+		return nil, 0, &err
 	}
 	slotDuration, err := strconv.Atoi(os.Getenv("SLOT_DURATION"))
 	if err != nil {
@@ -46,7 +46,7 @@ func (uc *SlotUsecase) QueryTop5Epochs(ctx context.Context) ([]data.QuerySlotAnd
 			"",
 			http.StatusInternalServerError,
 		)
-		return nil, &err
+		return nil, 0, &err
 	}
 	slotsPerEpoch, err := strconv.Atoi(os.Getenv("SLOTS_PER_EPOCH"))
 	if err != nil {
@@ -55,7 +55,7 @@ func (uc *SlotUsecase) QueryTop5Epochs(ctx context.Context) ([]data.QuerySlotAnd
 			"",
 			http.StatusInternalServerError,
 		)
-		return nil, &err
+		return nil, 0, &err
 	}
 	currentSlot := observerUtils.GetSlotNumber(uint64(currentTimestamp), uint64(genesisTimestamp), uint64(slotDuration))
 	currentEpoch := observerUtils.GetEpochNumber(currentSlot, uint64(slotsPerEpoch))
@@ -76,9 +76,9 @@ func (uc *SlotUsecase) QueryTop5Epochs(ctx context.Context) ([]data.QuerySlotAnd
 			"",
 			http.StatusInternalServerError,
 		)
-		return nil, &err
+		return nil, 0, &err
 	}
-	return slotAndValidatorData, nil
+	return slotAndValidatorData, nextEpoch, nil
 }
 
 func (uc *SlotUsecase) QueryIncludedTXsInSlot(ctx context.Context, slot int64) ([]data.QueryIncludedTxsInSlotRow, *error.Http) {
