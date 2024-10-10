@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import { NavLink as RouterLink } from 'react-router-dom';
 
 export const SidebarContainer = styled.aside.attrs({
-    className: 'sidebar-container',
+  className: 'sidebar-container',
 })`
   background: #f7f9fb;
   padding: 16px 20px;
@@ -23,7 +23,7 @@ export const SidebarContainer = styled.aside.attrs({
 `;
 
 export const SidebarNav = styled.nav.attrs({
-    className: 'sidebar-nav',
+  className: 'sidebar-nav',
 })`
   display: flex;
   flex-direction: column;
@@ -38,7 +38,7 @@ export const SidebarNav = styled.nav.attrs({
 `;
 
 export const NavItem = styled(RouterLink).attrs({
-    className: 'nav-item',
+  className: 'nav-item',
 })`
   display: flex;
   align-items: center;
@@ -52,7 +52,7 @@ export const NavItem = styled(RouterLink).attrs({
   cursor: pointer;
   text-align: left;
   text-decoration: none;
-
+  
   &:hover {
     color: #002861;
     background-color: #e0e0e0;
