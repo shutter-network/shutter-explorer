@@ -109,7 +109,7 @@ const Transaction = () => {
                     <Alert severity="error">Error fetching Transaction Percentage: {errorTransactionPercentage.message}</Alert>
                 ) : (
                     <InfoBox
-                        title="Percentage of Shielded Transactions"
+                        title="Shielded Transaction Percentage"
                         tooltip="Percentage of monthly shielded transactions amongst monthly Gnosis transactions"
                         value={loadingTransactionPercentage || transactionPercentage === null ? 'Loading...' : `${(transactionPercentage * 100).toFixed(2)}%`}
                     />

@@ -33,7 +33,7 @@ const TransactionLookup: FC = () => {
                                 <li> Unshielded Inclusion: Your transaction was resent by the inclusion service, temporarily unshielded, before being fully included.</li>
                                 <li> Invalid: Your transaction is invalid.</li>
                                 <li> Cannot be decrypted: Your transaction cannot be decrypted.</li>
-                                <li> Not included: Your transaction couldn't be included even through the unshielded inclusion. </li>
+                                <li> Not included: Your transaction couldn't be included. </li>
                             </ul>
                         </li>
 
