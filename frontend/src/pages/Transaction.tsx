@@ -115,7 +115,7 @@ const Transaction: FC = () => {
                     </>:<></>
                     }
 
-                    <Grid size={{ lg: 12 }}  sx={{display: { xs: 'none', md: 'block' }, }}>
+                    <Grid size={{ lg: 12 }}  sx={{display: { xs: 'none', sm: 'none', md: 'none', lg: 'block' }, }}>
                         <Divider></Divider>
                     </Grid>
 
@@ -161,7 +161,7 @@ const Transaction: FC = () => {
                                     <Typography variant="body1" className="card-value">{formatSeconds(transaction.InclusionDelay)}</Typography>
                                 </Grid>
 
-                                <Grid size={{ lg: 12 }}  sx={{display: { xs: 'none', md: 'block' }, }}>
+                                <Grid size={{ lg: 12 }}  sx={{display: { xs: 'none', sm: 'none', md: 'none', lg: 'block' }, }}>
                                     <Divider></Divider>
                                 </Grid>
                             </>
@@ -175,7 +175,7 @@ const Transaction: FC = () => {
                         <Typography variant="body1" className={`tx-status status-${transaction.TxStatus.replace(" ", "-")}`}>{transaction.TxStatus}</Typography>
                     </Grid>
 
-                    <Grid size={{ lg: 12 }}  sx={{display: { xs: 'none', md: 'block' }, }}>
+                    <Grid size={{ lg: 12 }}  sx={{display: { xs: 'none', sm:'none', md: 'none', lg: 'block' }, }}>
                         <Divider></Divider>
                     </Grid>
 

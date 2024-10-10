@@ -56,7 +56,7 @@ export default function BasicTable<T extends { [key: string]: any }>({
                                                     event.preventDefault();
                                                     event.clipboardData.setData("text/plain", row[column.id]);
                                                 }}>
-                                                    {isMobile ? truncateString(row[column.id], 35): row[column.id] }
+                                                    {isMobile ? truncateString(row[column.id], 35): truncateString(row[column.id], 60) }
                                                 </StyledNavLink>
                                                 <Tooltip title="copy" onClick={() => handleCopy(row[column.id])}>
                                                     {index % 2 === 0 ? <CopyIconGrey /> : <CopyIconBlue />}
