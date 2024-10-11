@@ -22,6 +22,7 @@ jobs:
                 username: ${{ secrets.STAGING_SERVER_USER }}
                 key: ${{ secrets.SERVER_KEY }}
                 script: |
+                    set -x
                     cd /root/shutter-explorer
                     git pull origin staging
                     git submodule update --init --recursive
@@ -43,6 +44,7 @@ jobs:
                 username: ${{ secrets.PROD_SERVER_USER }}
                 key: ${{ secrets.SERVER_KEY }}
                 script: |
+                    set -x
                     cd /root/shutter-explorer
                     git pull origin main
                     git submodule update --init --recursive
