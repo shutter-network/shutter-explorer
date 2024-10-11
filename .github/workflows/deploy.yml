@@ -21,10 +21,9 @@ jobs:
                 echo "${{ secrets.SERVER_KEY }}" > ~/.ssh/id_ed25519 && chmod 600 ~/.ssh/id_ed25519
 
             - name: Deploy to Instance 1
-              run: >
+              run: |
                 set -x
-                ssh -o StrictHostKeyChecking=no 
-                ${{secrets.STAGING_SERVER_USER}}@${{secrets.STAGING_SERVER_HOST}}
+                ssh -o StrictHostKeyChecking=no ${{secrets.STAGING_SERVER_USER}}@${{secrets.STAGING_SERVER_HOST}}
                 cd /root/shutter-explorer
                 git pull origin staging
                 git submodule update --init --recursive
@@ -45,10 +44,9 @@ jobs:
                 echo "${{ secrets.SERVER_KEY }}" > ~/.ssh/id_ed25519 && chmod 600 ~/.ssh/id_ed25519
 
             - name: Deploy to Instance
-              run: >
+              run: |
                 set -x
-                ssh -o StrictHostKeyChecking=no 
-                ${{secrets.PROD_SERVER_USER}}@${{secrets.PROD_SERVER_HOST}}
+                ssh -o StrictHostKeyChecking=no ${{secrets.PROD_SERVER_USER}}@${{secrets.PROD_SERVER_HOST}}
                 cd /root/shutter-explorer
                 git pull origin staging
                 git submodule update --init --recursive
