@@ -7,29 +7,25 @@ on:
         - staging
 
 jobs:
-    deploy_instance_1:
+    deploy_instance_staging:
         if: github.ref == 'refs/heads/staging'
         runs-on: ubuntu-latest
 
         steps:
             - name: Checkout code
               uses: actions/checkout@v3
+            
+            - name: Setup SSH
+              run: |
+                mkdir -p ~/.ssh
+                echo "${{ secrets.SERVER_KEY }}" > ~/.ssh/id_ed25519 && chmod 600 ~/.ssh/id_ed25519
 
             - name: Deploy to Instance 1
-              uses: appleboy/ssh-action@v1.0.3
-              with:
-                host: ${{ secrets.STAGING_SERVER_HOST }}
-                username: ${{ secrets.STAGING_SERVER_USER }}
-                key: ${{ secrets.SERVER_KEY }}
-                script: |
-                    set -x
-                    cd /root/shutter-explorer
-                    git pull origin staging
-                    git submodule update --init --recursive
-                    cd docker
-                    docker compose up -d --build
+              run: >
+                ssh -o StrictHostKeyChecking=no ${{secrets.STAGING_SERVER_USER}}@${{secrets.STAGING_SERVER_HOST}}
+                "set -x && cd /root/shutter-explorer && git pull origin staging && git submodule update --init --recursive && cd docker && docker compose up -d --build"
 
-    deploy_instance_2:
+    deploy_instance_prod:
         if: github.ref == 'refs/heads/main'
         runs-on: ubuntu-latest
 
@@ -37,16 +33,12 @@ jobs:
             - name: Checkout code
               uses: actions/checkout@v3
 
-            - name: Deploy to Instance 2
-              uses: appleboy/ssh-action@v1.0.3
-              with:
-                host: ${{ secrets.PROD_SERVER_HOST }}
-                username: ${{ secrets.PROD_SERVER_USER }}
-                key: ${{ secrets.SERVER_KEY }}
-                script: |
-                    set -x
-                    cd /root/shutter-explorer
-                    git pull origin main
-                    git submodule update --init --recursive
-                    cd docker
-                    docker compose up -d --build
+            - name: Setup SSH
+              run: |
+                mkdir -p ~/.ssh
+                echo "${{ secrets.SERVER_KEY }}" > ~/.ssh/id_ed25519 && chmod 600 ~/.ssh/id_ed25519
+
+            - name: Deploy to Instance
+              run: >
+                ssh -o StrictHostKeyChecking=no ${{secrets.PROD_SERVER_USER}}@${{secrets.PROD_SERVER_HOST}}
+                "set -x && cd /root/shutter-explorer && git pull origin staging && git submodule update --init --recursive && cd docker && docker compose up -d --build"
