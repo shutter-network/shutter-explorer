@@ -22,9 +22,8 @@ jobs:
 
             - name: Deploy to Instance 1
               run: >
-                set -x
                 ssh -o StrictHostKeyChecking=no ${{secrets.STAGING_SERVER_USER}}@${{secrets.STAGING_SERVER_HOST}}
-                "cd /root/shutter-explorer && git pull origin staging && git submodule update --init --recursive && cd docker && docker compose up -d --build"
+                "set -x && cd /root/shutter-explorer && git pull origin staging && git submodule update --init --recursive && cd docker && docker compose up -d --build"
 
     deploy_instance_prod:
         if: github.ref == 'refs/heads/main'
@@ -41,6 +40,5 @@ jobs:
 
             - name: Deploy to Instance
               run: >
-                set -x
                 ssh -o StrictHostKeyChecking=no ${{secrets.PROD_SERVER_USER}}@${{secrets.PROD_SERVER_HOST}}
-                "cd /root/shutter-explorer && git pull origin staging && git submodule update --init --recursive && cd docker && docker compose up -d --build"
+                "set -x && cd /root/shutter-explorer && git pull origin staging && git submodule update --init --recursive && cd docker && docker compose up -d --build"
