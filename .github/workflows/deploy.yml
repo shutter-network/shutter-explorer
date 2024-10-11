@@ -41,4 +41,4 @@ jobs:
             - name: Deploy to Instance
               run: >
                 ssh -o StrictHostKeyChecking=no ${{secrets.PROD_SERVER_USER}}@${{secrets.PROD_SERVER_HOST}}
-                "set -x && cd /root/shutter-explorer && git pull origin staging && git submodule update --init --recursive && cd docker && docker compose up -d --build"
+                "set -x && cd /root/shutter-explorer && git pull origin main && git submodule update --init --recursive && cd docker && docker compose up -d --build"
