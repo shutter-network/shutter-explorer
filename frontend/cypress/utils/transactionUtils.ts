@@ -47,7 +47,7 @@ export const updatedTransactionData: TransactionData = {
 
 export const explorerUrl = Cypress.env('REACT_APP_EXPLORER_URL') as string;
 
-// TODO update uncommented parts after update to backend and frontend
+// TODO Uncomment after fixing https://github.com/shutter-network/shutter-explorer/issues/150
 export const verifySubmittedTransactionDetails = (data: TransactionData): void => {
     cy.contains('Transaction Details').should('be.visible');
     cy.contains('Transaction Status').should('be.visible');
