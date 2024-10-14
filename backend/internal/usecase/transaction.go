@@ -9,6 +9,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/rs/zerolog/log"
 	"github.com/shutter-network/shutter-explorer/backend/internal/data"
@@ -217,7 +218,7 @@ func (uc *TransactionUsecase) QueryTransactionDetailsByTxHash(ctx context.Contex
 	var effectiveInclusionTime int64
 	var inclusionSlot int64
 	var inclusionDelay int64
-	txStatus := PendingUserTransaction
+	txStatus := Submitted
 	if tse.TxStatus.Valid {
 		if tse.TxStatus.TxStatusVal == data.TxStatusValShieldedinclusion {
 			txStatus = ShieldedInclusion
@@ -228,19 +229,21 @@ func (uc *TransactionUsecase) QueryTransactionDetailsByTxHash(ctx context.Contex
 			}
 		} else if tse.TxStatus.TxStatusVal == data.TxStatusValUnshieldedinclusion {
 			txStatus = UnshieldedInclusion
-			effectiveInclusionTime = tse.DecryptedTxCreatedAtUnix
-			inclusionDelay = effectiveInclusionTime - tse.CreatedAt.Time.Unix()
 			if tse.Slot.Valid {
 				inclusionSlot = tse.Slot.Int64
 			}
 		} else if tse.TxStatus.TxStatusVal == data.TxStatusValInvalid {
 			txStatus = Invalid
+			tse.BlockNumber = pgtype.Int8{Int64: 0, Valid: false}
 		} else if tse.TxStatus.TxStatusVal == data.TxStatusValPending {
 			txStatus = PendingUserTransaction
+			tse.BlockNumber = pgtype.Int8{Int64: 0, Valid: false}
 		} else if tse.TxStatus.TxStatusVal == data.TxStatusValNotdecrypted {
 			txStatus = CannotBeDecrypted
+			tse.BlockNumber = pgtype.Int8{Int64: 0, Valid: false}
 		} else if tse.TxStatus.TxStatusVal == data.TxStatusValNotincluded {
 			txStatus = NotIncluded
+			tse.BlockNumber = pgtype.Int8{Int64: 0, Valid: false}
 		}
 	}
 
