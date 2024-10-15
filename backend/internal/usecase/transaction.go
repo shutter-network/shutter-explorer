@@ -229,7 +229,7 @@ func (uc *TransactionUsecase) QueryTransactionDetailsByTxHash(ctx context.Contex
 			}
 		} else if tse.TxStatus.TxStatusVal == data.TxStatusValUnshieldedinclusion {
 			txStatus = UnshieldedInclusion
-			effectiveInclusionTime = tse.DecryptedTxCreatedAtUnix
+			effectiveInclusionTime = tse.DecryptedTxUpdatedAtUnix
 			inclusionDelay = effectiveInclusionTime - tse.CreatedAt.Time.Unix()
 		} else if tse.TxStatus.TxStatusVal == data.TxStatusValInvalid {
 			txStatus = Invalid
