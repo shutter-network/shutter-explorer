@@ -43,13 +43,13 @@ describe('<TransactionGauge />', () => {
         cy.get('div[role="meter"]').invoke('css', 'height', '300px');
         cy.get('div[role="meter"]').should('exist').and('be.visible');
 
-        cy.contains('Successful').should('be.visible');
+        cy.contains('Shielded').should('be.visible');
         cy.contains('25').should('be.visible');
 
         cy.contains('Total').should('be.visible');
         cy.contains('30').should('be.visible');
 
-        cy.contains('Failed').should('be.visible');
+        cy.contains('Unshielded').should('be.visible');
         cy.contains('5').should('be.visible');
     });
 });
