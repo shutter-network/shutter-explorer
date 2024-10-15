@@ -229,9 +229,8 @@ func (uc *TransactionUsecase) QueryTransactionDetailsByTxHash(ctx context.Contex
 			}
 		} else if tse.TxStatus.TxStatusVal == data.TxStatusValUnshieldedinclusion {
 			txStatus = UnshieldedInclusion
-			if tse.Slot.Valid {
-				inclusionSlot = tse.Slot.Int64
-			}
+			effectiveInclusionTime = tse.DecryptedTxCreatedAtUnix
+			inclusionDelay = effectiveInclusionTime - tse.CreatedAt.Time.Unix()
 		} else if tse.TxStatus.TxStatusVal == data.TxStatusValInvalid {
 			txStatus = Invalid
 			tse.BlockNumber = pgtype.Int8{Int64: 0, Valid: false}
