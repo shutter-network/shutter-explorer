@@ -3,7 +3,7 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom';  // MemoryRouter
 import { mount } from 'cypress/react18';
 import SearchBar from '../../src/components/SearchBar';
 import Transaction from '../../src/pages/Transaction';
-import { transactionData, verifyTransactionDetails } from '../utils/transactionUtils';
+import {transactionData, verifySubmittedTransactionDetails} from '../utils/transactionUtils';
 import { ThemeProvider as MUIThemeProvider } from '@mui/material/styles';
 import { ThemeProvider as StyledThemeProvider } from 'styled-components';
 import { muiTheme, customTheme } from '../../src/theme';
@@ -56,6 +56,6 @@ describe('<SearchBar /> and <Transaction /> data display test', () => {
 
         cy.wait('@getTransaction');
 
-        verifyTransactionDetails(transactionData);
+        verifySubmittedTransactionDetails(transactionData);
     });
 });

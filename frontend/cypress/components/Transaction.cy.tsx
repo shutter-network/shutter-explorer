@@ -2,14 +2,20 @@ import React from 'react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { mount } from 'cypress/react18';
 import Transaction from '../../src/pages/Transaction';
-import { transactionData, updatedTransactionData, verifyTransactionDetails, verifyTransactionDetailsUpdated } from '../utils/transactionUtils';
+import {
+    pendingTransactionData,
+    transactionData,
+    updatedTransactionData, verifyPendingTransactionDetails, verifySubmittedTransactionDetails,
+    verifyTransactionDetailsUpdated
+} from '../utils/transactionUtils';
 import {customTheme, muiTheme} from "../../src/theme";
 import { ThemeProvider as MUIThemeProvider } from '@mui/material/styles';
 import { ThemeProvider as StyledThemeProvider } from 'styled-components';
 
 
 describe('<Transaction />', () => {
-    it('renders the transaction details correctly', () => {
+
+    it('renders a transaction with submitted status correctly', () => {
         cy.intercept('GET', `/api/transaction/${transactionData.UserTxHash}`, {
             statusCode: 200,
             body: { message: transactionData },
@@ -29,7 +35,30 @@ describe('<Transaction />', () => {
         );
 
         cy.wait('@getTransaction');
-        verifyTransactionDetails(transactionData);
+        verifySubmittedTransactionDetails(transactionData);
+    });
+
+    it('renders a transaction with pending user transaction status correctly', () => {
+        cy.intercept('GET', `/api/transaction/${pendingTransactionData.UserTxHash}`, {
+            statusCode: 200,
+            body: { message: pendingTransactionData },
+        }).as('getTransaction');
+
+        mount(
+            <MUIThemeProvider theme={muiTheme}>
+                <StyledThemeProvider theme={customTheme}>
+
+                    <MemoryRouter initialEntries={[`/transaction-details/${pendingTransactionData.UserTxHash}`]}>
+                        <Routes>
+                            <Route path="/transaction-details/:txHash" element={<Transaction />} />
+                        </Routes>
+                    </MemoryRouter>
+                </StyledThemeProvider>
+            </MUIThemeProvider>
+        );
+
+        cy.wait('@getTransaction');
+        verifyPendingTransactionDetails(pendingTransactionData);
     });
 
     it('updates the transaction details after polling', () => {
@@ -52,9 +81,9 @@ describe('<Transaction />', () => {
         );
 
         cy.wait('@getTransaction');
-        verifyTransactionDetails(transactionData);
+        verifySubmittedTransactionDetails(transactionData);
 
-        cy.intercept('GET', `/api/transaction/${transactionData.UserTxHash}`, {
+        cy.intercept('GET', `/api/transaction/${updatedTransactionData.UserTxHash}`, {
             statusCode: 200,
             body: { message: updatedTransactionData },
         }).as('getUpdatedTransaction');

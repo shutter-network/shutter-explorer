@@ -1,9 +1,37 @@
-import { StrictMode } from 'react';
+import { FC, StrictMode, useEffect } from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { WebSocketProvider } from './context/WebSocketContext';
+
+const initializeMatomo = () => {
+    const _paq = (window as any)._paq = (window as any)._paq || [];
+    _paq.push(['trackPageView']);
+    _paq.push(['enableLinkTracking']);
+
+    const matomoURL = 'https://shutter.matomo.cloud/';
+    _paq.push(['setTrackerUrl', matomoURL + 'matomo.php']);
+    _paq.push(['setSiteId', '5']);
+
+    const scriptElement = document.createElement('script');
+    scriptElement.async = true;
+    scriptElement.src = 'https://cdn.matomo.cloud/shutter.matomo.cloud/matomo.js';
+
+    const firstScript = document.getElementsByTagName('script')[0];
+    firstScript.parentNode?.insertBefore(scriptElement, firstScript);
+};
+
+const MatomoInitializer: FC = () => {
+    useEffect(() => {
+        // Only initialize Matomo if the environment is 'production'
+        if (process.env.REACT_APP_ENV === 'production') {
+            console.log("Initializing Matomo Tracking!")
+            initializeMatomo();
+        }
+    }, []);
+    return null;
+};
 
 const root = ReactDOM.createRoot(
     document.getElementById('root') as HTMLElement
@@ -11,6 +39,7 @@ const root = ReactDOM.createRoot(
 
 root.render(
     <StrictMode>
+        <MatomoInitializer />
         <WebSocketProvider>
             <App />
         </WebSocketProvider>
