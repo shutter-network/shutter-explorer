@@ -24,8 +24,8 @@ const initializeMatomo = () => {
 
 const MatomoInitializer: FC = () => {
     useEffect(() => {
-        // Only initialize Matomo if the environment is 'staging'
-        if (process.env.REACT_APP_ENV === 'staging') {
+        // Only initialize Matomo if the environment is 'production'
+        if (process.env.REACT_APP_ENV === 'production') {
             console.log("Initializing Matomo Tracking!")
             initializeMatomo();
         }
