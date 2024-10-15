@@ -9,7 +9,6 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/jackc/pgx/v5"
-	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/rs/zerolog/log"
 	"github.com/shutter-network/shutter-explorer/backend/internal/data"
@@ -42,13 +41,12 @@ type QueryTransactionDetailResp struct {
 	SequencerTxHash        string
 	UserTxHash             string
 	TxStatus               string
-	InclusionSlot          int64
+	InclusionSlot          *int64
 	SequencerTxSubmittedAt int64
 	DecryptedTxCreatedAt   int64
-	EffectiveInclusionTime int64
-	EstimatedInclusionTime int64
-	InclusionDelay         int64
-	BlockNumber            int64
+	InclusionTime          *int64
+	InclusionDelay         *int64
+	BlockNumber            *int64
 }
 
 func NewTransactionUsecase(
@@ -215,34 +213,36 @@ func (uc *TransactionUsecase) QueryTransactionDetailsByTxHash(ctx context.Contex
 		return nil, &err
 	}
 
-	var effectiveInclusionTime int64
-	var inclusionSlot int64
-	var inclusionDelay int64
+	var inclusionTime *int64
+	var inclusionSlot *int64
+	var inclusionDelay *int64
+	var blockNumber *int64
 	txStatus := Submitted
 	if tse.TxStatus.Valid {
 		if tse.TxStatus.TxStatusVal == data.TxStatusValShieldedinclusion {
 			txStatus = ShieldedInclusion
-			effectiveInclusionTime = tse.DecryptedTxCreatedAtUnix
-			inclusionDelay = effectiveInclusionTime - tse.CreatedAt.Time.Unix()
+			inclusionTime = &tse.DecryptedTxUpdatedAtUnix
+			sub := *inclusionTime - tse.CreatedAt.Time.Unix()
+			inclusionDelay = &sub
 			if tse.Slot.Valid {
-				inclusionSlot = tse.Slot.Int64
+				inclusionSlot = &tse.Slot.Int64
+			}
+			if tse.BlockNumber.Valid {
+				blockNumber = &tse.BlockNumber.Int64
 			}
 		} else if tse.TxStatus.TxStatusVal == data.TxStatusValUnshieldedinclusion {
 			txStatus = UnshieldedInclusion
-			effectiveInclusionTime = tse.DecryptedTxUpdatedAtUnix
-			inclusionDelay = effectiveInclusionTime - tse.CreatedAt.Time.Unix()
+			inclusionTime = &tse.DecryptedTxUpdatedAtUnix
+			sub := *inclusionTime - tse.CreatedAt.Time.Unix()
+			inclusionDelay = &sub
 		} else if tse.TxStatus.TxStatusVal == data.TxStatusValInvalid {
 			txStatus = Invalid
-			tse.BlockNumber = pgtype.Int8{Int64: 0, Valid: false}
 		} else if tse.TxStatus.TxStatusVal == data.TxStatusValPending {
 			txStatus = PendingUserTransaction
-			tse.BlockNumber = pgtype.Int8{Int64: 0, Valid: false}
 		} else if tse.TxStatus.TxStatusVal == data.TxStatusValNotdecrypted {
 			txStatus = CannotBeDecrypted
-			tse.BlockNumber = pgtype.Int8{Int64: 0, Valid: false}
 		} else if tse.TxStatus.TxStatusVal == data.TxStatusValNotincluded {
 			txStatus = NotIncluded
-			tse.BlockNumber = pgtype.Int8{Int64: 0, Valid: false}
 		}
 	}
 
@@ -279,7 +279,13 @@ func (uc *TransactionUsecase) QueryTransactionDetailsByTxHash(ctx context.Contex
 		)
 		return nil, &err
 	}
-	estimatedInclusionTime := (int64(totalGnosisValidators) / totalRegisteredValidators) * int64(slotDuration)
+
+	if txStatus == Submitted || txStatus == PendingUserTransaction {
+		duration := (int64(totalGnosisValidators) / totalRegisteredValidators) * int64(slotDuration)
+		inclusionDelay = &duration
+		sub := tse.CreatedAt.Time.Unix() + *inclusionDelay
+		inclusionTime = &sub
+	}
 
 	var userTxHash string
 	if len(tse.UserTxHash) > 0 {
@@ -299,10 +305,9 @@ func (uc *TransactionUsecase) QueryTransactionDetailsByTxHash(ctx context.Contex
 		InclusionSlot:          inclusionSlot,
 		SequencerTxSubmittedAt: int64(tse.CreatedAtUnix),
 		DecryptedTxCreatedAt:   tse.DecryptedTxCreatedAtUnix,
-		EffectiveInclusionTime: effectiveInclusionTime,
-		EstimatedInclusionTime: estimatedInclusionTime,
+		InclusionTime:          inclusionTime,
 		InclusionDelay:         inclusionDelay,
-		BlockNumber:            tse.BlockNumber.Int64,
+		BlockNumber:            blockNumber,
 	}
 	return resp, nil
 }
