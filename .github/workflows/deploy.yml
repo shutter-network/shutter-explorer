@@ -7,9 +7,28 @@ on:
         - staging
 
 jobs:
+    run_cypress_tests:
+      runs-on: ubuntu-latest
+
+      steps:
+        - name: Checkout code
+          uses: actions/checkout@v3
+
+        - name: Install Node.js
+          uses: actions/setup-node@v3
+          with:
+            node-version: '20.12.2'
+
+        - name: Install dependencies
+          run: npm install
+
+        - name: Run Cypress component tests
+          run: npx cypress run --component
+
     deploy_instance_staging:
         if: github.ref == 'refs/heads/staging'
         runs-on: ubuntu-latest
+        needs: run_cypress_tests
 
         steps:
             - name: Checkout code
@@ -20,7 +39,7 @@ jobs:
                 mkdir -p ~/.ssh
                 echo "${{ secrets.SERVER_KEY }}" > ~/.ssh/id_ed25519 && chmod 600 ~/.ssh/id_ed25519
 
-            - name: Deploy to Instance 1
+            - name: Deploy to Staging
               run: >
                 ssh -o StrictHostKeyChecking=no ${{secrets.STAGING_SERVER_USER}}@${{secrets.STAGING_SERVER_HOST}}
                 "set -x && cd /root/shutter-explorer && git pull origin staging && git submodule update --init --recursive && cd docker && docker compose up -d --build"
@@ -28,6 +47,7 @@ jobs:
     deploy_instance_prod:
         if: github.ref == 'refs/heads/main'
         runs-on: ubuntu-latest
+        needs: run_cypress_tests
 
         steps:
             - name: Checkout code
@@ -38,7 +58,7 @@ jobs:
                 mkdir -p ~/.ssh
                 echo "${{ secrets.SERVER_KEY }}" > ~/.ssh/id_ed25519 && chmod 600 ~/.ssh/id_ed25519
 
-            - name: Deploy to Instance
+            - name: Deploy to Production
               run: >
                 ssh -o StrictHostKeyChecking=no ${{secrets.PROD_SERVER_USER}}@${{secrets.PROD_SERVER_HOST}}
                 "set -x && cd /root/shutter-explorer && git pull origin main && git submodule update --init --recursive && cd docker && docker compose up -d --build"

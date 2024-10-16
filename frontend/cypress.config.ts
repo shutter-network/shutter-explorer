@@ -11,15 +11,12 @@ export default defineConfig({
     REACT_APP_EXPLORER_URL: process.env.REACT_APP_EXPLORER_URL,
   },
   component: {
+    specPattern: 'cypress/components/**/*.cy.{js,jsx,ts,tsx}',
     devServer: {
       framework: "create-react-app",
       bundler: "webpack",
     },
-    viewportWidth: 1280, // Set your desired width
-    viewportHeight: 720, // Set your desired height
+    viewportWidth: 1280,
+    viewportHeight: 720,
   },
-  e2e: {
-    viewportWidth: 1280, // Set your desired width for e2e tests if you're using them
-    viewportHeight: 720, // Set your desired height for e2e tests if you're using them
-  }
 });
