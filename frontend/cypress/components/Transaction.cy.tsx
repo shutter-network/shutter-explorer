@@ -4,17 +4,15 @@ import { mount } from 'cypress/react18';
 import Transaction from '../../src/pages/Transaction';
 import {
     pendingTransactionData,
-    transactionData,
-    updatedTransactionData, verifyPendingTransactionDetails, verifySubmittedTransactionDetails,
-    verifyTransactionDetailsUpdated
+    transactionData, updatedTransactionData, verifyPendingTransactionDetails,
+    verifySubmittedTransactionDetails, verifyTransactionDetailsUpdated,
 } from '../utils/transactionUtils';
-import {customTheme, muiTheme} from "../../src/theme";
+import { customTheme, muiTheme } from "../../src/theme";
 import { ThemeProvider as MUIThemeProvider } from '@mui/material/styles';
 import { ThemeProvider as StyledThemeProvider } from 'styled-components';
 
 
 describe('<Transaction />', () => {
-
     it('renders a transaction with submitted status correctly', () => {
         cy.intercept('GET', `/api/transaction/${transactionData.UserTxHash}`, {
             statusCode: 200,
@@ -25,11 +23,11 @@ describe('<Transaction />', () => {
             <MUIThemeProvider theme={muiTheme}>
                 <StyledThemeProvider theme={customTheme}>
 
-                <MemoryRouter initialEntries={[`/transaction-details/${transactionData.UserTxHash}`]}>
-                <Routes>
-                    <Route path="/transaction-details/:txHash" element={<Transaction />} />
-                </Routes>
-            </MemoryRouter>
+                    <MemoryRouter initialEntries={[`/transaction-details/${transactionData.UserTxHash}`]}>
+                        <Routes>
+                            <Route path="/transaction-details/:txHash" element={<Transaction />} />
+                        </Routes>
+                    </MemoryRouter>
                 </StyledThemeProvider>
             </MUIThemeProvider>
         );
@@ -70,11 +68,11 @@ describe('<Transaction />', () => {
         mount(
             <MUIThemeProvider theme={muiTheme}>
                 <StyledThemeProvider theme={customTheme}>
-                <MemoryRouter initialEntries={[`/transaction-details/${transactionData.UserTxHash}`]}>
-                <Routes>
-                    <Route path="/transaction-details/:txHash" element={<Transaction />} />
-                </Routes>
-            </MemoryRouter>
+                    <MemoryRouter initialEntries={[`/transaction-details/${transactionData.UserTxHash}`]}>
+                        <Routes>
+                            <Route path="/transaction-details/:txHash" element={<Transaction />} />
+                        </Routes>
+                    </MemoryRouter>
                 </StyledThemeProvider>
             </MUIThemeProvider>
 
@@ -104,11 +102,11 @@ describe('<Transaction />', () => {
             <MUIThemeProvider theme={muiTheme}>
                 <StyledThemeProvider theme={customTheme}>
 
-                <MemoryRouter initialEntries={['/transaction-details/invalid-hash']}>
-                <Routes>
-                    <Route path="/transaction-details/:txHash" element={<Transaction />} />
-                </Routes>
-            </MemoryRouter>
+                    <MemoryRouter initialEntries={['/transaction-details/invalid-hash']}>
+                        <Routes>
+                            <Route path="/transaction-details/:txHash" element={<Transaction />} />
+                        </Routes>
+                    </MemoryRouter>
                 </StyledThemeProvider>
             </MUIThemeProvider>
         );
