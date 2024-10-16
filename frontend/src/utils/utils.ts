@@ -47,16 +47,16 @@ export const getTimeAgo = (timestamp: number): string => {
 
 export const formatSeconds = (seconds: number): string => {
   if (seconds < 60) {
-    return `${seconds} ${seconds == 1 ? 'second' : 'seconds'}`;
+    return `${seconds} ${seconds === 1 ? 'second' : 'seconds'}`;
   } else if (seconds < 3600) {
     const minutes = Math.floor(seconds / 60);
-    return `${minutes} ${minutes == 1 ? 'minute' : 'minutes'}`;
+    return `${minutes} ${minutes === 1 ? 'minute' : 'minutes'}`;
   } else if (seconds < 86400) {
     const hours = Math.floor(seconds / 3600);
-    return `${hours} ${hours == 1 ? 'hour' : 'hours'}`;
+    return `${hours} ${hours === 1 ? 'hour' : 'hours'}`;
   } else {
     const days = Math.floor(seconds / 86400);
-    return `${days} ${days == 1 ? 'day' : 'days'}`;
+    return `${days} ${days === 1 ? 'day' : 'days'}`;
   }
 }
 
@@ -67,16 +67,16 @@ export const formatTimestamp = (ago: boolean, unixTimestamp: number): string => 
 
   let timeAgo: string;
   if (secondsAgo < 60) {
-    timeAgo = `${secondsAgo} secs ago`;
+    timeAgo = `${secondsAgo} ${secondsAgo === 1 ? 'sec' : 'secs'} ago`;
   } else if (secondsAgo < 3600) {
     const minutesAgo = Math.floor(secondsAgo / 60);
-    timeAgo = `${minutesAgo} mins ago`;
+    timeAgo = `${minutesAgo} ${minutesAgo === 1 ? 'min' : 'mins'} ago`;
   } else if (secondsAgo < 86400) {
     const hoursAgo = Math.floor(secondsAgo / 3600);
-    timeAgo = `${hoursAgo} hours ago`;
+    timeAgo = `${hoursAgo} ${hoursAgo === 1 ? 'hour' : 'hours'} ago`;
   } else {
     const daysAgo = Math.floor(secondsAgo / 86400);
-    timeAgo = `${daysAgo} days ago`;
+    timeAgo = `${daysAgo} ${daysAgo === 1 ? 'day' : 'days'} ago`;
   }
 
   const date = new Date(unixTimestamp * 1000);
