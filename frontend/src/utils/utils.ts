@@ -47,36 +47,36 @@ export const getTimeAgo = (timestamp: number): string => {
 
 export const formatSeconds = (seconds: number): string => {
   if (seconds < 60) {
-    return `${seconds} seconds`;
+    return `${seconds} ${seconds === 1 ? 'second' : 'seconds'}`;
   } else if (seconds < 3600) {
     const minutes = Math.floor(seconds / 60);
-    return `${minutes} minutes`;
+    return `${minutes} ${minutes === 1 ? 'minute' : 'minutes'}`;
   } else if (seconds < 86400) {
     const hours = Math.floor(seconds / 3600);
-    return `${hours} hours`;
+    return `${hours} ${hours === 1 ? 'hour' : 'hours'}`;
   } else {
     const days = Math.floor(seconds / 86400);
-    return `${days} days`;
+    return `${days} ${days === 1 ? 'day' : 'days'}`;
   }
 }
 
-export const formatTimestamp = (unixTimestamp: number): string => {
+export const formatTimestamp = (ago: boolean, unixTimestamp: number): string => {
   const now = Date.now();
   const timeDifference = now - unixTimestamp * 1000;
   const secondsAgo = Math.floor(timeDifference / 1000);
 
   let timeAgo: string;
   if (secondsAgo < 60) {
-    timeAgo = `${secondsAgo} secs ago`;
+    timeAgo = `${secondsAgo} ${secondsAgo === 1 ? 'sec' : 'secs'} ago`;
   } else if (secondsAgo < 3600) {
     const minutesAgo = Math.floor(secondsAgo / 60);
-    timeAgo = `${minutesAgo} mins ago`;
+    timeAgo = `${minutesAgo} ${minutesAgo === 1 ? 'min' : 'mins'} ago`;
   } else if (secondsAgo < 86400) {
     const hoursAgo = Math.floor(secondsAgo / 3600);
-    timeAgo = `${hoursAgo} hours ago`;
+    timeAgo = `${hoursAgo} ${hoursAgo === 1 ? 'hour' : 'hours'} ago`;
   } else {
     const daysAgo = Math.floor(secondsAgo / 86400);
-    timeAgo = `${daysAgo} days ago`;
+    timeAgo = `${daysAgo} ${daysAgo === 1 ? 'day' : 'days'} ago`;
   }
 
   const date = new Date(unixTimestamp * 1000);
@@ -96,7 +96,11 @@ export const formatTimestamp = (unixTimestamp: number): string => {
 
   const formattedDate = `${day}-${month}-${year} ${formattedHours}:${minutes}:${seconds} ${period} UTC`;
 
-  return `${timeAgo} (${formattedDate})`;
+  if (ago) {
+    return `${timeAgo} (${formattedDate})`;
+  } else {
+    return `${formattedDate}`;
+  }
 }
 
 export const truncateString = (str: string, num: number): string => {
@@ -115,18 +119,18 @@ export const truncateDecimals = (num: number): string => {
 }
 
 export const formatTime = (seconds: number | undefined): string => {
-  if (seconds){
-    if (seconds >= 86400){
-      let days = seconds/86400
+  if (seconds) {
+    if (seconds >= 86400) {
+      let days = seconds / 86400
       return `${truncateDecimals(days)}d`
-    }else if (seconds >= 3600) {
-        let hours = Math.floor(seconds / 3600);
-        return `${hours}h`;
+    } else if (seconds >= 3600) {
+      let hours = Math.floor(seconds / 3600);
+      return `${hours}h`;
     } else if (seconds >= 60) {
-        let minutes = Math.floor(seconds / 60);
-        return `${minutes}m`;
+      let minutes = Math.floor(seconds / 60);
+      return `${minutes}m`;
     } else {
-        return `${seconds}s`;
+      return `${seconds}s`;
     }
   }
   return ''

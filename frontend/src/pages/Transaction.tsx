@@ -11,14 +11,13 @@ import { useParams } from 'react-router-dom';
 
 interface TransactionDetails {
     TxStatus: string;
-    EstimatedInclusionTime: number;
-    EffectiveInclusionTime: number;
+    InclusionTime: number | null;
     UserTxHash: string;
     SequencerTxHash: string;
-    InclusionSlot: number;
+    InclusionSlot: number | null;
     Sender: string;
-    InclusionDelay: number;
-    BlockNumber: number;
+    InclusionDelay: number | null;
+    BlockNumber: number | null;
 }
 
 const Transaction: FC = () => {
@@ -36,7 +35,8 @@ const Transaction: FC = () => {
     }, [updatedData]);
 
     const statusesWithBlockNumber = ['Shielded inclusion'];
-
+    const statusesWithEffectiveInclusionTime = ['Shielded inclusion', 'Unshielded inclusion']
+    const statusesWithEstimatedeInclusionTime = ['Submitted', 'Pending user transaction']
 
     if (!transaction) {
         return (
@@ -64,10 +64,10 @@ const Transaction: FC = () => {
 
                     </Grid>
                     <Grid size={{ xs: 12, sm: 8 }}>
-                        {transaction.UserTxHash!==""?
+                        {transaction.UserTxHash !== "" ?
                             <Link href={`${explorerUrl}/tx/${transaction.UserTxHash}`} target="_blank" rel="noopener noreferrer" className="hash">
                                 {transaction.UserTxHash}
-                            </Link>:
+                            </Link> :
                             <Typography variant="body1" className="card-value">N/A</Typography>}
 
                     </Grid>
@@ -89,20 +89,24 @@ const Transaction: FC = () => {
 
 
                     {/* Inclusion Slot */}
-                    <Grid size={{ xs: 'auto', sm: 4 }}>
-                        <Box display="flex" alignItems="center" gap={1}>
-                            <Typography variant="body1" fontWeight="bold" className="card-label" textAlign="left">Inclusion Slot</Typography>
-                            <Tooltip title="Slot in which the transaction was included">
-                                <InfoIcon />
-                            </Tooltip>
-                        </Box>
-                    </Grid>
-                    <Grid size={{ xs: 12, sm: 8 }}>
-                        <Typography variant="body1" className="card-value">{transaction.InclusionSlot!==0? transaction.InclusionSlot : "N/A"}</Typography>
-                    </Grid>
+                    {(transaction.BlockNumber) && statusesWithBlockNumber.includes(transaction.TxStatus) && (
+                        <>
+                            <Grid size={{ xs: 'auto', sm: 4 }}>
+                                <Box display="flex" alignItems="center" gap={1}>
+                                    <Typography variant="body1" fontWeight="bold" className="card-label" textAlign="left">Inclusion Slot</Typography>
+                                    <Tooltip title="Slot in which the transaction was included">
+                                        <InfoIcon />
+                                    </Tooltip>
+                                </Box>
+                            </Grid>
+                            <Grid size={{ xs: 12, sm: 8 }}>
+                                <Typography variant="body1" className="card-value">{transaction.InclusionSlot ? transaction.InclusionSlot : "N/A"}</Typography>
+                            </Grid>
+                        </>
+                    )}
 
                     {/* Block Number (conditionally rendered) */}
-                    {(transaction.BlockNumber !== 0) && statusesWithBlockNumber.includes(transaction.TxStatus) && (
+                    {(transaction.BlockNumber) && statusesWithBlockNumber.includes(transaction.TxStatus) && (
                         <>
                             <Grid size={{ xs: 'auto', sm: 4 }}>
                                 <Box display="flex" alignItems="center" gap={1}>
@@ -127,57 +131,75 @@ const Transaction: FC = () => {
                         </>
                     )}
 
-                    <Grid size={{ lg: 12 }}  sx={{display: { xs: 'none', sm: 'none', md: 'none', lg: 'block' }, }}>
+                    <Grid size={{ lg: 12 }} sx={{ display: { xs: 'none', sm: 'none', md: 'none', lg: 'block' }, }}>
                         <Divider></Divider>
                     </Grid>
 
-                    {
-                        transaction.EffectiveInclusionTime === 0 ?
-                            /* Estimated Inclusion Time */
-                            <>
-                                <Grid size={{ xs: 'auto', sm: 4 }}>
-                                    <Box display="flex" alignItems="center" gap={1}>
-                                        <Typography variant="body1" fontWeight="bold" className="card-label" textAlign="left">Estimated Inclusion Delay</Typography>
-                                        <Tooltip title="Estimated delay for the transaction to be included">
-                                            <InfoIcon />
-                                        </Tooltip>
-                                    </Box>
-                                </Grid>
-                                <Grid size={{ xs: 12, sm: 8 }}>
-                                    <Typography variant="body1" className="card-value">{formatSeconds(transaction.EstimatedInclusionTime)}</Typography>
-                                </Grid>
-                            </> :
-                            /* Effective Inclusion Time */
-                            <>
-                                <Grid size={{ xs: 'auto', sm: 4 }}>
-                                    <Box display="flex" alignItems="center" gap={1}>
-                                        <Typography variant="body1" fontWeight="bold" className="card-label" textAlign="left">Effective Inclusion Time</Typography>
-                                        <Tooltip title="Time in which the transaction was included">
-                                            <InfoIcon />
-                                        </Tooltip>
-                                    </Box>
-                                </Grid>
-                                <Grid size={{ xs: 12, sm: 8 }}>
-                                    <Typography variant="body1" className="card-value">{formatTimestamp(transaction.EffectiveInclusionTime)}</Typography>
-                                </Grid>
+                    {transaction.InclusionTime && statusesWithEstimatedeInclusionTime.includes(transaction.TxStatus) && (
+                        /* Estimated Inclusion Time */
+                        <>
+                            <Grid size={{ xs: 'auto', sm: 4 }}>
+                                <Box display="flex" alignItems="center" gap={1}>
+                                    <Typography variant="body1" fontWeight="bold" className="card-label" textAlign="left">Estimated Inclusion Time</Typography>
+                                    <Tooltip title="Estimated time in which transaction should be included">
+                                        <InfoIcon />
+                                    </Tooltip>
+                                </Box>
+                            </Grid>
+                            <Grid size={{ xs: 12, sm: 8 }}>
+                                <Typography variant="body1" className="card-value">{formatTimestamp(false, transaction.InclusionTime)}</Typography>
+                            </Grid>
 
-                                <Grid size={{ xs: 'auto', sm: 4 }}>
-                                    <Box display="flex" alignItems="center" gap={1}>
-                                        <Typography variant="body1" fontWeight="bold" className="card-label" textAlign="left">Inclusion Delay</Typography>
-                                        <Tooltip title="Time taken for tx to be included">
-                                            <InfoIcon />
-                                        </Tooltip>
-                                    </Box>
-                                </Grid>
-                                <Grid size={{ xs: 12, sm: 8 }}>
-                                    <Typography variant="body1" className="card-value">{formatSeconds(transaction.InclusionDelay)}</Typography>
-                                </Grid>
+                            <Grid size={{ xs: 'auto', sm: 4 }}>
+                                <Box display="flex" alignItems="center" gap={1}>
+                                    <Typography variant="body1" fontWeight="bold" className="card-label" textAlign="left">Estimated Inclusion Delay</Typography>
+                                    <Tooltip title="Time it might take for tx to be included">
+                                        <InfoIcon />
+                                    </Tooltip>
+                                </Box>
+                            </Grid>
+                            <Grid size={{ xs: 12, sm: 8 }}>
+                                <Typography variant="body1" className="card-value">{transaction.InclusionDelay ? formatSeconds(transaction.InclusionDelay) : 'N/A'}</Typography>
+                            </Grid>
 
-                                <Grid size={{ lg: 12 }}  sx={{display: { xs: 'none', sm: 'none', md: 'none', lg: 'block' }, }}>
-                                    <Divider></Divider>
-                                </Grid>
-                            </>
-                    }
+                            <Grid size={{ lg: 12 }} sx={{ display: { xs: 'none', sm: 'none', md: 'none', lg: 'block' }, }}>
+                                <Divider></Divider>
+                            </Grid>
+                        </>
+                    )}
+
+                    {transaction.InclusionTime && statusesWithEffectiveInclusionTime.includes(transaction.TxStatus) && (
+                        /* Effective Inclusion Time */
+                        <>
+                            <Grid size={{ xs: 'auto', sm: 4 }}>
+                                <Box display="flex" alignItems="center" gap={1}>
+                                    <Typography variant="body1" fontWeight="bold" className="card-label" textAlign="left">Effective Inclusion Time</Typography>
+                                    <Tooltip title="Time in which the transaction was included">
+                                        <InfoIcon />
+                                    </Tooltip>
+                                </Box>
+                            </Grid>
+                            <Grid size={{ xs: 12, sm: 8 }}>
+                                <Typography variant="body1" className="card-value">{formatTimestamp(true, transaction.InclusionTime)}</Typography>
+                            </Grid>
+
+                            <Grid size={{ xs: 'auto', sm: 4 }}>
+                                <Box display="flex" alignItems="center" gap={1}>
+                                    <Typography variant="body1" fontWeight="bold" className="card-label" textAlign="left">Effective Inclusion Delay</Typography>
+                                    <Tooltip title="Time taken for tx to be included">
+                                        <InfoIcon />
+                                    </Tooltip>
+                                </Box>
+                            </Grid>
+                            <Grid size={{ xs: 12, sm: 8 }}>
+                                <Typography variant="body1" className="card-value">{transaction.InclusionDelay ? formatSeconds(transaction.InclusionDelay) : 'N/A'}</Typography>
+                            </Grid>
+
+                            <Grid size={{ lg: 12 }} sx={{ display: { xs: 'none', sm: 'none', md: 'none', lg: 'block' }, }}>
+                                <Divider></Divider>
+                            </Grid>
+                        </>
+                    )}
 
                     {/* Transaction Status */}
                     <Grid size={{ xs: 'auto', sm: 4 }}>
@@ -187,7 +209,7 @@ const Transaction: FC = () => {
                         <Typography variant="body1" className={`tx-status status-${transaction.TxStatus.replace(/\s+/g, "-")}`}>{transaction.TxStatus}</Typography>
                     </Grid>
 
-                    <Grid size={{ lg: 12 }}  sx={{display: { xs: 'none', sm:'none', md: 'none', lg: 'block' }, }}>
+                    <Grid size={{ lg: 12 }} sx={{ display: { xs: 'none', sm: 'none', md: 'none', lg: 'block' }, }}>
                         <Divider></Divider>
                     </Grid>
 
