@@ -3,6 +3,7 @@ package usecase
 import (
 	"context"
 	"encoding/hex"
+	"fmt"
 	"net/http"
 	"os"
 	"strconv"
@@ -191,7 +192,15 @@ func (uc *TransactionUsecase) QueryTransactionDetailsByTxHash(ctx context.Contex
 			return nil, &err
 		}
 	} else {
-		txHashBytes = common.HexToHash(erpcTX.EncryptedTxHash).Bytes()
+		if len(erpcTX) > 0 {
+			if txHash == erpcTX[0].EncryptedTxHash {
+				fmt.Println("encrypted tx enc called")
+				txHashBytes = common.HexToHash(erpcTX[0].EncryptedTxHash).Bytes()
+			} else {
+				fmt.Println("user tx enc called")
+				txHashBytes = common.HexToHash(erpcTX[0].UserTxHash).Bytes()
+			}
+		}
 	}
 
 	tse, err := uc.observerDBQuery.QueryTransactionDetailsByTxHash(ctx, txHashBytes)
@@ -291,8 +300,8 @@ func (uc *TransactionUsecase) QueryTransactionDetailsByTxHash(ctx context.Contex
 	if len(tse.UserTxHash) > 0 {
 		userTxHash = "0x" + hex.EncodeToString(tse.UserTxHash)
 	} else {
-		if erpcTxErr == nil {
-			userTxHash = erpcTX.UserTxHash
+		if len(erpcTX) > 0 {
+			userTxHash = erpcTX[0].UserTxHash
 		}
 	}
 

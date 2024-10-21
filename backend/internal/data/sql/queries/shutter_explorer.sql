@@ -139,12 +139,11 @@ SELECT tx_hash, EXTRACT(EPOCH FROM created_at)::BIGINT AS included_timestamp
 FROM decrypted_tx 
 WHERE slot = $1 AND tx_status = 'shielded inclusion';
 
--- name: QueryFromTransactionDetails :one
+-- name: QueryFromTransactionDetails :many
 SELECT tx_hash as user_tx_hash, encrypted_tx_hash
 FROM transaction_details 
 WHERE tx_hash = $1 OR encrypted_tx_hash = $1
-ORDER BY submission_time DESC
-LIMIT 1;
+ORDER BY submission_time DESC;
 
 -- name: QueryTransactionDetailsByTxHash :one
 WITH prioritized_tx AS (

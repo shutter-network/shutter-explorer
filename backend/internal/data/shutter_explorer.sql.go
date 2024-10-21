@@ -84,12 +84,11 @@ func (q *Queries) QueryExecutedTransactionStats(ctx context.Context) ([]QueryExe
 	return items, nil
 }
 
-const queryFromTransactionDetails = `-- name: QueryFromTransactionDetails :one
+const queryFromTransactionDetails = `-- name: QueryFromTransactionDetails :many
 SELECT tx_hash as user_tx_hash, encrypted_tx_hash
 FROM transaction_details 
 WHERE tx_hash = $1 OR encrypted_tx_hash = $1
 ORDER BY submission_time DESC
-LIMIT 1
 `
 
 type QueryFromTransactionDetailsRow struct {
@@ -97,11 +96,24 @@ type QueryFromTransactionDetailsRow struct {
 	EncryptedTxHash string
 }
 
-func (q *Queries) QueryFromTransactionDetails(ctx context.Context, txHash string) (QueryFromTransactionDetailsRow, error) {
-	row := q.db.QueryRow(ctx, queryFromTransactionDetails, txHash)
-	var i QueryFromTransactionDetailsRow
-	err := row.Scan(&i.UserTxHash, &i.EncryptedTxHash)
-	return i, err
+func (q *Queries) QueryFromTransactionDetails(ctx context.Context, txHash string) ([]QueryFromTransactionDetailsRow, error) {
+	rows, err := q.db.Query(ctx, queryFromTransactionDetails, txHash)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []QueryFromTransactionDetailsRow
+	for rows.Next() {
+		var i QueryFromTransactionDetailsRow
+		if err := rows.Scan(&i.UserTxHash, &i.EncryptedTxHash); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const queryGreeter = `-- name: QueryGreeter :many
