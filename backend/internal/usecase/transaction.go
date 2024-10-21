@@ -3,7 +3,6 @@ package usecase
 import (
 	"context"
 	"encoding/hex"
-	"fmt"
 	"net/http"
 	"os"
 	"strconv"
@@ -194,10 +193,8 @@ func (uc *TransactionUsecase) QueryTransactionDetailsByTxHash(ctx context.Contex
 	} else {
 		if len(erpcTX) > 0 {
 			if txHash == erpcTX[0].EncryptedTxHash {
-				fmt.Println("encrypted tx enc called")
 				txHashBytes = common.HexToHash(erpcTX[0].EncryptedTxHash).Bytes()
 			} else {
-				fmt.Println("user tx enc called")
 				txHashBytes = common.HexToHash(erpcTX[0].UserTxHash).Bytes()
 			}
 		}
