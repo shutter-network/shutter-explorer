@@ -32,7 +32,7 @@ const Transaction: FC = () => {
     const statusesWithEstimatedeInclusionTime = ['Submitted', 'Pending user transaction']
 
     useEffect(() => {
-        const finalisedStatuses = ['Shielded inclusion', 'Unshielded inclusion', 'invalid', 'not included', 'not decrypted']
+        const finalisedStatuses = ['Shielded inclusion', 'Unshielded inclusion', 'Invalid', 'Not included', 'Cannot be decrypted']
 
         if (updatedData) {
             setTransaction(updatedData.message as TransactionDetails);
