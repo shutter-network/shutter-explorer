@@ -147,17 +147,30 @@ ORDER BY submission_time DESC
 LIMIT 1;
 
 -- name: QueryTransactionDetailsByTxHash :one
-SELECT 
-    tse.event_tx_hash, tse.sender, FLOOR(EXTRACT(EPOCH FROM tse.created_at)) as created_at_unix, tse.created_at,
-    dt.tx_hash AS user_tx_hash, dt.tx_status, dt.slot, 
-    COALESCE(FLOOR(EXTRACT(EPOCH FROM dt.created_at)), 0)::BIGINT AS decrypted_tx_created_at_unix,
-    COALESCE(FLOOR(EXTRACT(EPOCH FROM dt.updated_at)), 0)::BIGINT AS decrypted_tx_updated_at_unix,
-    bk.block_number as block_number
-FROM transaction_submitted_event tse 
-LEFT JOIN decrypted_tx dt ON tse.id = dt.transaction_submitted_event_id
-LEFT JOIN block bk ON dt.slot = bk.slot
-WHERE tse.event_tx_hash = $1 OR dt.tx_hash = $1
+WITH prioritized_tx AS (
+    SELECT 
+        tse.event_tx_hash, tse.sender, 
+        FLOOR(EXTRACT(EPOCH FROM tse.created_at)) AS created_at_unix, 
+        tse.created_at,
+        dt.tx_hash AS user_tx_hash, dt.tx_status, dt.slot, 
+        COALESCE(FLOOR(EXTRACT(EPOCH FROM dt.created_at)), 0)::BIGINT AS decrypted_tx_created_at_unix,
+        COALESCE(FLOOR(EXTRACT(EPOCH FROM dt.updated_at)), 0)::BIGINT AS decrypted_tx_updated_at_unix,
+        bk.block_number AS block_number,
+        CASE 
+            WHEN dt.tx_status = 'shielded inclusion' THEN 1
+            WHEN dt.tx_status = 'unshielded inclusion' THEN 2
+            ELSE 3
+        END AS priority
+    FROM transaction_submitted_event tse 
+    LEFT JOIN decrypted_tx dt ON tse.id = dt.transaction_submitted_event_id
+    LEFT JOIN block bk ON dt.slot = bk.slot
+    WHERE tse.event_tx_hash = $1 OR dt.tx_hash = $1
+)
+SELECT *
+FROM prioritized_tx
+ORDER BY priority
 LIMIT 1;
+
 
 -- name: QueryLatestSequencerTransactions :many
 SELECT ('0x' || encode(event_tx_hash, 'hex'))::TEXT AS sequencer_tx_hash, FLOOR(EXTRACT(EPOCH FROM created_at)) as created_at_unix
