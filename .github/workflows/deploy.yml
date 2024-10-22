@@ -3,71 +3,136 @@ name: Build and Deploy
 on:
   push:
     branches:
-        - main
-        - staging
+      - main
+      - staging
   pull_request:
     branches:
-        - main
-        - staging
-      
+      - main
+      - staging
 
 jobs:
-    run_cypress_tests:
-      runs-on: ubuntu-latest
+  run_cypress_tests:
+    runs-on: ubuntu-latest
 
-      steps:
-        - name: Checkout code
-          uses: actions/checkout@v3
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-        - name: Install Node.js
-          uses: actions/setup-node@v3
-          with:
-            node-version: '20.12.2'
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20.12.2'
 
-        - name: Install dependencies
-          run: |
-            cd frontend
-            npm install
+      - name: Install dependencies
+        run: |
+          cd frontend
+          npm install
 
-        - name: Run Cypress component tests
-          run: |
-            cd frontend
-            npx cypress run --component
+      - name: Run Cypress component tests
+        run: |
+          cd frontend
+          npx cypress run --component
 
-    deploy_instance_staging:
-        if: github.ref == 'refs/heads/staging' && github.event_name == 'push'
-        runs-on: ubuntu-latest
-        needs: run_cypress_tests
+  # Staging Deployment (with Tagging)
+  deploy_instance_staging:
+    if: github.ref == 'refs/heads/staging' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    needs: run_cypress_tests
 
-        steps:
-            - name: Checkout code
-              uses: actions/checkout@v3
-            
-            - name: Setup SSH
-              run: |
-                mkdir -p ~/.ssh
-                echo "${{ secrets.SERVER_KEY }}" > ~/.ssh/id_ed25519 && chmod 600 ~/.ssh/id_ed25519
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-            - name: Deploy to Staging
-              run: >
-                ssh -o StrictHostKeyChecking=no ${{secrets.STAGING_SERVER_USER}}@${{secrets.STAGING_SERVER_HOST}}
-                "set -x && cd /root/shutter-explorer && git pull origin staging && git submodule update --init --recursive && cd docker && docker compose up -d --build"
+      # Fetch tags to get the latest version tag
+      - name: Fetch tags
+        run: git fetch --tags
 
-    deploy_instance_prod:
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        runs-on: ubuntu-latest
-        needs: run_cypress_tests
+      # Determine version bump based on branch name
+      - name: Determine version bump
+        id: version_bump
+        run: |
+          # Get the latest tag (assuming semantic versioning format v1.2.3)
+          LATEST_TAG=$(git describe --tags $(git rev-list --tags --max-count=1))
 
-        steps:
-            - name: Checkout code
-              uses: actions/checkout@v3
+          # Default version bump is patch
+          VERSION_BUMP="patch"
 
-            - name: Setup SSH
-              run: |
-                mkdir -p ~/.ssh
-                echo "${{ secrets.SERVER_KEY }}" > ~/.ssh/id_ed25519 && chmod 600 ~/.ssh/id_ed25519
+          # Get the branch name from GitHub ref
+          BRANCH_NAME="${{ github.ref_name }}"
 
-            - name: Deploy to Production
-              run: >
-                ssh -o StrictHostKeyChecking=no ${{secrets.PROD_SERVER_USER}}@${{secrets.PROD_SERVER_HOST}}
-                "set -x && cd /root/shutter-explorer && git pull origin main && git submodule update --init --recursive && cd docker && docker compose up -d --build"
+          # Determine version bump based on branch name
+          if [[ "$BRANCH_NAME" == release/* ]]; then
+              VERSION_BUMP="major"
+          elif [[ "$BRANCH_NAME" == feat/* ]]; then
+              VERSION_BUMP="minor"
+          elif [[ "$BRANCH_NAME" == fix/* ]]; then
+              VERSION_BUMP="patch"
+          elif [[ "$BRANCH_NAME" == chore/* ]]; then
+              VERSION_BUMP="patch"
+          elif [[ "$BRANCH_NAME" == docs/* ]]; then
+              VERSION_BUMP="patch"
+          elif [[ "$BRANCH_NAME" == test/* ]]; then
+              VERSION_BUMP="patch"
+          else
+              echo "Error: Branch name must start with 'release/', 'feat/', 'fix/', 'chore/', 'docs/' or 'test/'."
+              exit 1  # Exit the workflow if the branch name doesn't match
+          fi
+
+          # Calculate the next version using semver
+          NEXT_VERSION=$(npx semver "$LATEST_TAG" -i $VERSION_BUMP)
+
+          echo "NEXT_VERSION=$NEXT_VERSION" >> $GITHUB_ENV
+          echo "Next version: $NEXT_VERSION"
+
+      # Create a new tag for the staging deployment
+      - name: Create and push new version tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag "v${{ env.NEXT_VERSION }}"
+          git push origin "v${{ env.NEXT_VERSION }}"
+
+      # Setup SSH for deployment
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SERVER_KEY }}" > ~/.ssh/id_ed25519 && chmod 600 ~/.ssh/id_ed25519
+
+      # Deploy to Staging
+      - name: Deploy to Staging
+        run: >
+          ssh -o StrictHostKeyChecking=no ${{secrets.STAGING_SERVER_USER}}@${{secrets.STAGING_SERVER_HOST}}
+          "set -x && cd /root/shutter-explorer && git pull origin staging && git submodule update --init --recursive && cd docker && docker compose up -d --build"
+
+  # Production Deployment (using the tag from staging)
+  deploy_instance_prod:
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    needs: run_cypress_tests
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Fetch tags to get the latest version tag from staging
+      - name: Fetch tags
+        run: git fetch --tags
+
+      # Get the latest tag from staging
+      - name: Get latest version tag
+        id: get_latest_tag
+        run: |
+          LATEST_TAG=$(git describe --tags $(git rev-list --tags --max-count=1))
+          echo "LATEST_TAG=$LATEST_TAG" >> $GITHUB_ENV
+
+      # Setup SSH for deployment
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SERVER_KEY }}" > ~/.ssh/id_ed25519 && chmod 600 ~/.ssh/id_ed25519
+
+      # Deploy to Production with the latest tag from staging
+      - name: Deploy to Production
+        run: >
+          ssh -o StrictHostKeyChecking=no ${{secrets.PROD_SERVER_USER}}@${{secrets.PROD_SERVER_HOST}}
+          "set -x && cd /root/shutter-explorer && git pull origin main && git submodule update --init --recursive && git checkout tags/${{ env.LATEST_TAG }} && cd docker && docker compose up -d --build"
