@@ -24,19 +24,26 @@ const Transaction: FC = () => {
     const explorerUrl = process.env.REACT_APP_EXPLORER_URL;
     let { txHash } = useParams();
     const [transaction, setTransaction] = useState<TransactionDetails | null>(null);
-    const { data: updatedData, loading, error } = useFetchWithPolling(`/api/transaction/${txHash}`, 10000);
+    const { data: updatedData, loading, error, setStopPolling } = useFetchWithPolling(`/api/transaction/${txHash}`, 10000);
 
-    useEffect(() => {
-        if (updatedData) {
-            setTransaction(updatedData.message as TransactionDetails);
-        } else {
-            setTransaction(null)
-        }
-    }, [updatedData]);
 
     const statusesWithBlockNumber = ['Shielded inclusion'];
     const statusesWithEffectiveInclusionTime = ['Shielded inclusion', 'Unshielded inclusion']
     const statusesWithEstimatedeInclusionTime = ['Submitted', 'Pending user transaction']
+
+    useEffect(() => {
+        const finalisedStatuses = ['Shielded inclusion', 'Unshielded inclusion', 'Invalid', 'Not included', 'Cannot be decrypted']
+
+        if (updatedData) {
+            setTransaction(updatedData.message as TransactionDetails);
+            if (transaction? finalisedStatuses.includes(transaction.TxStatus): false){
+                setStopPolling(true)
+            }
+        } else {
+            setTransaction(null)
+        }
+    }, [updatedData, setStopPolling, transaction]);
+
 
     if (!transaction) {
         return (
