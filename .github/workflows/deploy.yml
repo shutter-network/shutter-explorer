@@ -125,6 +125,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      # Install semver package (fix for missing semver)
+      - name: Install semver
+        run: npm install -g semver
+
       # Fetch tags to get the latest version tag from staging
       - name: Fetch tags
         run: git fetch --tags
