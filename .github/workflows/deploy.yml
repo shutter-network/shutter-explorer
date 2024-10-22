@@ -67,6 +67,12 @@ jobs:
 
           echo "Branch name: $BRANCH_NAME"
 
+          # Allow 'staging' and 'main' branches without a version bump
+          if [[ "$BRANCH_NAME" == "staging" || "$BRANCH_NAME" == "main" ]]; then
+              echo "No version bump required for 'staging' or 'main' branch."
+              exit 0
+          fi
+
           # Determine version bump based on branch name
           if [[ "$BRANCH_NAME" == release/* ]]; then
               VERSION_BUMP="major"
