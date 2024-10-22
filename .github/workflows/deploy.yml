@@ -47,7 +47,17 @@ jobs:
       - name: Fetch tags
         run: git fetch --tags
 
-      # Determine version bump based on branch name
+  # Version bump and tagging on pull_request event
+  determine_version_bump:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Fetch tags
+        run: git fetch --tags
+
       - name: Determine version bump
         id: version_bump
         run: |
@@ -57,21 +67,9 @@ jobs:
           # Default version bump is patch
           VERSION_BUMP="patch"
 
-          # Get the branch name based on the GitHub Actions environment
-          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
-              BRANCH_NAME="${{ github.head_ref }}"
-          else
-              BRANCH_NAME="${{ github.ref }}"
-              BRANCH_NAME=${BRANCH_NAME#refs/heads/}
-          fi
-
+          # Get the source branch name from the pull request
+          BRANCH_NAME="${{ github.head_ref }}"
           echo "Branch name: $BRANCH_NAME"
-
-          # Allow 'staging' and 'main' branches without a version bump
-          if [[ "$BRANCH_NAME" == "staging" || "$BRANCH_NAME" == "main" ]]; then
-              echo "No version bump required for 'staging' or 'main' branch."
-              exit 0
-          fi
 
           # Determine version bump based on branch name
           if [[ "$BRANCH_NAME" == release/* ]]; then
@@ -88,7 +86,7 @@ jobs:
               VERSION_BUMP="patch"
           else
               echo "Error: Branch name must start with 'release/', 'feat/', 'fix/', 'chore/', 'docs/' or 'test/'."
-              exit 1  # Exit the workflow if the branch name doesn't match
+              exit 1  # Exit if the branch name is not valid
           fi
 
           # Calculate the next version using semver
@@ -99,7 +97,6 @@ jobs:
 
       # Create a new tag for the staging deployment
       - name: Create and push new version tag
-        if: env.NEXT_VERSION != ''
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
