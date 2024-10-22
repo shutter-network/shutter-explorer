@@ -99,6 +99,7 @@ jobs:
 
       # Create a new tag for the staging deployment
       - name: Create and push new version tag
+        if: env.NEXT_VERSION != ''
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
