@@ -24,8 +24,7 @@ const calculateCurrentSlotAndEpoch = (genesisTime: number, slotDuration: number)
 const SlotProgression = () => {
     const [forceRefetch, setForceRefetch] = useState(false);
     const { data: slotData, loading: loadingSlots, error: errorSlots } = useFetch('/api/slot/top_5_epochs', forceRefetch);
-    const [currentEpochSlots, setCurrentEpochSlots] = useState<any[]>([]);
-    const [nextEpochSlots, setNextEpochSlots] = useState<any[]>([]);
+    const [epochsSlots, setEpochsSlots] = useState<any[]>([]);
     const [currentEpoch, setCurrentEpoch] = useState<number>(0);
     const [currentSlotIndex, setCurrentSlotIndex] = useState<number>(0);
 
@@ -38,22 +37,29 @@ const SlotProgression = () => {
             console.log('Initial slot data received from API:', slotData);
 
             const sortedSlots = slotData.message.sort((a: any, b: any) => a.Slot - b.Slot);
+
+            // Group slots by epochs present in the API data
+            const epochsMap = new Map<number, any[]>();
+            sortedSlots.forEach((slot: any) => {
+                const epoch = Math.floor(slot.Slot / 16);
+                if (!epochsMap.has(epoch)) {
+                    epochsMap.set(epoch, []);
+                }
+                epochsMap.get(epoch)?.push(slot);
+            });
+
+            const epochsData = Array.from(epochsMap.entries()).map(([epoch, slots]) => ({
+                epoch,
+                slots,
+            }));
+
+            setEpochsSlots(epochsData); // Set slots grouped by epochs
             const { currentEpoch, relativeSlotIndex } = calculateCurrentSlotAndEpoch(gnosisGenesisTime, slotDuration);
-
-            const currentEpochSlotsData = sortedSlots.filter(
-                (slot: any) => slot.Slot >= currentEpoch * 16 && slot.Slot < (currentEpoch + 1) * 16
-            );
-            const nextEpochSlotsData = sortedSlots.filter(
-                (slot: any) => slot.Slot >= (currentEpoch + 1) * 16 && slot.Slot < (currentEpoch + 2) * 16
-            );
-
-            setCurrentEpochSlots(currentEpochSlotsData); // Load current epoch slots
-            setNextEpochSlots(nextEpochSlotsData); // Preload next epoch slots
             setCurrentEpoch(currentEpoch);
             setCurrentSlotIndex(relativeSlotIndex);
 
-            console.log('Current Epoch Slots:', currentEpochSlotsData);
-            console.log('Next Epoch Slots:', nextEpochSlotsData);
+            console.log('Epochs Data:', epochsData);
+            console.log('Current Epoch:', currentEpoch, 'Current Slot Index:', relativeSlotIndex);
         } else {
             console.warn('Invalid slot data structure received from the API:', slotData);
         }
@@ -67,13 +73,11 @@ const SlotProgression = () => {
 
                 if (prevIndex < currentEpochEndSlot) {
                     console.log('Moving to the next slot within the current epoch');
-                    return prevIndex + 1; // Move to the next slot within the current epoch
+                    return prevIndex + 1;
                 } else {
                     console.log('Transitioning to the next epoch');
                     setCurrentEpoch((prevEpoch) => prevEpoch + 1);
-                    setCurrentEpochSlots(nextEpochSlots); // Use the preloaded next epoch slots as the current epoch slots
-                    setNextEpochSlots([]); // Clear the next epoch slots temporarily
-                    setForceRefetch((prev) => !prev); // Toggle the forceRefetch state to trigger a data refetch
+                    setForceRefetch((prev) => !prev); // Trigger a data refetch for new epoch data
 
                     return 0; // Reset slot index to the beginning of the new epoch
                 }
@@ -81,9 +85,7 @@ const SlotProgression = () => {
         }, slotDuration * 1000);
 
         return () => clearInterval(slotInterval);
-    }, [nextEpochSlots]);
-
-    const slotsToDisplay = currentEpochSlots;
+    }, []);
 
     const renderSlotBlock = (slot: any) => {
         const isCurrentSlot = slot.Slot === currentSlotIndex + currentEpoch * 16;
@@ -102,27 +104,45 @@ const SlotProgression = () => {
         );
     };
 
+    const currentEpochSlots = epochsSlots.find((epoch) => epoch.epoch === currentEpoch);
+    const currentSlotData = currentEpochSlots?.slots[currentSlotIndex];
+
     return (
-        <Box sx={{ flexGrow: 1, marginTop: 4 }}>
+        <Box sx={{ flexGrow: 1}}>
             {errorSlots ? (
                 <Alert severity="error">Error fetching Slot data: {errorSlots.message}</Alert>
             ) : (
                 <SlotDetailsWrapper>
-                    <Typography variant="h2" align="left">Epoch {currentEpoch}</Typography>
-                    <SlotVisualizer>
-                        {loadingSlots ? (
-                            <p>Loading slot progression...</p>
-                        ) : (
-                            slotsToDisplay.map((slot: any) => renderSlotBlock(slot))
-                        )}
-                    </SlotVisualizer>
+                    {loadingSlots ? (
+                        <p>Loading slot progression...</p>
+                    ) : (
+                        epochsSlots.map(({ epoch, slots }) => (
+                            <div key={epoch}>
+                                <Typography variant="h2" align="left" paddingTop={"20px"}>
+                                    Epoch {epoch}
+                                </Typography>
+                                <SlotVisualizer>
+                                    {slots.map((slot: any) => renderSlotBlock(slot))}
+                                </SlotVisualizer>
+                            </div>
+                        ))
+                    )}
 
                     <PreviousSlotDetails>
                         <Typography variant="h2" align="left">Slot Details</Typography>
                         <DetailsGrid>
-                            <DetailCard title="Slot number" value={slotsToDisplay[currentSlotIndex]?.Slot || 'N/A'} />
-                            <DetailCard title="Validator Index" value={slotsToDisplay[currentSlotIndex]?.ValidatorIndex || 'N/A'} />
-                            <DetailCard title="Shutterized" value={slotsToDisplay[currentSlotIndex]?.IsRegisteration ? 'Yes' : 'No'} />
+                            <DetailCard
+                                title="Slot number"
+                                value={currentSlotData?.Slot || 'N/A'}
+                            />
+                            <DetailCard
+                                title="Validator Index"
+                                value={currentSlotData?.ValidatorIndex || 'N/A'}
+                            />
+                            <DetailCard
+                                title="Shutterized"
+                                value={currentSlotData?.IsRegisteration ? 'Yes' : 'No'}
+                            />
                         </DetailsGrid>
                     </PreviousSlotDetails>
                 </SlotDetailsWrapper>
