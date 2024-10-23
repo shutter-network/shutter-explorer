@@ -33,6 +33,24 @@ jobs:
           cd frontend
           npx cypress run --component
 
+  # Branch Name Validation for Pull Requests
+  validate_branch_name:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate branch name
+        run: |
+          BRANCH_NAME="${{ github.head_ref }}"
+          echo "Validating branch name: $BRANCH_NAME"
+
+          # Check if the branch name starts with the expected prefixes
+          if [[ "$BRANCH_NAME" == release/* ]] || [[ "$BRANCH_NAME" == feat/* ]] || [[ "$BRANCH_NAME" == fix/* ]] || [[ "$BRANCH_NAME" == chore/* ]] || [[ "$BRANCH_NAME" == docs/* ]] || [[ "$BRANCH_NAME" == test/* ]]; then
+              echo "Branch name is valid: $BRANCH_NAME"
+          else
+              echo "Error: Branch name must start with 'release/', 'feat/', 'fix/', 'chore/', 'docs/', or 'test/'."
+              exit 1  # Exit if the branch name is not valid
+          fi
+
   # Staging Deployment (with Tagging)
   deploy_instance_staging:
     if: github.ref == 'refs/heads/staging' && github.event_name == 'push'
@@ -47,21 +65,11 @@ jobs:
       - name: Fetch tags
         run: git fetch --tags
 
-  # Version bump and tagging on pull_request event
-  determine_version_bump:
-    if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      # Install semver package (fix for missing semver)
+      # Install semver for version bumping
       - name: Install semver
         run: npm install -g semver
 
-      - name: Fetch tags
-        run: git fetch --tags
-
+      # Determine version bump after a merge to staging
       - name: Determine version bump
         id: version_bump
         run: |
@@ -71,26 +79,27 @@ jobs:
           # Default version bump is patch
           VERSION_BUMP="patch"
 
-          # Get the source branch name from the pull request
-          BRANCH_NAME="${{ github.head_ref }}"
-          echo "Branch name: $BRANCH_NAME"
+          # Find the source branch by checking the latest merge commit
+          SOURCE_BRANCH=$(git log -1 --pretty=%B | grep -oP '(?<=from\s)[^\s]+')
 
-          # Determine version bump based on branch name
-          if [[ "$BRANCH_NAME" == release/* ]]; then
+          echo "Source branch: $SOURCE_BRANCH"
+
+          # Determine version bump based on the source branch
+          if [[ "$SOURCE_BRANCH" == release/* ]]; then
               VERSION_BUMP="major"
-          elif [[ "$BRANCH_NAME" == feat/* ]]; then
+          elif [[ "$SOURCE_BRANCH" == feat/* ]]; then
               VERSION_BUMP="minor"
-          elif [[ "$BRANCH_NAME" == fix/* ]]; then
+          elif [[ "$SOURCE_BRANCH" == fix/* ]]; then
               VERSION_BUMP="patch"
-          elif [[ "$BRANCH_NAME" == chore/* ]]; then
+          elif [[ "$SOURCE_BRANCH" == chore/* ]]; then
               VERSION_BUMP="patch"
-          elif [[ "$BRANCH_NAME" == docs/* ]]; then
+          elif [[ "$SOURCE_BRANCH" == docs/* ]]; then
               VERSION_BUMP="patch"
-          elif [[ "$BRANCH_NAME" == test/* ]]; then
+          elif [[ "$SOURCE_BRANCH" == test/* ]]; then
               VERSION_BUMP="patch"
           else
-              echo "Error: Branch name must start with 'release/', 'feat/', 'fix/', 'chore/', 'docs/' or 'test/'."
-              exit 1  # Exit if the branch name is not valid
+              echo "Error: Source branch name must start with 'release/', 'feat/', 'fix/', 'chore/', 'docs/' or 'test/'."
+              exit 1
           fi
 
           # Calculate the next version using semver
