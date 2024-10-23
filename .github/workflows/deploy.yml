@@ -43,6 +43,11 @@ jobs:
           BRANCH_NAME="${{ github.head_ref }}"
           echo "Validating branch name: $BRANCH_NAME"
 
+          # Allow 'staging' and 'main' branches
+          if [[ "$BRANCH_NAME" == "staging" || "$BRANCH_NAME" == "main" ]]; then
+              exit 0
+          fi
+
           # Check if the branch name starts with the expected prefixes
           if [[ "$BRANCH_NAME" == release/* ]] || [[ "$BRANCH_NAME" == feat/* ]] || [[ "$BRANCH_NAME" == fix/* ]] || [[ "$BRANCH_NAME" == chore/* ]] || [[ "$BRANCH_NAME" == docs/* ]] || [[ "$BRANCH_NAME" == test/* ]]; then
               echo "Branch name is valid: $BRANCH_NAME"
@@ -84,6 +89,12 @@ jobs:
 
           echo "Source branch: $SOURCE_BRANCH"
 
+          # Allow 'staging' and 'main' branches without version bump
+          if [[ "$SOURCE_BRANCH" == "staging" || "$SOURCE_BRANCH" == "main" ]]; then
+              echo "No version bump required for 'staging' or 'main' branch."
+              exit 0
+          fi
+
           # Determine version bump based on the source branch
           if [[ "$SOURCE_BRANCH" == release/* ]]; then
               VERSION_BUMP="major"
@@ -110,6 +121,7 @@ jobs:
 
       # Create a new tag for the staging deployment
       - name: Create and push new version tag
+        if: env.NEXT_VERSION != ''
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
