@@ -33,6 +33,29 @@ jobs:
           cd frontend
           npx cypress run --component
 
+  # Branch Name Validation for Pull Requests
+  validate_branch_name:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate branch name
+        run: |
+          BRANCH_NAME="${{ github.head_ref }}"
+          echo "Validating branch name: $BRANCH_NAME"
+
+          # Allow 'staging' and 'main' branches
+          if [[ "$BRANCH_NAME" == "staging" || "$BRANCH_NAME" == "main" ]]; then
+              exit 0
+          fi
+
+          # Check if the branch name starts with the expected prefixes
+          if [[ "$BRANCH_NAME" == release/* ]] || [[ "$BRANCH_NAME" == feat/* ]] || [[ "$BRANCH_NAME" == fix/* ]] || [[ "$BRANCH_NAME" == chore/* ]] || [[ "$BRANCH_NAME" == docs/* ]] || [[ "$BRANCH_NAME" == test/* ]]; then
+              echo "Branch name is valid: $BRANCH_NAME"
+          else
+              echo "Error: Branch name must start with 'release/', 'feat/', 'fix/', 'chore/', 'docs/', or 'test/'."
+              exit 1  # Exit if the branch name is not valid
+          fi
+
   # Staging Deployment (with Tagging)
   deploy_instance_staging:
     if: github.ref == 'refs/heads/staging' && github.event_name == 'push'
@@ -47,7 +70,11 @@ jobs:
       - name: Fetch tags
         run: git fetch --tags
 
-      # Determine version bump based on branch name
+      # Install semver for version bumping
+      - name: Install semver
+        run: npm install -g semver
+
+      # Determine version bump after a merge to staging
       - name: Determine version bump
         id: version_bump
         run: |
@@ -57,38 +84,33 @@ jobs:
           # Default version bump is patch
           VERSION_BUMP="patch"
 
-          # Get the branch name based on the GitHub Actions environment
-          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
-              BRANCH_NAME="${{ github.head_ref }}"
-          else
-              BRANCH_NAME="${{ github.ref }}"
-              BRANCH_NAME=${BRANCH_NAME#refs/heads/}
-          fi
+          # Find the source branch by checking the latest merge commit
+          SOURCE_BRANCH=$(git log -1 --pretty=%B | grep -oP '(?<=from\s)[^\s]+')
 
-          echo "Branch name: $BRANCH_NAME"
+          echo "Source branch: $SOURCE_BRANCH"
 
-          # Allow 'staging' and 'main' branches without a version bump
-          if [[ "$BRANCH_NAME" == "staging" || "$BRANCH_NAME" == "main" ]]; then
+          # Allow 'staging' and 'main' branches without version bump
+          if [[ "$SOURCE_BRANCH" == "staging" || "$SOURCE_BRANCH" == "main" ]]; then
               echo "No version bump required for 'staging' or 'main' branch."
               exit 0
           fi
 
-          # Determine version bump based on branch name
-          if [[ "$BRANCH_NAME" == release/* ]]; then
+          # Determine version bump based on the source branch
+          if [[ "$SOURCE_BRANCH" == release/* ]]; then
               VERSION_BUMP="major"
-          elif [[ "$BRANCH_NAME" == feat/* ]]; then
+          elif [[ "$SOURCE_BRANCH" == feat/* ]]; then
               VERSION_BUMP="minor"
-          elif [[ "$BRANCH_NAME" == fix/* ]]; then
+          elif [[ "$SOURCE_BRANCH" == fix/* ]]; then
               VERSION_BUMP="patch"
-          elif [[ "$BRANCH_NAME" == chore/* ]]; then
+          elif [[ "$SOURCE_BRANCH" == chore/* ]]; then
               VERSION_BUMP="patch"
-          elif [[ "$BRANCH_NAME" == docs/* ]]; then
+          elif [[ "$SOURCE_BRANCH" == docs/* ]]; then
               VERSION_BUMP="patch"
-          elif [[ "$BRANCH_NAME" == test/* ]]; then
+          elif [[ "$SOURCE_BRANCH" == test/* ]]; then
               VERSION_BUMP="patch"
           else
-              echo "Error: Branch name must start with 'release/', 'feat/', 'fix/', 'chore/', 'docs/' or 'test/'."
-              exit 1  # Exit the workflow if the branch name doesn't match
+              echo "Error: Source branch name must start with 'release/', 'feat/', 'fix/', 'chore/', 'docs/' or 'test/'."
+              exit 1
           fi
 
           # Calculate the next version using semver
@@ -99,6 +121,7 @@ jobs:
 
       # Create a new tag for the staging deployment
       - name: Create and push new version tag
+        if: env.NEXT_VERSION != ''
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
