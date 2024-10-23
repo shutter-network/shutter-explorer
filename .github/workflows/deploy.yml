@@ -87,26 +87,29 @@ jobs:
           # Find the source branch by checking the latest merge commit
           SOURCE_BRANCH=$(git log -1 --pretty=%B | grep -oP '(?<=from\s)[^\s]+')
 
-          echo "Source branch: $SOURCE_BRANCH"
+          # Remove the 'shutter-network/' prefix if it exists
+          CLEANED_SOURCE_BRANCH=$(echo "$SOURCE_BRANCH" | sed 's/^shutter-network\///')
+
+          echo "Source branch: $CLEANED_SOURCE_BRANCH"
 
           # Allow 'staging' and 'main' branches without version bump
-          if [[ "$SOURCE_BRANCH" == "staging" || "$SOURCE_BRANCH" == "main" ]]; then
+          if [[ "$CLEANED_SOURCE_BRANCH" == "staging" || "$CLEANED_SOURCE_BRANCH" == "main" ]]; then
               echo "No version bump required for 'staging' or 'main' branch."
               exit 0
           fi
 
           # Determine version bump based on the source branch
-          if [[ "$SOURCE_BRANCH" == release/* ]]; then
+          if [[ "$CLEANED_SOURCE_BRANCH" == release/* ]]; then
               VERSION_BUMP="major"
-          elif [[ "$SOURCE_BRANCH" == feat/* ]]; then
+          elif [[ "$CLEANED_SOURCE_BRANCH" == feat/* ]]; then
               VERSION_BUMP="minor"
-          elif [[ "$SOURCE_BRANCH" == fix/* ]]; then
+          elif [[ "$CLEANED_SOURCE_BRANCH" == fix/* ]]; then
               VERSION_BUMP="patch"
-          elif [[ "$SOURCE_BRANCH" == chore/* ]]; then
+          elif [[ "$CLEANED_SOURCE_BRANCH" == chore/* ]]; then
               VERSION_BUMP="patch"
-          elif [[ "$SOURCE_BRANCH" == docs/* ]]; then
+          elif [[ "$CLEANED_SOURCE_BRANCH" == docs/* ]]; then
               VERSION_BUMP="patch"
-          elif [[ "$SOURCE_BRANCH" == test/* ]]; then
+          elif [[ "$CLEANED_SOURCE_BRANCH" == test/* ]]; then
               VERSION_BUMP="patch"
           else
               echo "Error: Source branch name must start with 'release/', 'feat/', 'fix/', 'chore/', 'docs/' or 'test/'."
