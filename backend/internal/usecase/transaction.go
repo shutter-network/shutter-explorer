@@ -241,6 +241,9 @@ func (uc *TransactionUsecase) QueryTransactionDetailsByTxHash(ctx context.Contex
 			inclusionTime = &tse.BlockTimestamp.Int64
 			sub := *inclusionTime - tse.CreatedAt.Time.Unix()
 			inclusionDelay = &sub
+			if tse.BlockNumber.Valid {
+				blockNumber = &tse.BlockNumber.Int64
+			}
 		} else if tse.TxStatus.TxStatusVal == data.TxStatusValInvalid {
 			txStatus = Invalid
 		} else if tse.TxStatus.TxStatusVal == data.TxStatusValPending {

@@ -27,7 +27,7 @@ const Transaction: FC = () => {
     const { data: updatedData, loading, error, setStopPolling } = useFetchWithPolling(`/api/transaction/${txHash}`, 10000);
 
 
-    const statusesWithBlockNumber = ['Shielded inclusion'];
+    const statusesWithBlockNumber = ['Shielded inclusion', "Unshielded inclusion"];
     const statusesWithEffectiveInclusionTime = ['Shielded inclusion', 'Unshielded inclusion']
     const statusesWithEstimatedeInclusionTime = ['Submitted', 'Pending user transaction']
 
