@@ -227,7 +227,7 @@ func (uc *TransactionUsecase) QueryTransactionDetailsByTxHash(ctx context.Contex
 	if tse.TxStatus.Valid {
 		if tse.TxStatus.TxStatusVal == data.TxStatusValShieldedinclusion {
 			txStatus = ShieldedInclusion
-			inclusionTime = &tse.DecryptedTxUpdatedAtUnix
+			inclusionTime = &tse.BlockTimestamp.Int64
 			sub := *inclusionTime - tse.CreatedAt.Time.Unix()
 			inclusionDelay = &sub
 			if tse.Slot.Valid {
@@ -238,7 +238,7 @@ func (uc *TransactionUsecase) QueryTransactionDetailsByTxHash(ctx context.Contex
 			}
 		} else if tse.TxStatus.TxStatusVal == data.TxStatusValUnshieldedinclusion {
 			txStatus = UnshieldedInclusion
-			inclusionTime = &tse.DecryptedTxUpdatedAtUnix
+			inclusionTime = &tse.BlockTimestamp.Int64
 			sub := *inclusionTime - tse.CreatedAt.Time.Unix()
 			inclusionDelay = &sub
 		} else if tse.TxStatus.TxStatusVal == data.TxStatusValInvalid {
