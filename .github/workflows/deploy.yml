@@ -174,4 +174,4 @@ jobs:
       - name: Deploy to Production
         run: >
           ssh -o StrictHostKeyChecking=no ${{secrets.PROD_SERVER_USER}}@${{secrets.PROD_SERVER_HOST}}
-          "set -x && cd /root/shutter-explorer && git pull origin main && git submodule update --init --recursive && git checkout tags/${{ env.LATEST_TAG }} && cd docker && docker compose up -d --build"
+          "set -x && cd /root/shutter-explorer && git pull origin main && git submodule update --init --recursive && git checkout ${{ env.LATEST_TAG }} && cd docker && docker compose up -d --build"
