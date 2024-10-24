@@ -116,6 +116,7 @@ type DecryptedTx struct {
 	TxIndex                     int64
 	TxHash                      []byte
 	TxStatus                    TxStatusVal
+	BlockNumber                 pgtype.Int8
 	DecryptionKeyID             int64
 	TransactionSubmittedEventID int64
 	CreatedAt                   pgtype.Timestamptz
