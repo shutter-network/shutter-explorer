@@ -143,7 +143,7 @@ jobs:
           ssh -o StrictHostKeyChecking=no ${{secrets.STAGING_SERVER_USER}}@${{secrets.STAGING_SERVER_HOST}}
           "set -x && cd /root/shutter-explorer && git pull origin staging && git submodule update --init --recursive && cd docker && docker compose up -d --build"
 
-  # Production Deployment (using the tag from staging)
+  # Production Deployment (using latest tag from staging)
   deploy_instance_prod:
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
