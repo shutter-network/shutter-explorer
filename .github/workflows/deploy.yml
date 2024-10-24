@@ -164,16 +164,6 @@ jobs:
           LATEST_TAG=$(git describe --tags $(git rev-list --tags --max-count=1))
           echo "LATEST_TAG=$LATEST_TAG" >> $GITHUB_ENV
 
-      # Tag the main branch with the latest tag from staging
-      - name: Tag the main branch
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git checkout main
-          git pull origin main
-          git tag "$LATEST_TAG"
-          git push origin "$LATEST_TAG"
-
       # Setup SSH for deployment
       - name: Setup SSH
         run: |
