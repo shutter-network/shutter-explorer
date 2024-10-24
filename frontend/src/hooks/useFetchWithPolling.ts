@@ -5,10 +5,11 @@ const useFetchWithPolling = (url: string, interval: number) => {
     const [data, setData] = useState<any>(null);
     const [loading, setLoading] = useState<boolean>(false); // Change initial loading state
     const [error, setError] = useState<Error | null>(null);
+    const [stopPolling, setStopPolling] = useState(false);
     const backendUrl = process.env.REACT_APP_BACKEND_API
 
     useEffect(() => {
-        if (!url) return;
+        if (!url || stopPolling) return;
 
         const fetchData = async () => {
             try {
@@ -29,9 +30,9 @@ const useFetchWithPolling = (url: string, interval: number) => {
         const intervalId = setInterval(fetchData, interval);
 
         return () => clearInterval(intervalId);
-    }, [url, interval, backendUrl]);
+    }, [url, interval, backendUrl, stopPolling]);
 
-    return { data, loading, error };
+    return { data, loading, error, setStopPolling };
 };
 
 export default useFetchWithPolling;

@@ -84,12 +84,11 @@ func (q *Queries) QueryExecutedTransactionStats(ctx context.Context) ([]QueryExe
 	return items, nil
 }
 
-const queryFromTransactionDetails = `-- name: QueryFromTransactionDetails :one
+const queryFromTransactionDetails = `-- name: QueryFromTransactionDetails :many
 SELECT tx_hash as user_tx_hash, encrypted_tx_hash
 FROM transaction_details 
 WHERE tx_hash = $1 OR encrypted_tx_hash = $1
 ORDER BY submission_time DESC
-LIMIT 1
 `
 
 type QueryFromTransactionDetailsRow struct {
@@ -97,11 +96,24 @@ type QueryFromTransactionDetailsRow struct {
 	EncryptedTxHash string
 }
 
-func (q *Queries) QueryFromTransactionDetails(ctx context.Context, txHash string) (QueryFromTransactionDetailsRow, error) {
-	row := q.db.QueryRow(ctx, queryFromTransactionDetails, txHash)
-	var i QueryFromTransactionDetailsRow
-	err := row.Scan(&i.UserTxHash, &i.EncryptedTxHash)
-	return i, err
+func (q *Queries) QueryFromTransactionDetails(ctx context.Context, txHash string) ([]QueryFromTransactionDetailsRow, error) {
+	rows, err := q.db.Query(ctx, queryFromTransactionDetails, txHash)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []QueryFromTransactionDetailsRow
+	for rows.Next() {
+		var i QueryFromTransactionDetailsRow
+		if err := rows.Scan(&i.UserTxHash, &i.EncryptedTxHash); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const queryGreeter = `-- name: QueryGreeter :many
@@ -511,16 +523,28 @@ func (q *Queries) QueryTotalTXsForEachTXStatusLast30Days(ctx context.Context, tx
 }
 
 const queryTransactionDetailsByTxHash = `-- name: QueryTransactionDetailsByTxHash :one
-SELECT 
-    tse.event_tx_hash, tse.sender, FLOOR(EXTRACT(EPOCH FROM tse.created_at)) as created_at_unix, tse.created_at,
-    dt.tx_hash AS user_tx_hash, dt.tx_status, dt.slot, 
-    COALESCE(FLOOR(EXTRACT(EPOCH FROM dt.created_at)), 0)::BIGINT AS decrypted_tx_created_at_unix,
-    COALESCE(FLOOR(EXTRACT(EPOCH FROM dt.updated_at)), 0)::BIGINT AS decrypted_tx_updated_at_unix,
-    bk.block_number as block_number
-FROM transaction_submitted_event tse 
-LEFT JOIN decrypted_tx dt ON tse.id = dt.transaction_submitted_event_id
-LEFT JOIN block bk ON dt.slot = bk.slot
-WHERE tse.event_tx_hash = $1 OR dt.tx_hash = $1
+WITH prioritized_tx AS (
+    SELECT 
+        tse.event_tx_hash, tse.sender, 
+        FLOOR(EXTRACT(EPOCH FROM tse.created_at)) AS created_at_unix, 
+        tse.created_at,
+        dt.tx_hash AS user_tx_hash, dt.tx_status, dt.slot, 
+        COALESCE(FLOOR(EXTRACT(EPOCH FROM dt.created_at)), 0)::BIGINT AS decrypted_tx_created_at_unix,
+        COALESCE(FLOOR(EXTRACT(EPOCH FROM dt.updated_at)), 0)::BIGINT AS decrypted_tx_updated_at_unix,
+        bk.block_number AS block_number,
+        CASE 
+            WHEN dt.tx_status = 'shielded inclusion' THEN 1
+            WHEN dt.tx_status = 'unshielded inclusion' THEN 2
+            ELSE 3
+        END AS priority
+    FROM transaction_submitted_event tse 
+    LEFT JOIN decrypted_tx dt ON tse.id = dt.transaction_submitted_event_id
+    LEFT JOIN block bk ON dt.slot = bk.slot
+    WHERE tse.event_tx_hash = $1 OR dt.tx_hash = $1
+)
+SELECT event_tx_hash, sender, created_at_unix, created_at, user_tx_hash, tx_status, slot, decrypted_tx_created_at_unix, decrypted_tx_updated_at_unix, block_number, priority
+FROM prioritized_tx
+ORDER BY priority
 LIMIT 1
 `
 
@@ -535,6 +559,7 @@ type QueryTransactionDetailsByTxHashRow struct {
 	DecryptedTxCreatedAtUnix int64
 	DecryptedTxUpdatedAtUnix int64
 	BlockNumber              pgtype.Int8
+	Priority                 int32
 }
 
 func (q *Queries) QueryTransactionDetailsByTxHash(ctx context.Context, eventTxHash []byte) (QueryTransactionDetailsByTxHashRow, error) {
@@ -551,6 +576,7 @@ func (q *Queries) QueryTransactionDetailsByTxHash(ctx context.Context, eventTxHa
 		&i.DecryptedTxCreatedAtUnix,
 		&i.DecryptedTxUpdatedAtUnix,
 		&i.BlockNumber,
+		&i.Priority,
 	)
 	return i, err
 }
