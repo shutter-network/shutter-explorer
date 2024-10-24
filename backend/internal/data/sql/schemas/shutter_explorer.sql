@@ -93,6 +93,7 @@ CREATE TABLE IF NOT EXISTS decrypted_tx
     tx_index                            BIGINT NOT NULL,
     tx_hash                             BYTEA NOT NULL,
     tx_status                           tx_status_val NOT NULL,
+    block_number                        BIGINT,
     decryption_key_id                   BIGINT NOT NULL,
     transaction_submitted_event_id      BIGINT NOT NULL,
     created_at                          TIMESTAMP WITH TIME ZONE DEFAULT NOW()  NOT NULL,

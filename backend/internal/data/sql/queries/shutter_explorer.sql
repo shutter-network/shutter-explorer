@@ -153,8 +153,8 @@ WITH prioritized_tx AS (
         tse.created_at,
         dt.tx_hash AS user_tx_hash, dt.tx_status, dt.slot, 
         COALESCE(FLOOR(EXTRACT(EPOCH FROM dt.created_at)), 0)::BIGINT AS decrypted_tx_created_at_unix,
-        COALESCE(FLOOR(EXTRACT(EPOCH FROM dt.updated_at)), 0)::BIGINT AS decrypted_tx_updated_at_unix,
         bk.block_number AS block_number,
+        bk.block_timestamp as block_timestamp,
         CASE 
             WHEN dt.tx_status = 'shielded inclusion' THEN 1
             WHEN dt.tx_status = 'unshielded inclusion' THEN 2
@@ -162,7 +162,7 @@ WITH prioritized_tx AS (
         END AS priority
     FROM transaction_submitted_event tse 
     LEFT JOIN decrypted_tx dt ON tse.id = dt.transaction_submitted_event_id
-    LEFT JOIN block bk ON dt.slot = bk.slot
+    LEFT JOIN block bk ON dt.block_number = bk.block_number
     WHERE tse.event_tx_hash = $1 OR dt.tx_hash = $1
 )
 SELECT *
