@@ -30,6 +30,16 @@ export const pendingTransactionData: TransactionData = {
     BlockNumber: null,
 }; 
 
+export const notIncludedTransactionData: TransactionData = {
+    TxStatus: 'Not included',
+    InclusionTime: 0,
+    UserTxHash: '0xa061e12c2a2bb266d9c0b29c67306f7f214bda92d0c72d995bc1fcc98ca85701',
+    SequencerTxHash: '0xdc677e4e7da47ee0b67e1e059148627ac71195b36cfd987dd5e2ece9b58c2f94',
+    InclusionSlot: null,
+    InclusionDelay: 0,
+    BlockNumber: null,
+}; 
+
 export const updatedTransactionData: TransactionData = {
     TxStatus: 'Shielded inclusion',
     InclusionTime: 1725020101,
