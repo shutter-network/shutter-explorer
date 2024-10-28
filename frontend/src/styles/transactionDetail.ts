@@ -54,7 +54,7 @@ export const StyledTransactionDetails = styled(Box).attrs({
   }
 
   .status-Not-included {
-    background-color: #FAE1EA;
+    background-color: #FDF6C8;
     color: #7F0A35;
   }
 
@@ -104,5 +104,9 @@ export const StyledTransactionDetails = styled(Box).attrs({
       width: 100%;
       margin-bottom: 4px;
     }
+  }
+  
+  .time-out-message {
+    font-size: 13px
   }
 `;

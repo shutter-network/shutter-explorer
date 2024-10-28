@@ -212,9 +212,20 @@ const Transaction: FC = () => {
                     <Grid size={{ xs: 'auto', sm: 4 }}>
                         <Typography variant="body1" fontWeight="bold" className="card-label" textAlign="left">Transaction Status</Typography>
                     </Grid>
-                    <Grid size={{ xs: 12, sm: 8 }}>
-                        <Typography variant="body1" className={`tx-status status-${transaction.TxStatus.replace(/\s+/g, "-")}`}>{transaction.TxStatus}</Typography>
-                    </Grid>
+                    <Grid container>
+                        <Grid>
+                            <Typography variant="body1" className={`tx-status status-${transaction.TxStatus.replace(/\s+/g, "-")}`}>
+                            {transaction.TxStatus === 'Not included' ? 'Expired' : transaction.TxStatus}
+                            </Typography>
+                        </Grid>
+                        {transaction.TxStatus === 'Not included' && (
+                            <Grid>
+                            <Typography variant="body1" className="time-out-message">
+                                (check for inclusion time-out, please check gnosisscan)
+                            </Typography>
+                            </Grid>
+                        )}
+                        </Grid>
 
                     <Grid size={{ lg: 12 }} sx={{ display: { xs: 'none', sm: 'none', md: 'none', lg: 'block' }, }}>
                         <Divider></Divider>
