@@ -33,7 +33,7 @@ const TransactionLookup: FC = () => {
                                 <li> Unshielded Inclusion: Your transaction was resent by the inclusion service, temporarily unshielded, before being fully included.</li>
                                 <li> Invalid: Your transaction is invalid.</li>
                                 <li> Cannot be decrypted: Your transaction cannot be decrypted.</li>
-                                <li> Not included: Your transaction couldn't be included. </li>
+                                <li> Inclusion Timeout Expired: We waited for your transaction receipt for a certain time (1 hour), and we didn't receive it. Your transaction could still included after the timeout expired. Please check on the corresponding explorer. </li>
                             </ul>
                         </li>
 

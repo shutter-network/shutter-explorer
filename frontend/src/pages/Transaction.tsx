@@ -8,6 +8,7 @@ import TitleSection from "../components/TitleSection";
 import { formatSeconds, formatTimestamp } from '../utils/utils';
 import { ReactComponent as InfoIcon } from '../assets/icons/info.svg';
 import { useParams } from 'react-router-dom';
+import LinkIcon from '@mui/icons-material/Link';
 
 interface TransactionDetails {
     TxStatus: string;
@@ -212,18 +213,24 @@ const Transaction: FC = () => {
                     <Grid size={{ xs: 'auto', sm: 4 }}>
                         <Typography variant="body1" fontWeight="bold" className="card-label" textAlign="left">Transaction Status</Typography>
                     </Grid>
-                    <Grid container>
+                    <Grid container spacing={1}>
                         <Grid>
                             <Typography variant="body1" className={`tx-status status-${transaction.TxStatus.replace(/\s+/g, "-")}`}>
-                            {transaction.TxStatus === 'Not included' ? 'Expired' : transaction.TxStatus}
+                            {transaction.TxStatus === 'Not included' ? 'Inclusion Timeout Expired' : transaction.TxStatus}
                             </Typography>
                         </Grid>
                         {transaction.TxStatus === 'Not included' && (
-                            <Grid>
-                            <Typography variant="body1" className="time-out-message">
-                                (check for inclusion time-out, please check gnosisscan)
-                            </Typography>
+                            <><Grid>
+                                <Typography variant="body1" className="card-value">
+                                    (Please check for inclusion directly on the Gnosis Explorer)
+                                </Typography>
                             </Grid>
+                            <Grid>
+                                <Link target="_blank" href={`${explorerUrl}/tx/${transaction.UserTxHash}`}>
+                                    <LinkIcon color='primary'/>
+                                </Link>
+                            </Grid> 
+                            </>
                         )}
                         </Grid>
 
