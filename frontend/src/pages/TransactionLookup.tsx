@@ -9,7 +9,7 @@ const TransactionLookup: FC = () => {
             <>
                 <TitleSection title="Transaction Lookup" />
 
-                <Typography variant="body1" textAlign="left" color="#051016" lineHeight="180%">
+                <Typography variant="body1" textAlign="left" paddingTop="20px" lineHeight="180%" fontSize={"18px"}>
                     <h2> How to Use the Transaction Lookup on Shutter Explorer </h2>
                     When you send a transaction using Shutter, it remains encrypted and won’t show up on Gnosisscan until it’s processed.
                     To help you track your transaction status while it’s still shielded, we created the Transaction Lookup tool on Shutter Explorer.
