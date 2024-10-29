@@ -13,9 +13,9 @@ import {
     StyledShutterLogoIcon,
 } from '../styles/slotProgression';
 
-const calculateCurrentSlotAndEpoch = (genesisTime: number, slotDuration: number) => {
-    const currentTime = Math.floor(Date.now() / 1000);
-    const currentSlot = Math.floor((currentTime - genesisTime) / slotDuration);
+const calculateCurrentSlotAndEpoch = (genesisTime: number, slotDuration: number, currentTime = Date.now()) => {
+    const currentSlot = Math.floor((currentTime / 1000 - genesisTime) / slotDuration);
+    console.log("Current slot in code" + currentSlot);
     const currentEpoch = Math.floor(currentSlot / 16);
     const relativeSlotIndex = currentSlot % 16;
     return { currentEpoch, relativeSlotIndex, currentSlot };
@@ -38,7 +38,6 @@ const SlotProgression = () => {
 
             const sortedSlots = slotData.message.sort((a: any, b: any) => a.Slot - b.Slot);
 
-            // Group slots by epochs present in the API data
             const epochsMap = new Map<number, any[]>();
             sortedSlots.forEach((slot: any) => {
                 const epoch = Math.floor(slot.Slot / 16);
@@ -53,7 +52,7 @@ const SlotProgression = () => {
                 slots,
             }));
 
-            setEpochsSlots(epochsData); // Set slots grouped by epochs
+            setEpochsSlots(epochsData);
             const { currentEpoch, relativeSlotIndex } = calculateCurrentSlotAndEpoch(gnosisGenesisTime, slotDuration);
             setCurrentEpoch(currentEpoch);
             setCurrentSlotIndex(relativeSlotIndex);
@@ -104,11 +103,15 @@ const SlotProgression = () => {
         );
     };
 
+    const filteredEpochsSlots = epochsSlots.filter(({ epoch }) =>
+        epoch >= currentEpoch - 1 && epoch <= currentEpoch + 1
+    );
+
     const currentEpochSlots = epochsSlots.find((epoch) => epoch.epoch === currentEpoch);
     const currentSlotData = currentEpochSlots?.slots[currentSlotIndex];
 
     return (
-        <Box sx={{ flexGrow: 1}}>
+        <Box sx={{ flexGrow: 1 }}>
             {errorSlots ? (
                 <Alert severity="error">Error fetching Slot data: {errorSlots.message}</Alert>
             ) : (
