@@ -86,9 +86,10 @@ export const StyledTransactionDetails = styled(Box).attrs({
   .tx-status{
     border-radius: 100px;
     padding: 2px 8px;
-    font-size: 12px;
+    font-size: 14px;
     font-weight: bold;
     width: fit-content;
+    letter-spacing: 0.1px;
   }
 
   .info-icon{
