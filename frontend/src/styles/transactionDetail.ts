@@ -74,8 +74,8 @@ export const StyledTransactionDetails = styled(Box).attrs({
   }
 
   .status-Unshielded-inclusion {
-    background-color: #A8E6CF;
-    color: #5CAB78;
+    background-color: #DBF5E8;
+    color: #2A7A50;
   }
 
   .status-Pending-user-transaction {
