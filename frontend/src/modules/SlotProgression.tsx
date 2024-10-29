@@ -116,7 +116,7 @@ const SlotProgression = () => {
                     {loadingSlots ? (
                         <p>Loading slot progression...</p>
                     ) : (
-                        epochsSlots.map(({ epoch, slots }) => (
+                        filteredEpochsSlots.map(({ epoch, slots }) => (
                             <div key={epoch}>
                                 <Typography variant="h2" align="left" paddingTop={"20px"}>
                                     Epoch {epoch}
