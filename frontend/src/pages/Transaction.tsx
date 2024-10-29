@@ -216,7 +216,7 @@ const Transaction: FC = () => {
                     <Grid container spacing={1}>
                         <Grid>
                             <Typography variant="body1" className={`tx-status status-${transaction.TxStatus.replace(/\s+/g, "-")}`}>
-                            {transaction.TxStatus === 'Not included' ? 'Inclusion Timeout Expired' : transaction.TxStatus}
+                            {transaction.TxStatus === 'Not included' ? 'INCLUSION TIMEOUT EXPIRED' : transaction.TxStatus.toUpperCase()}
                             </Typography>
                         </Grid>
                         {transaction.TxStatus === 'Not included' && (

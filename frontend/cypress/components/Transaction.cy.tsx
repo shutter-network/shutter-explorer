@@ -137,7 +137,7 @@ describe('<Transaction />', () => {
         );
 
         cy.wait('@getTransaction');
-        cy.contains('Inclusion Timeout Expired').should('be.visible');
+        cy.contains('INCLUSION TIMEOUT EXPIRED').should('be.visible');
         cy.contains('(Please check for inclusion directly on the Gnosis Explorer)').should('be.visible');
         cy.get(`a[href*="${explorerUrl}/tx/${notIncludedTransactionData.UserTxHash}"]`).should('be.visible');
     });

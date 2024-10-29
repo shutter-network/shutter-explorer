@@ -55,7 +55,7 @@ export const explorerUrl = Cypress.env('REACT_APP_EXPLORER_URL') as string;
 export const verifySubmittedTransactionDetails = (data: TransactionData): void => {
     cy.contains('Transaction Details').should('be.visible');
     cy.contains('Transaction Status').should('be.visible');
-    cy.contains(data.TxStatus).should('be.visible');
+    cy.contains(data.TxStatus.toUpperCase()).should('be.visible');
     cy.contains('Estimated Inclusion Time').should('be.visible');
     cy.contains(formatTimestamp(false, data.InclusionTime!)).should('be.visible');
     cy.contains('Estimated Inclusion Delay').should('be.visible');
@@ -69,7 +69,7 @@ export const verifySubmittedTransactionDetails = (data: TransactionData): void =
 export const verifyPendingTransactionDetails = (data: TransactionData): void => {
     cy.contains('Transaction Details').should('be.visible');
     cy.contains('Transaction Status').should('be.visible');
-    cy.contains(data.TxStatus).should('be.visible');
+    cy.contains(data.TxStatus.toUpperCase()).should('be.visible');
     cy.contains('Estimated Inclusion Time').should('be.visible');
     cy.contains(formatTimestamp(false, data.InclusionTime!)).should('be.visible');
     cy.contains('Estimated Inclusion Delay').should('be.visible');
@@ -84,7 +84,7 @@ export const verifyPendingTransactionDetails = (data: TransactionData): void => 
 export const verifyTransactionDetailsUpdated = (data: TransactionData): void => {
     cy.contains('Transaction Details').should('be.visible');
     cy.contains('Transaction Status').should('be.visible');
-    cy.contains(data.TxStatus).should('be.visible');
+    cy.contains(data.TxStatus.toUpperCase()).should('be.visible');
     cy.contains('Effective Inclusion Time').should('be.visible');
     cy.contains(formatTimestamp(true, data.InclusionTime!)).should('be.visible');
     cy.contains('Effective Inclusion Delay').should('be.visible');
