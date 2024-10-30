@@ -9,8 +9,9 @@ describe('<InclusionTime />', () => {
         cy.intercept('GET', '/api/inclusion_time/estimated_inclusion_time', { message: 10 }).as('getEstimatedInclusionTime');
         cy.intercept('GET', '/api/inclusion_time/executed_transactions', {
             message:{
-                Successful: 25,
-                Failed: 5
+                Shielded: 25,
+                Unshielded: 5,
+                Total: 30
             }
         }).as('getExecutedTransactions');
         cy.intercept('GET', '/api/inclusion_time/historical_inclusion_time', {
