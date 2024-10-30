@@ -10,7 +10,7 @@ export const SidebarContainer = styled.aside.attrs({
 
   @media (max-width: 900px) {
     width: 100%;
-    height: 60px;
+    height: 90px;
     position: fixed;
     left: 0;
     bottom: 0;
