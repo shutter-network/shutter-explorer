@@ -23,7 +23,7 @@ const Sidebar: React.FC = () => {
                     <NavItem style={
                         item.label === "Transaction Lookup" ? baseRoute === "transaction-details" ? { backgroundColor: "#e0e0e0", color: "#002861" } : {} : {}
                     } key={index} to={'/' + item.label.toLowerCase().replace(' ', '-')}>
-                        <NavIcon as={item.icon} style={{ fill: '#0044A4' }} />
+                        <center><NavIcon as={item.icon} style={{ fill: '#0044A4' }} /></center>
                         <span>{item.label}</span>
                     </NavItem>
                 ))}

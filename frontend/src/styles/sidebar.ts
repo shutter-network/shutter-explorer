@@ -19,6 +19,7 @@ export const SidebarContainer = styled.aside.attrs({
     justify-content: space-around;
     align-items: center;
     z-index: 1000; 
+    padding: 0px 20px;
   }
 `;
 
@@ -64,9 +65,9 @@ export const NavItem = styled(RouterLink).attrs({
   }
 
   @media (max-width: 900px) {
-      justify-content: center;
-      width: auto;
-      height: auto;
+    display: block;
+    text-align: center;
+    width: 100%;
   }
 `;
 
