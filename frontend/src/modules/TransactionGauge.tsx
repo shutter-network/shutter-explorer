@@ -9,7 +9,6 @@ const TransactionGauge = () => {
     const { data: transactionStatsData, loading: loadingTransactionStats, error: errorTransactionStats } = useFetch('/api/inclusion_time/executed_transactions');
     const [successfulTransactions, setSuccessfulTransactions] = useState<number>(transactionStatsData?.message?.Shielded || 0);
     const [failedTransactions, setFailedTransactions] = useState<number>(transactionStatsData?.message?.Unshielded || 0);
-    const [totalTransactions, setTotalTransactions] = useState<number>(transactionStatsData?.message?.Total || 0);
     const [, setWebSocketError] = useState<string | null>(null);
 
     const { socket } = useWebSocket()!;
@@ -23,10 +22,9 @@ const TransactionGauge = () => {
                 } else if (websocketEvent.data) {
                     setWebSocketError(null);
                     if (websocketEvent.type === 'executed_transactions_updated') {
-                        if ('Shielded' in websocketEvent.data.message && 'Unshielded' in websocketEvent.data.message && 'Total' in websocketEvent.data.message) {
+                        if ('Shielded' in websocketEvent.data.message && 'Unshielded' in websocketEvent.data.message) {
                             setSuccessfulTransactions(websocketEvent.data.message.Shielded);
                             setFailedTransactions(websocketEvent.data.message.Unshielded);
-                            setTotalTransactions(websocketEvent.data.message.Total);
                         }
                     }
                 }
@@ -48,9 +46,9 @@ const TransactionGauge = () => {
     useEffect(() => {
         if (transactionStatsData?.message?.Shielded) setSuccessfulTransactions(transactionStatsData.message.Shielded);
         if (transactionStatsData?.message?.Unshielded) setFailedTransactions(transactionStatsData.message.Unshielded);
-        if (transactionStatsData?.message?.Total) setTotalTransactions(transactionStatsData.message.Total);
     }, [transactionStatsData]);
 
+    const totalTransactions = successfulTransactions + failedTransactions
     return (
         <Box sx={{ flexGrow: 1, marginTop: 4 }}>
             <OverviewCard title="Shielded Transactions" centerTitle>
