@@ -74,8 +74,8 @@ export const StyledTransactionDetails = styled(Box).attrs({
   }
 
   .status-Unshielded-inclusion {
-    background-color: #A8E6CF;
-    color: #5CAB78;
+    background-color: #DBF5E8;
+    color: #2A7A50;
   }
 
   .status-Pending-user-transaction {
@@ -86,9 +86,10 @@ export const StyledTransactionDetails = styled(Box).attrs({
   .tx-status{
     border-radius: 100px;
     padding: 2px 8px;
-    font-size: 12px;
+    font-size: 14px;
     font-weight: bold;
     width: fit-content;
+    letter-spacing: 0.1px;
   }
 
   .info-icon{

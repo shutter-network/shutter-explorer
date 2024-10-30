@@ -108,7 +108,7 @@ const Slot = () => {
         <ResponsiveLayout>
             <Box sx={{ flexGrow: 1, marginTop: 4 }}>
                 <TitleSection title="Slot Overview" />
-                <Typography variant="body1" textAlign="left" paddingTop="20px" color="#051016" lineHeight="180%">
+                <Typography variant="body1" textAlign="left" paddingTop="20px" lineHeight="180%" fontSize={"18px"}>
                     The slot overview is designed to give you information about the activity around the current blockchain's state.
                     It gives a look ahead to the next 16 slots and shows when a registered validator is scheduled.
                     A green background means that the slot has passed. The Shutter logo means the corresponding proposer will include encrypted transactions.
