@@ -13,8 +13,13 @@ import (
 )
 
 type QueryExectuedTransactionStatsResp struct {
-	Successful int64
-	Failed     int64
+	Shielded     int64
+	Unshielded   int64
+	NotIncluded  int64
+	Pending      int64
+	Invalid      int64
+	NotDecrypted int64
+	Total        int64
 }
 
 type InclusionTimeUsecase struct {
@@ -84,10 +89,20 @@ func (uc *InclusionTimeUsecase) QueryExecutedTransactionStats(ctx context.Contex
 
 	resp := &QueryExectuedTransactionStatsResp{}
 	for i := 0; i < len(stats); i++ {
-		if stats[i].TxStatus == data.TxStatusValShieldedinclusion {
-			resp.Successful = stats[i].Count
-		} else if stats[i].TxStatus == data.TxStatusValNotincluded {
-			resp.Failed = stats[i].Count
+		resp.Total += stats[i].Count
+		switch stats[i].TxStatus {
+		case data.TxStatusValInvalid:
+			resp.Invalid = stats[i].Count
+		case data.TxStatusValNotdecrypted:
+			resp.NotDecrypted = stats[i].Count
+		case data.TxStatusValNotincluded:
+			resp.NotIncluded = stats[i].Count
+		case data.TxStatusValPending:
+			resp.Pending = stats[i].Count
+		case data.TxStatusValShieldedinclusion:
+			resp.Shielded = stats[i].Count
+		case data.TxStatusValUnshieldedinclusion:
+			resp.Unshielded = stats[i].Count
 		}
 	}
 

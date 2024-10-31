@@ -7,8 +7,8 @@ import useFetch from '../hooks/useFetch';
 
 const TransactionGauge = () => {
     const { data: transactionStatsData, loading: loadingTransactionStats, error: errorTransactionStats } = useFetch('/api/inclusion_time/executed_transactions');
-    const [successfulTransactions, setSuccessfulTransactions] = useState<number>(transactionStatsData?.message?.Successful || 0);
-    const [failedTransactions, setFailedTransactions] = useState<number>(transactionStatsData?.message?.Failed || 0);
+    const [successfulTransactions, setSuccessfulTransactions] = useState<number>(transactionStatsData?.message?.Shielded || 0);
+    const [failedTransactions, setFailedTransactions] = useState<number>(transactionStatsData?.message?.Unshielded || 0);
     const [, setWebSocketError] = useState<string | null>(null);
 
     const { socket } = useWebSocket()!;
@@ -22,9 +22,9 @@ const TransactionGauge = () => {
                 } else if (websocketEvent.data) {
                     setWebSocketError(null);
                     if (websocketEvent.type === 'executed_transactions_updated') {
-                        if ('Successful' in websocketEvent.data.message && 'Failed' in websocketEvent.data.message) {
-                            setSuccessfulTransactions(websocketEvent.data.message.Successful);
-                            setFailedTransactions(websocketEvent.data.message.Failed);
+                        if ('Shielded' in websocketEvent.data.message && 'Unshielded' in websocketEvent.data.message) {
+                            setSuccessfulTransactions(websocketEvent.data.message.Shielded);
+                            setFailedTransactions(websocketEvent.data.message.Unshielded);
                         }
                     }
                 }
@@ -44,12 +44,11 @@ const TransactionGauge = () => {
     }, [socket]);
 
     useEffect(() => {
-        if (transactionStatsData?.message?.Successful) setSuccessfulTransactions(transactionStatsData.message.Successful);
-        if (transactionStatsData?.message?.Failed) setFailedTransactions(transactionStatsData.message.Failed);
+        if (transactionStatsData?.message?.Shielded) setSuccessfulTransactions(transactionStatsData.message.Shielded);
+        if (transactionStatsData?.message?.Unshielded) setFailedTransactions(transactionStatsData.message.Unshielded);
     }, [transactionStatsData]);
 
-    const totalTransactions = successfulTransactions + failedTransactions;
-
+    const totalTransactions = successfulTransactions + failedTransactions
     return (
         <Box sx={{ flexGrow: 1, marginTop: 4 }}>
             <OverviewCard title="Shielded Transactions" centerTitle>

@@ -20,8 +20,9 @@ describe('<TransactionGauge />', () => {
             statusCode: 200,
             body: {
                 message: {
-                    Successful: 25,
-                    Failed: 5,
+                    Shielded: 25,
+                    Unshielded: 5,
+                    Total: 30
                 }
             },
         }).as('getExecutedTransactions');
