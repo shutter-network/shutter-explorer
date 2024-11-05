@@ -32,7 +32,7 @@ const ResponsiveLayout: FC<ResponsiveLayoutProps> = ({ children }) => {
                 <Box component="main" sx={mainStyles}>
                     <Box sx={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center', mb: 2, padding: 0 }}>
                         <SearchBar
-                            placeholder="Search by Txn Hash"
+                            placeholder="Search by transaction Hash"
                             value={searchQuery}
                             onChange={handleSearchChange}
                         />

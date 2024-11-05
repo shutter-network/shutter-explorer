@@ -37,7 +37,7 @@ const Transaction: FC = () => {
 
         if (updatedData) {
             setTransaction(updatedData.message as TransactionDetails);
-            if (transaction? finalisedStatuses.includes(transaction.TxStatus): false){
+            if (transaction ? finalisedStatuses.includes(transaction.TxStatus) : false) {
                 setStopPolling(true)
             }
         } else {
@@ -149,7 +149,7 @@ const Transaction: FC = () => {
                             <Grid size={{ xs: 'auto', sm: 4 }}>
                                 <Box display="flex" alignItems="center" gap={1}>
                                     <Typography variant="body1" fontWeight="bold" className="card-label" textAlign="left">Estimated Inclusion Time</Typography>
-                                    <Tooltip title="Estimated time in which transaction should be included">
+                                    <Tooltip title="Estimated timestamp at which the transaction should be included">
                                         <InfoIcon />
                                     </Tooltip>
                                 </Box>
@@ -161,7 +161,7 @@ const Transaction: FC = () => {
                             <Grid size={{ xs: 'auto', sm: 4 }}>
                                 <Box display="flex" alignItems="center" gap={1}>
                                     <Typography variant="body1" fontWeight="bold" className="card-label" textAlign="left">Estimated Inclusion Delay</Typography>
-                                    <Tooltip title="Time it might take for tx to be included">
+                                    <Tooltip title="Estimated delay between submission time and inclusion time">
                                         <InfoIcon />
                                     </Tooltip>
                                 </Box>
@@ -182,7 +182,7 @@ const Transaction: FC = () => {
                             <Grid size={{ xs: 'auto', sm: 4 }}>
                                 <Box display="flex" alignItems="center" gap={1}>
                                     <Typography variant="body1" fontWeight="bold" className="card-label" textAlign="left">Effective Inclusion Time</Typography>
-                                    <Tooltip title="Time in which the transaction was included">
+                                    <Tooltip title="Timestamp at which the transaction was included">
                                         <InfoIcon />
                                     </Tooltip>
                                 </Box>
@@ -194,7 +194,7 @@ const Transaction: FC = () => {
                             <Grid size={{ xs: 'auto', sm: 4 }}>
                                 <Box display="flex" alignItems="center" gap={1}>
                                     <Typography variant="body1" fontWeight="bold" className="card-label" textAlign="left">Effective Inclusion Delay</Typography>
-                                    <Tooltip title="Time taken for tx to be included">
+                                    <Tooltip title="Delay between submission time and inclusion time">
                                         <InfoIcon />
                                     </Tooltip>
                                 </Box>
@@ -216,7 +216,7 @@ const Transaction: FC = () => {
                     <Grid container spacing={1}>
                         <Grid>
                             <Typography variant="body1" className={`tx-status status-${transaction.TxStatus.replace(/\s+/g, "-")}`}>
-                            {transaction.TxStatus === 'Not included' ? 'INCLUSION TIMEOUT EXPIRED' : transaction.TxStatus.toUpperCase()}
+                                {transaction.TxStatus === 'Not included' ? 'INCLUSION TIMEOUT EXPIRED' : transaction.TxStatus.toUpperCase()}
                             </Typography>
                         </Grid>
                         {transaction.TxStatus === 'Not included' && (
@@ -225,14 +225,14 @@ const Transaction: FC = () => {
                                     (Please check for inclusion directly on the Gnosis Explorer)
                                 </Typography>
                             </Grid>
-                            <Grid>
-                                <Link target="_blank" href={`${explorerUrl}/tx/${transaction.UserTxHash}`}>
-                                    <LinkIcon color='primary'/>
-                                </Link>
-                            </Grid> 
+                                <Grid>
+                                    <Link target="_blank" href={`${explorerUrl}/tx/${transaction.UserTxHash}`}>
+                                        <LinkIcon color='primary' />
+                                    </Link>
+                                </Grid>
                             </>
                         )}
-                        </Grid>
+                    </Grid>
 
                     <Grid size={{ lg: 12 }} sx={{ display: { xs: 'none', sm: 'none', md: 'none', lg: 'block' }, }}>
                         <Divider></Divider>

@@ -23,7 +23,7 @@ describe('<SearchBar /> and <Transaction /> data display test', () => {
                                     path="/"
                                     element={
                                         <SearchBar
-                                            placeholder="Search by Txn Hash"
+                                            placeholder="Search by transaction Hash"
                                             value={searchQuery}
                                             onChange={handleSearchChange}
                                         />
@@ -49,7 +49,7 @@ describe('<SearchBar /> and <Transaction /> data display test', () => {
 
         mount(<TestComponent />);
 
-        cy.get('input[placeholder="Search by Txn Hash"]', { timeout: 10000 })
+        cy.get('input[placeholder="Search by transaction Hash"]', { timeout: 10000 })
             .should('exist')
             .should('be.visible')
             .type(`${txHash}{enter}`, { force: true });
