@@ -32,7 +32,7 @@ export const Icon = styled.img`
 `;
 
 export const CardContent = styled(Box).attrs({
-    className: 'card-content',
+  className: 'card-content',
 })`
   flex-grow: 1;
 `;
