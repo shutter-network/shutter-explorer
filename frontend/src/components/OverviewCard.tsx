@@ -23,10 +23,7 @@ const OverviewCard: FC<OverviewCardProps> = ({ title, iconSrc, children, centerT
                 <Typography variant="h2">
                     {title}
                 </Typography>
-
-                {updIcon && (
-                    <RefreshContainer time='4M AGO' />
-                )}
+                {updIcon && <RefreshContainer time='4M AGO' />}
             </CardHeader>
             <CardContent>
                 {children}
