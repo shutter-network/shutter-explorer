@@ -86,7 +86,7 @@ const Transaction = () => {
 
     return (
         <Box sx={{ flexGrow: 1, marginTop: 4 }}>
-            <OverviewCard title="Transaction Overview" iconSrc={overviewIcon}>
+            <OverviewCard title="Transaction Overview" iconSrc={overviewIcon} updIcon={true}>
                 {errorExecutedTransactions ? (
                     <Alert severity="error">Error fetching Executed Transactions: {errorExecutedTransactions.message}</Alert>
                 ) : (

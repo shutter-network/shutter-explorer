@@ -51,7 +51,7 @@ const TransactionGauge = () => {
     const totalTransactions = successfulTransactions + failedTransactions
     return (
         <Box sx={{ flexGrow: 1, marginTop: 4 }}>
-            <OverviewCard title="Shielded Transactions" centerTitle>
+            <OverviewCard title="Shielded Transactions" centerTitle updIcon={false}>
                 {errorTransactionStats ? (
                     <Alert severity="error">Error fetching Transaction Stats: {errorTransactionStats.message}</Alert>
                 ) : (

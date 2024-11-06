@@ -9,7 +9,7 @@ const Keyper = () => {
 
     return (
         <Box sx={{ flexGrow: 1, marginTop: 4 }}>
-            <OverviewCard title="Keyper Overview" iconSrc={overviewIcon}>
+            <OverviewCard title="Keyper Overview" iconSrc={overviewIcon} updIcon={false}>
                 <InfoBox
                     title="Gnosis Chain Keypers"
                     tooltip="Number of keypers for Gnosis Chain"

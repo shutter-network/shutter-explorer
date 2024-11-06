@@ -84,7 +84,7 @@ const Validator = () => {
     return (
         <Box sx={{ flexGrow: 1, marginTop: 4 }}>
 
-                    <OverviewCard title="Validator Overview" iconSrc={overviewIcon}>
+                    <OverviewCard title="Validator Overview" iconSrc={overviewIcon} updIcon={false}>
                         {/* Error handling and InfoBox display */}
                         {errorShutterized ? (
                             <Alert severity="error">Error fetching shutterized validators: {errorShutterized.message}</Alert>
