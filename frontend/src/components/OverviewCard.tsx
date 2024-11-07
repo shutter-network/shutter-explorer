@@ -8,10 +8,10 @@ interface OverviewCardProps {
     iconSrc?: string;
     children: React.ReactNode;
     centerTitle?: boolean;
-    updIcon: boolean;
+    timeAgo?: string;
 }
 
-const OverviewCard: FC<OverviewCardProps> = ({ title, iconSrc, children, centerTitle = false, updIcon }) => {
+const OverviewCard: FC<OverviewCardProps> = ({ title, iconSrc, children, centerTitle = false, timeAgo }) => {
     return (
         <CardContainer>
             <CardHeader centerTitle={centerTitle}>
@@ -23,7 +23,7 @@ const OverviewCard: FC<OverviewCardProps> = ({ title, iconSrc, children, centerT
                 <Typography variant="h2">
                     {title}
                 </Typography>
-                {updIcon && <RefreshContainer time='4M AGO' />}
+                {timeAgo && <RefreshContainer time={timeAgo} />}
             </CardHeader>
             <CardContent>
                 {children}

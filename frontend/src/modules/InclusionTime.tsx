@@ -59,7 +59,7 @@ const InclusionTime = () => {
 
             <Grid container spacing={3}>
                 <Grid size={{ xs: 12 }}>
-                    <OverviewCard title="Historical Inclusion Time" updIcon={false}>
+                    <OverviewCard title="Historical Inclusion Time">
                         {errorHistoricalInclusionTime ? (
                             <Alert severity="error">Error fetching Historical Inclusion Times: {errorHistoricalInclusionTime.message}</Alert>
                         ) : ( errorEstimatedInclusionTime ? 

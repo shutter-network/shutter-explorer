@@ -135,3 +135,40 @@ export const formatTime = (seconds: number | undefined): string => {
   }
   return ''
 }
+
+export const getTimeDiff = (startTime: number, timestamp: number): string => {
+  const diff = timestamp - startTime
+
+  console.log("diff", diff)
+  if (diff < 60) {
+    return `< 1M AGO`;
+  }
+
+  const minutes = Math.floor(diff / 60);
+  if (minutes < 60) {
+    return `${minutes}M AGO`;
+  }
+
+  const hours = Math.floor(diff / 3600);
+  if (hours < 24) {
+    return `${hours}H AGO`;
+  }
+
+  const days = Math.floor(diff / 86400);
+  if (days < 7) {
+    return `${days}DAY AGO`;
+  }
+
+  const weeks = Math.floor(days / 7);
+  if (weeks < 4) {
+    return `${weeks}WEEK AGO`;
+  }
+
+  const months = Math.floor(days / 30);
+  if (months < 12) {
+    return `${months}MONTH ago`;
+  }
+
+  const years = Math.floor(days / 365);
+  return `${years}YEAR AGO`;
+};

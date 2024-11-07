@@ -6,7 +6,7 @@ import { useWebSocket } from '../context/WebSocketContext';
 import useFetch from '../hooks/useFetch';
 import overviewIcon from '../assets/icons/shield_check.svg';
 import { WebsocketEvent } from '../types/WebsocketEvent';
-import { truncateDecimals } from '../utils/utils';
+import { getTimeDiff, truncateDecimals } from '../utils/utils';
 
 
 const Validator = () => {
@@ -16,6 +16,8 @@ const Validator = () => {
     const [shutterizedValidators, setShutterizedValidators] = useState(shutterizedValidatorsData?.message || 'N/A');
     const [validatorPercentage, setValidatorPercentage] = useState(truncateDecimals((shutterizedValidatorsData?.message * 100) / totalValidatorsData?.message) || 'N/A');
     const [totalValidators, setTotalValidators] = useState(totalValidatorsData?.message || 'N/A');
+    const [timeAgo, setTimeAgo] = useState(Math.floor(Date.now() / 1000));
+    const [startTime, setStartTime] = useState(Math.floor(Date.now() / 1000));
     const [, setWebSocketError] = useState<string | null>(null);
 
     const { socket } = useWebSocket()!;
@@ -31,16 +33,22 @@ const Validator = () => {
                     switch (websocketEvent.Type) {
                         case 'shutterized_validators_updated':
                             if ('count' in websocketEvent.Data) {
+                                if (shutterizedValidators && shutterizedValidators != websocketEvent.Data.count) {
+                                    setStartTime(Math.floor(Date.now() / 1000))
+                                }
                                 setShutterizedValidators(websocketEvent.Data.count);
-                                setValidatorPercentage(truncateDecimals((websocketEvent.Data.count*100)/totalValidators))
+                                setValidatorPercentage(truncateDecimals((websocketEvent.Data.count * 100) / totalValidators))
                             } else {
                                 console.warn('Invalid data format for shutterized_validators_updated');
                             }
                             break;
                         case 'total_validators_updated':
                             if ('count' in websocketEvent.Data) {
+                                if (totalValidators && totalValidators != websocketEvent.Data.count) {
+                                    setStartTime(Math.floor(Date.now() / 1000))
+                                }
                                 setTotalValidators(websocketEvent.Data.count);
-                                setValidatorPercentage(truncateDecimals((shutterizedValidators*100)/websocketEvent.Data.count))
+                                setValidatorPercentage(truncateDecimals((shutterizedValidators * 100) / websocketEvent.Data.count))
                             } else {
                                 console.warn('Invalid data format for total_validators_updated');
                             }
@@ -72,62 +80,69 @@ const Validator = () => {
     }, [socket, shutterizedValidators, totalValidators]);
 
     useEffect(() => {
-        if (shutterizedValidatorsData?.message){
+        if (shutterizedValidatorsData?.message) {
             setShutterizedValidators(shutterizedValidatorsData.message);
-        } 
-        if (totalValidatorsData?.message){
+        }
+        if (totalValidatorsData?.message) {
             setTotalValidators(totalValidatorsData.message);
-        } 
-        setValidatorPercentage(truncateDecimals((shutterizedValidatorsData?.message*100)/totalValidatorsData?.message));
+        }
+        setValidatorPercentage(truncateDecimals((shutterizedValidatorsData?.message * 100) / totalValidatorsData?.message));
     }, [shutterizedValidatorsData, totalValidatorsData]);
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setTimeAgo(prevSeconds => prevSeconds + 1);
+        }, 1000);
+        return () => clearInterval(interval);
+    }, [timeAgo]);
 
     return (
         <Box sx={{ flexGrow: 1, marginTop: 4 }}>
 
-                    <OverviewCard title="Validator Overview" iconSrc={overviewIcon} updIcon={false}>
-                        {/* Error handling and InfoBox display */}
-                        {errorShutterized ? (
-                            <Alert severity="error">Error fetching shutterized validators: {errorShutterized.message}</Alert>
-                        ) : (
-                            <InfoBox
-                                title="# Shutterized Validators"
-                                tooltip="Total number of shutterized validators"
-                                value={loadingShutterized ? 'Loading...' : shutterizedValidators}
-                            />
-                        )}
+            <OverviewCard title="Validator Overview" iconSrc={overviewIcon} timeAgo={getTimeDiff(startTime, timeAgo)}>
+                {/* Error handling and InfoBox display */}
+                {errorShutterized ? (
+                    <Alert severity="error">Error fetching shutterized validators: {errorShutterized.message}</Alert>
+                ) : (
+                    <InfoBox
+                        title="# Shutterized Validators"
+                        tooltip="Total number of shutterized validators"
+                        value={loadingShutterized ? 'Loading...' : shutterizedValidators}
+                    />
+                )}
 
-                        {errorShutterized || errorTotal ? (
-                                errorShutterized ? (
-                                    <Alert severity="error">
-                                    Error fetching validator percentage: {errorShutterized?.message}
-                                    </Alert>
-                                ) : errorTotal ? (
-                                    <Alert severity="error">
-                                    Error fetching validator percentage: {errorTotal?.message}
-                                    </Alert>
-                                ) : null
-                                ) : (
-                                <InfoBox
-                                    title="Validator Percentage"
-                                    tooltip="Percentage amongst all validators"
-                                    value={
-                                    loadingShutterized || loadingTotal
-                                        ? "Loading..."
-                                        : `${validatorPercentage}%`
-                                    }
-                                />
-                                )}
+                {errorShutterized || errorTotal ? (
+                    errorShutterized ? (
+                        <Alert severity="error">
+                            Error fetching validator percentage: {errorShutterized?.message}
+                        </Alert>
+                    ) : errorTotal ? (
+                        <Alert severity="error">
+                            Error fetching validator percentage: {errorTotal?.message}
+                        </Alert>
+                    ) : null
+                ) : (
+                    <InfoBox
+                        title="Validator Percentage"
+                        tooltip="Percentage amongst all validators"
+                        value={
+                            loadingShutterized || loadingTotal
+                                ? "Loading..."
+                                : `${validatorPercentage}%`
+                        }
+                    />
+                )}
 
-                        {errorTotal ? (
-                            <Alert severity="error">Error fetching total validators: {errorTotal.message}</Alert>
-                        ) : (
-                            <InfoBox
-                                title="# Validators"
-                                tooltip="Total number of validators"
-                                value={loadingTotal ? 'Loading...' : totalValidators}
-                            />
-                        )}
-                    </OverviewCard>
+                {errorTotal ? (
+                    <Alert severity="error">Error fetching total validators: {errorTotal.message}</Alert>
+                ) : (
+                    <InfoBox
+                        title="# Validators"
+                        tooltip="Total number of validators"
+                        value={loadingTotal ? 'Loading...' : totalValidators}
+                    />
+                )}
+            </OverviewCard>
         </Box>
     );
 };

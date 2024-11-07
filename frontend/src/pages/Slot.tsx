@@ -5,10 +5,11 @@ import ResponsiveLayout from "../components/ResponsiveLayout";
 import useFetch from "../hooks/useFetch";
 import { useEffect, useState } from 'react';
 import { useWebSocket } from '../context/WebSocketContext';
-import { SequencerTransaction, Transaction, WebsocketEvent } from "../types/WebsocketEvent";
-import { getTimeAgo } from "../utils/utils";
+import { SequencerTransaction, Transaction, WebsocketEvent, SequencerTransactions } from "../types/WebsocketEvent";
+import { getTimeAgo, getTimeDiff } from 'utils/utils';
 import TitleSection from "../components/TitleSection";
 import SlotProgression from "../modules/SlotProgression";
+import RefreshContainer from 'components/RefreshContainer';
 
 const Slot = () => {
     const { data: sequencerTransactionsData, loading: loadingSequencer, error: errorSequencer } = useFetch('/api/transaction/latest_sequencer_transactions?limit=10');
@@ -28,6 +29,9 @@ const Slot = () => {
     const [userTransactions, setUserTransactions] = useState(userTransactionsData?.message || []);
     const [, setWebSocketError] = useState<string | null>(null); // State to store WebSocket errors
     const [isMobile, setIsMobile] = useState(false);
+    const [timeAgo, setTimeAgo] = useState(Math.floor(Date.now() / 1000));
+    const [seqStartTime, setSeqStartTime] = useState(Math.floor(Date.now() / 1000));
+    const [userStartTime, setUserStartTime] = useState(Math.floor(Date.now() / 1000));
 
     const handleResize = () => {
         setIsMobile(window.matchMedia("(max-width: 900px)").matches);
@@ -37,7 +41,6 @@ const Slot = () => {
 
     useEffect(() => {
         handleResize();
-
         // Event listener for resizing
         window.addEventListener("resize", handleResize);
 
@@ -46,6 +49,7 @@ const Slot = () => {
     }, [])
     useEffect(() => {
         if (sequencerTransactionsData?.message) {
+            console.log("called in first useffect", sequencerTransactionsData.message)
             setSequencerTransactions(sequencerTransactionsData.message);
         }
         if (userTransactionsData?.message) {
@@ -63,10 +67,20 @@ const Slot = () => {
                     setWebSocketError(null);
                     switch (websocketEvent.Type) {
                         case 'latest_sequencer_transactions_updated':
+                            let newSequencerData: any = websocketEvent.Data
+                            if (sequencerTransactions?.length > 0 &&
+                                sequencerTransactions[0].SequencerTxHash != newSequencerData[0].SequencerTxHash) {
+                                setSeqStartTime(Math.floor(Date.now() / 1000));
+                            }
                             setSequencerTransactions(websocketEvent.Data);
                             break;
 
                         case 'latest_user_transactions_updated':
+                            let newUserData: any = websocketEvent.Data
+                            if (userTransactions?.length > 0 &&
+                                userTransactions[0].TxHash != newUserData[0].TxHash) {
+                                setUserStartTime(Math.floor(Date.now() / 1000));
+                            }
                             setUserTransactions(websocketEvent.Data);
                             break;
 
@@ -92,7 +106,17 @@ const Slot = () => {
                 socket.removeEventListener('error', handleError)
             }
         }
-    }, [socket]);
+    }, [socket, sequencerTransactions, userTransactions]);
+
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setTimeAgo(prevSeconds => prevSeconds + 1);
+            console.log("slot overview called", timeAgo)
+        }, 1000);
+        return () => clearInterval(interval);
+    }, [timeAgo]);
+
 
     const sequencerTransactionsWithAge = sequencerTransactions.map((transaction: SequencerTransaction) => ({
         hash: transaction.SequencerTxHash,
@@ -114,14 +138,17 @@ const Slot = () => {
                     A green background means that the slot has passed. The Shutter logo means the corresponding proposer will include encrypted transactions.
                     Additionally, it shows the 10 recent sequencer and successfully executed user transactions which were included through the encrypted mempool.
                 </Typography>
-                <SlotProgression/>
+                <SlotProgression />
                 <Grid container spacing={2} sx={{ marginTop: 4 }}>
                     <Grid size={{ sm: 12, md: 12, lg: 6, xs: 'auto' }} >
                         {errorSequencer ? (
                             <Alert severity="error">Error fetching sequencer transactions: {errorSequencer.message}</Alert>
                         ) : (
                             <>
-                                <Typography variant="h5" align='left' sx={{ fontWeight: 'bold'}} color='black' >Sequencer Transactions</Typography>
+                                <div style={{ display: "flex" }}>
+                                    <Typography variant="h5" align='left' sx={{ fontWeight: 'bold' }} color='black' style={{ marginRight: "10px" }} >Sequencer Transactions</Typography>
+                                    <RefreshContainer time={getTimeDiff(seqStartTime, timeAgo)} />
+                                </div>
                                 {loadingSequencer ? (
                                     <Typography>Loading...</Typography>
                                 ) : (
@@ -135,7 +162,10 @@ const Slot = () => {
                             <Alert severity="error">Error fetching user transactions: {errorUser.message}</Alert>
                         ) : (
                             <>
-                                <Typography variant="h5" align='left' sx={{ fontWeight: 'bold' }} color='black' >Shielded User Transactions</Typography>
+                                <div style={{ display: "flex" }}>
+                                    <Typography variant="h5" align='left' sx={{ fontWeight: 'bold' }} color='black' >Shielded User Transactions</Typography>
+                                    <RefreshContainer time={getTimeDiff(userStartTime, timeAgo)} />
+                                </div>
                                 {loadingUser ? (
                                     <Typography>Loading...</Typography>
                                 ) : (
