@@ -10,6 +10,12 @@ services:
         condition: service_healthy
     ports:
       - "4000:4000"
+    logging:
+      driver: loki
+      options:
+        loki-url: ${LOKI_URL}
+        loki-external-labels: |
+          job=observer
     environment:
         DB_HOST: db
         DB_PORT: 5432
@@ -46,6 +52,12 @@ services:
     restart: unless-stopped
     depends_on: 
       - observer
+    logging:
+      driver: loki
+      options:
+        loki-url: ${LOKI_URL}
+        loki-external-labels: |
+          job=explorer-backend
     environment:
       SERVER_PORT: 5000
       OBSERVER_DB_HOST: db
