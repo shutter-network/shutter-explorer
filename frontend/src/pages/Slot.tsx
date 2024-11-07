@@ -112,7 +112,6 @@ const Slot = () => {
     useEffect(() => {
         const interval = setInterval(() => {
             setTimeAgo(prevSeconds => prevSeconds + 1);
-            console.log("slot overview called", timeAgo)
         }, 1000);
         return () => clearInterval(interval);
     }, [timeAgo]);
@@ -145,7 +144,7 @@ const Slot = () => {
                             <Alert severity="error">Error fetching sequencer transactions: {errorSequencer.message}</Alert>
                         ) : (
                             <>
-                                <div style={{ display: "flex" }}>
+                                <div style={{ display: "flex", alignItems: "center" }}>
                                     <Typography variant="h5" align='left' sx={{ fontWeight: 'bold' }} color='black' style={{ marginRight: "10px" }} >Sequencer Transactions</Typography>
                                     <RefreshContainer time={getTimeDiff(seqStartTime, timeAgo)} />
                                 </div>
@@ -162,8 +161,8 @@ const Slot = () => {
                             <Alert severity="error">Error fetching user transactions: {errorUser.message}</Alert>
                         ) : (
                             <>
-                                <div style={{ display: "flex" }}>
-                                    <Typography variant="h5" align='left' sx={{ fontWeight: 'bold' }} color='black' >Shielded User Transactions</Typography>
+                                <div style={{ display: "flex", alignItems: "center" }}>
+                                    <Typography variant="h5" align='left' sx={{ fontWeight: 'bold' }} color='black' style={{ marginRight: "10px" }} >Shielded User Transactions</Typography>
                                     <RefreshContainer time={getTimeDiff(userStartTime, timeAgo)} />
                                 </div>
                                 {loadingUser ? (

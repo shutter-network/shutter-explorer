@@ -4,11 +4,12 @@ import { RefreshContainerHolder } from 'styles/refreshCard';
 
 interface RefreshContainerProps {
     time: string;
+    style?: React.CSSProperties;
 }
 
-const RefreshContainer: FC<RefreshContainerProps> = ({ time }) => {
+const RefreshContainer: FC<RefreshContainerProps> = ({ time, style }) => {
     return (
-        <RefreshContainerHolder>
+        <RefreshContainerHolder style={style}>
             <UpdIcon />
             <span style={{ marginLeft: "3px", color: "#0044A4" }}>{time}</span>
         </RefreshContainerHolder>

@@ -139,7 +139,6 @@ export const formatTime = (seconds: number | undefined): string => {
 export const getTimeDiff = (startTime: number, timestamp: number): string => {
   const diff = timestamp - startTime
 
-  console.log("diff", diff)
   if (diff < 60) {
     return `< 1M AGO`;
   }

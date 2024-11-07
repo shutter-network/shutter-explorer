@@ -5,10 +5,11 @@ import { FC, useState, useEffect } from "react";
 import useFetchWithPolling from '../hooks/useFetchWithPolling';
 import { StyledTransactionDetails } from '../styles/transactionDetail';
 import TitleSection from "../components/TitleSection";
-import { formatSeconds, formatTimestamp } from '../utils/utils';
+import { formatSeconds, formatTimestamp, getTimeDiff } from '../utils/utils';
 import { ReactComponent as InfoIcon } from '../assets/icons/info.svg';
 import { useParams } from 'react-router-dom';
 import LinkIcon from '@mui/icons-material/Link';
+import RefreshContainer from 'components/RefreshContainer';
 
 interface TransactionDetails {
     TxStatus: string;
@@ -26,7 +27,8 @@ const Transaction: FC = () => {
     let { txHash } = useParams();
     const [transaction, setTransaction] = useState<TransactionDetails | null>(null);
     const { data: updatedData, loading, error, setStopPolling } = useFetchWithPolling(`/api/transaction/${txHash}`, 10000);
-
+    const [timeAgo, setTimeAgo] = useState(Math.floor(Date.now() / 1000));
+    const [startTime, setStartTime] = useState(Math.floor(Date.now() / 1000));
 
     const statusesWithBlockNumber = ['Shielded inclusion', "Unshielded inclusion"];
     const statusesWithEffectiveInclusionTime = ['Shielded inclusion', 'Unshielded inclusion']
@@ -36,8 +38,12 @@ const Transaction: FC = () => {
         const finalisedStatuses = ['Shielded inclusion', 'Unshielded inclusion', 'Invalid', 'Not included', 'Cannot be decrypted']
 
         if (updatedData) {
+            let newData = updatedData.message as TransactionDetails
+            if (newData && newData.TxStatus != transaction?.TxStatus) {
+                setStartTime(Math.floor(Date.now() / 1000));
+            }
             setTransaction(updatedData.message as TransactionDetails);
-            if (transaction? finalisedStatuses.includes(transaction.TxStatus): false){
+            if (transaction ? finalisedStatuses.includes(transaction.TxStatus) : false) {
                 setStopPolling(true)
             }
         } else {
@@ -45,6 +51,12 @@ const Transaction: FC = () => {
         }
     }, [updatedData, setStopPolling, transaction]);
 
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setTimeAgo(prevSeconds => prevSeconds + 1);
+        }, 1000);
+        return () => clearInterval(interval);
+    }, [timeAgo]);
 
     if (!transaction) {
         return (
@@ -57,7 +69,10 @@ const Transaction: FC = () => {
     return (
         <ResponsiveLayout>
             <StyledTransactionDetails>
-                <TitleSection title="Transaction Details" />
+                <div className='tx-detail-hldr'>
+                    <TitleSection title="Transaction Details" />
+                    <RefreshContainer time={getTimeDiff(startTime, timeAgo)} style={{ marginTop: "100px", marginLeft: "10px" }} />
+                </div>
                 <Grid container spacing={2} sx={{ marginTop: 4 }}>
                     {/* Transaction Hash */}
                     <Grid size={{ xs: 'auto', sm: 4 }}>
@@ -216,7 +231,7 @@ const Transaction: FC = () => {
                     <Grid container spacing={1}>
                         <Grid>
                             <Typography variant="body1" className={`tx-status status-${transaction.TxStatus.replace(/\s+/g, "-")}`}>
-                            {transaction.TxStatus === 'Not included' ? 'INCLUSION TIMEOUT EXPIRED' : transaction.TxStatus.toUpperCase()}
+                                {transaction.TxStatus === 'Not included' ? 'INCLUSION TIMEOUT EXPIRED' : transaction.TxStatus.toUpperCase()}
                             </Typography>
                         </Grid>
                         {transaction.TxStatus === 'Not included' && (
@@ -225,14 +240,14 @@ const Transaction: FC = () => {
                                     (Please check for inclusion directly on the Gnosis Explorer)
                                 </Typography>
                             </Grid>
-                            <Grid>
-                                <Link target="_blank" href={`${explorerUrl}/tx/${transaction.UserTxHash}`}>
-                                    <LinkIcon color='primary'/>
-                                </Link>
-                            </Grid> 
+                                <Grid>
+                                    <Link target="_blank" href={`${explorerUrl}/tx/${transaction.UserTxHash}`}>
+                                        <LinkIcon color='primary' />
+                                    </Link>
+                                </Grid>
                             </>
                         )}
-                        </Grid>
+                    </Grid>
 
                     <Grid size={{ lg: 12 }} sx={{ display: { xs: 'none', sm: 'none', md: 'none', lg: 'block' }, }}>
                         <Divider></Divider>
