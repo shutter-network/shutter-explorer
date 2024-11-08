@@ -15,7 +15,7 @@ export const CardHeader = styled.div<{ centerTitle?: boolean }>`
   display: flex;
   flex-direction: column;
   align-items: ${({ centerTitle }) => (centerTitle ? 'center' : 'flex-start')};
-  gap: 16px;
+  gap: 8px;
   margin-bottom: 16px;
 `;
 

@@ -98,7 +98,6 @@ const Validator = () => {
 
     return (
         <Box sx={{ flexGrow: 1, marginTop: 4 }}>
-
             <OverviewCard title="Validator Overview" iconSrc={overviewIcon} timeAgo={getTimeDiff(startTime, timeAgo)}>
                 {/* Error handling and InfoBox display */}
                 {errorShutterized ? (
