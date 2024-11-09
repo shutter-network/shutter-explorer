@@ -33,7 +33,7 @@ const Validator = () => {
                     switch (websocketEvent.Type) {
                         case 'shutterized_validators_updated':
                             if ('count' in websocketEvent.Data) {
-                                if (shutterizedValidators && shutterizedValidators != websocketEvent.Data.count) {
+                                if (shutterizedValidators && shutterizedValidators !== websocketEvent.Data.count) {
                                     setStartTime(Math.floor(Date.now() / 1000))
                                 }
                                 setShutterizedValidators(websocketEvent.Data.count);
@@ -44,7 +44,7 @@ const Validator = () => {
                             break;
                         case 'total_validators_updated':
                             if ('count' in websocketEvent.Data) {
-                                if (totalValidators && totalValidators != websocketEvent.Data.count) {
+                                if (totalValidators && totalValidators !== websocketEvent.Data.count) {
                                     setStartTime(Math.floor(Date.now() / 1000))
                                 }
                                 setTotalValidators(websocketEvent.Data.count);

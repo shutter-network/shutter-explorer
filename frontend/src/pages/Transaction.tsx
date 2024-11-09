@@ -39,7 +39,7 @@ const Transaction: FC = () => {
 
         if (updatedData) {
             let newData = updatedData.message as TransactionDetails
-            if (newData && newData.TxStatus != transaction?.TxStatus) {
+            if (newData && newData.TxStatus !== transaction?.TxStatus) {
                 setStartTime(Math.floor(Date.now() / 1000));
             }
             setTransaction(updatedData.message as TransactionDetails);
