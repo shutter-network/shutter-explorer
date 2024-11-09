@@ -268,8 +268,14 @@ describe('<Slot />', () => {
             }),
         });
 
+        cy.tick(120000);
+
+        cy.get('span').contains("2M AGO").should('be.visible');
+
         cy.then(() => {
             mockSocket.dispatchEvent(messageEvent2);
         });
+
+        cy.get('span').contains("< 1M AGO").should('be.visible');
     });
 });
