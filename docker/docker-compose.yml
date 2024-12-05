@@ -25,8 +25,10 @@ services:
         DB_SSL_MODE: disable
         P2P_BOOTSTRAP_ADDRESSES:
         P2P_ENVIRONMENT: 
-        P2P_DISCOVERY_NAMESPACE: 
-    command: ["start", "--rpc-url", "${RPC_URL}", "--beacon-api-url", "${BEACON_API_URL}", "--sequencer-contract-address", "${SEQUENCER_CONTRACT_ADDRESS}", "--validator-registry-contract-address", "${VALIDATOR_REGISTRY_CONTRACT_ADDRESS}", "--p2pkey", "${P2P_KEY}"]
+        P2P_DISCOVERY_NAMESPACE:
+        INCLUSION_DELAY: ${INCLUSION_DELAY} 
+        
+    command: ["start", "--rpc-url", "${RPC_URL}", "--beacon-api-url", "${BEACON_API_URL}", "--sequencer-contract-address", "${SEQUENCER_CONTRACT_ADDRESS}", "--validator-registry-contract-address", "${VALIDATOR_REGISTRY_CONTRACT_ADDRESS}", "--p2pkey", "${P2P_KEY}", "--inclusion-delay", "${INCLUSION_DELAY}"]
 
   db:
     image: postgres:14.12
