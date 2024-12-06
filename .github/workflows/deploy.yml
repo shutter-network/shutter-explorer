@@ -39,7 +39,7 @@ jobs:
     steps:
       - name: Validate branch name
         run: |
-          BRANCH_NAME="${{ github.head_ref }}"
+          BRANCH_NAME="${{ github.ref_name }}"
           echo "Validating branch name: $BRANCH_NAME"
 
           # Allow 'staging' and 'main' branches
