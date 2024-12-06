@@ -39,6 +39,7 @@ jobs:
     steps:
       - name: Validate branch name
         run: |
+          $BRANCH_NAME=""
           if [ "${{ github.event_name }}" == "pull_request" ]; then
             $BRANCH_NAME=${{ github.head_ref }}
           else
