@@ -6,6 +6,7 @@ import { useWebSocket } from '../context/WebSocketContext';
 import useFetch from '../hooks/useFetch';
 import overviewIcon from '../assets/icons/arrows_horizontal.svg';
 import { WebsocketEvent } from '../types/WebsocketEvent';
+import { getTimeAgo, getTimeDiff } from 'utils/utils';
 
 const Transaction = () => {
     const { data: executedTransactionsData, loading: loadingExecutedTransactions, error: errorExecutedTransactions } = useFetch('/api/transaction/total_executed_transactions');
@@ -15,6 +16,8 @@ const Transaction = () => {
     const [executedTransactions, setExecutedTransactions] = useState<number | null>(null);
     const [transactionsPerMonth, setTransactionsPerMonth] = useState<number | null>(null);
     const [transactionPercentage, setTransactionPercentage] = useState<number | null>(null);
+    const [timeAgo, setTimeAgo] = useState(Math.floor(Date.now() / 1000));
+    const [startTime, setStartTime] = useState(Math.floor(Date.now() / 1000));
     const [, setWebSocketError] = useState<string | null>(null);
 
     const { socket } = useWebSocket()!;
@@ -31,6 +34,9 @@ const Transaction = () => {
                     switch (websocketEvent.Type) {
                         case 'total_executed_transactions_updated':
                             if (typeof websocketEvent.Data === 'number') {
+                                if (executedTransactions && executedTransactions != websocketEvent.Data) {
+                                    setStartTime(Math.floor(Date.now() / 1000))
+                                }
                                 setExecutedTransactions(websocketEvent.Data);
                             } else {
                                 console.warn('Unexpected data type for total_executed_transactions_updated');
@@ -38,6 +44,9 @@ const Transaction = () => {
                             break;
                         case 'transactions_per_month_updated':
                             if ('count' in websocketEvent.Data && typeof websocketEvent.Data.count === 'number') {
+                                if (transactionsPerMonth && transactionsPerMonth != websocketEvent.Data.count) {
+                                    setStartTime(Math.floor(Date.now() / 1000))
+                                }
                                 setTransactionsPerMonth(websocketEvent.Data.count);
                             } else {
                                 console.warn('Unexpected data structure for transactions_per_month_updated');
@@ -45,6 +54,9 @@ const Transaction = () => {
                             break;
                         case 'transaction_percentage_updated':
                             if (typeof websocketEvent.Data === 'number') {
+                                if (transactionPercentage && transactionPercentage != websocketEvent.Data) {
+                                    setStartTime(Math.floor(Date.now() / 1000))
+                                }
                                 setTransactionPercentage(websocketEvent.Data);
                             } else {
                                 console.warn('Unexpected data type for transaction_percentage_updated');
@@ -68,7 +80,7 @@ const Transaction = () => {
                 socket.removeEventListener('error', handleError);
             };
         }
-    }, [socket]);
+    }, [socket, executedTransactions, transactionsPerMonth, transactionPercentage]);
 
     useEffect(() => {
         if (executedTransactionsData && executedTransactionsData.message !== undefined) {
@@ -84,9 +96,16 @@ const Transaction = () => {
         }
     }, [executedTransactionsData, totalTransactionsPerMonthData, transactionPercentageData]);
 
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setTimeAgo(prevSeconds => prevSeconds + 1);
+        }, 1000);
+        return () => clearInterval(interval);
+    }, [timeAgo]);
+
     return (
         <Box sx={{ flexGrow: 1, marginTop: 4 }}>
-            <OverviewCard title="Transaction Overview" iconSrc={overviewIcon}>
+            <OverviewCard title="Transaction Overview" iconSrc={overviewIcon} timeAgo={getTimeDiff(startTime, timeAgo)}>
                 {errorExecutedTransactions ? (
                     <Alert severity="error">Error fetching Executed Transactions: {errorExecutedTransactions.message}</Alert>
                 ) : (

@@ -3,7 +3,7 @@ import Slot from '../../src/pages/Slot';
 import { mount } from "cypress/react18";
 import React from 'react';
 import { WebSocketContext } from '../../src/context/WebSocketContext';
-import { getTimeAgo, truncateString } from '../../src/utils/utils';
+import { getTimeAgo, getTimeDiff, truncateString } from '../../src/utils/utils';
 import { ThemeProvider as MUIThemeProvider } from '@mui/material/styles';
 import { ThemeProvider as StyledThemeProvider } from 'styled-components';
 import { muiTheme, customTheme } from '../../src/theme';
@@ -213,5 +213,69 @@ describe('<Slot />', () => {
         cy.get('td').contains(getTimeAgo(1725204600), { timeout: 10000 }).should('be.visible');
         cy.get('td').contains('0xnewUserTransactionHash2', { timeout: 10000 }).should('be.visible');
         cy.get('td').contains(getTimeAgo(1725204900), { timeout: 10000 }).should('be.visible');
+    });
+
+    it('receives a new array of transactions via WebSocket and updates the refresh timer', () => {
+        cy.clock(Date.now());
+
+        const mockSocket = new EventTarget();
+
+        mount(
+            <MUIThemeProvider theme={muiTheme}>
+                <StyledThemeProvider theme={customTheme}>
+                    <WebSocketContext.Provider value={{ socket: mockSocket as unknown as WebSocket }}>
+                        <MemoryRouter>
+                            <Slot />
+                        </MemoryRouter>
+                    </WebSocketContext.Provider>
+                </StyledThemeProvider>
+            </MUIThemeProvider>
+        );
+
+        cy.wait('@getSequencerTransactions');
+        cy.wait('@getUserTransactions');
+
+        cy.get('span').contains("< 1M AGO").should('be.visible');
+
+        cy.tick(60000);
+
+        cy.get('span').contains("1M AGO").should('be.visible');
+
+
+        const messageEvent1 = new MessageEvent('message', {
+            data: JSON.stringify({
+                Type: 'latest_sequencer_transactions_updated',
+                Data: [
+                    { SequencerTxHash: '0xnewSequencerTransactionHash1', CreatedAtUnix: 1725204000 },
+                    { SequencerTxHash: '0xnewSequencerTransactionHash2', CreatedAtUnix: 1725204300 },
+                ],
+            }),
+        });
+
+        cy.then(() => {
+            mockSocket.dispatchEvent(messageEvent1);
+        });
+
+        cy.get('span').contains("< 1M AGO").should('be.visible');
+
+        const messageEvent2 = new MessageEvent('message', {
+            data: JSON.stringify({
+                Type: 'latest_user_transactions_updated',
+                Data: [
+                    { TxHash: '0xnewUserTransactionHash1', IncludedAtUnix: 1725204600 },
+                    { TxHash: '0xnewUserTransactionHash2', IncludedAtUnix: 1725204900 },
+                ],
+            }),
+        });
+
+        cy.tick(120000);
+
+        cy.get('span').contains("2M AGO").should('be.visible');
+
+        cy.then(() => {
+            mockSocket.dispatchEvent(messageEvent2);
+        });
+
+        cy.get('span').contains("< 1M AGO").should('be.visible');
     });
 });
