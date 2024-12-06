@@ -35,7 +35,6 @@ jobs:
 
   # Branch Name Validation for Pull Requests
   validate_branch_name:
-    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - name: Validate branch name
