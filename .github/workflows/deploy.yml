@@ -35,12 +35,15 @@ jobs:
 
   # Branch Name Validation for Pull Requests
   validate_branch_name:
-    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - name: Validate branch name
         run: |
-          BRANCH_NAME="${{ github.head_ref }}"
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            BRANCH_NAME=${{ github.head_ref }}
+          else
+            BRANCH_NAME=${{ github.ref_name }}
+          fi
           echo "Validating branch name: $BRANCH_NAME"
 
           # Allow 'staging' and 'main' branches
