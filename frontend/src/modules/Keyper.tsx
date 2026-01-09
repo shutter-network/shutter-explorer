@@ -2,14 +2,26 @@ import { Box, Typography } from '@mui/material';
 import InfoBox from '../components/InfoBox';
 import OverviewCard from '../components/OverviewCard';
 import overviewIcon from '../assets/icons/shutter.svg';
+import { useEffect, useState } from 'react';
+import { getTimeDiff } from 'utils/utils';
 
 const Keyper = () => {
+    const [timeAgo, setTimeAgo] = useState(Math.floor(Date.now() / 1000));
+    const [startTime, setStartTime] = useState(Math.floor(Date.now() / 1000));
+
     const keyperCount = 7;
     const keyperThreshold = 4;
 
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setTimeAgo(prevSeconds => prevSeconds + 1);
+        }, 1000);
+        return () => clearInterval(interval);
+    }, [timeAgo]);
+
     return (
         <Box sx={{ flexGrow: 1, marginTop: 4 }}>
-            <OverviewCard title="Keyper Overview" iconSrc={overviewIcon}>
+            <OverviewCard title="Keyper Overview" iconSrc={overviewIcon} timeAgo={getTimeDiff(startTime, timeAgo)}>
                 <InfoBox
                     title="Gnosis Chain Keypers"
                     tooltip="Number of keypers for Gnosis Chain"

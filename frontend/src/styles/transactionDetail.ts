@@ -96,6 +96,12 @@ export const StyledTransactionDetails = styled(Box).attrs({
     fill: green;
   }
 
+  .tx-detail-hldr{
+    display:flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+  }
+
   @media (max-width: 991px) {
     .detail-row {
       flex-direction: column;
@@ -104,6 +110,13 @@ export const StyledTransactionDetails = styled(Box).attrs({
     .card-label {
       width: 100%;
       margin-bottom: 4px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .tx-detail-hldr {
+      flex-direction: column;
+      align-items: center;
     }
   }
 `;

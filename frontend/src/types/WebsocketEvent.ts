@@ -33,7 +33,7 @@ export interface HistoricalInclusionTimeResponse {
     MaxInclusionTimeSeconds: number;
 }
 
-interface SequencerTransactions {
+export interface SequencerTransactions {
     transactions: Array<SequencerTransaction>;
 }
 
