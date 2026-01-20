@@ -52,10 +52,10 @@ jobs:
           fi
 
           # Check if the branch name starts with the expected prefixes
-          if [[ "$BRANCH_NAME" == release/* ]] || [[ "$BRANCH_NAME" == feat/* ]] || [[ "$BRANCH_NAME" == fix/* ]] || [[ "$BRANCH_NAME" == chore/* ]] || [[ "$BRANCH_NAME" == docs/* ]] || [[ "$BRANCH_NAME" == test/* ]]; then
+          if [[ "$BRANCH_NAME" == release/* ]] || [[ "$BRANCH_NAME" == feat/* ]] || [[ "$BRANCH_NAME" == fix/* ]] || [[ "$BRANCH_NAME" == chore/* ]] || [[ "$BRANCH_NAME" == docs/* ]] || [[ "$BRANCH_NAME" == test/* ]] || [[ "$BRANCH_NAME" == refactor/* ]]; then
               echo "Branch name is valid: $BRANCH_NAME"
           else
-              echo "Error: Branch name must start with 'release/', 'feat/', 'fix/', 'chore/', 'docs/', or 'test/'."
+              echo "Error: Branch name must start with 'release/', 'feat/', 'fix/', 'chore/', 'docs/', 'test/' or 'refactor/'."
               exit 1  # Exit if the branch name is not valid
           fi
 

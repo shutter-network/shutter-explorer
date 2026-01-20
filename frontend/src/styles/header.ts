@@ -53,7 +53,7 @@ export const NavIcon = styled.img.attrs({
 
 export const ScheduleDemo = styled.a.attrs({
   className: 'shedule-a-demo-button',
-  href: "mailto:contact@shutter.network?subject=Schedule%20a%20Demo",
+  href: "https://calendly.com/loringharkness/30min",
   target: '_blank',
 })`
   background-color: #fde12d;
