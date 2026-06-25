@@ -84,6 +84,32 @@ func (q *Queries) QueryExecutedTransactionStats(ctx context.Context) ([]QueryExe
 	return items, nil
 }
 
+const queryExecutedTransactionStatsRecent = `-- name: QueryExecutedTransactionStatsRecent :many
+SELECT COUNT(id), tx_status FROM decrypted_tx
+WHERE created_at >= NOW() - ($1::int * INTERVAL '1 day')
+GROUP BY tx_status
+`
+
+func (q *Queries) QueryExecutedTransactionStatsRecent(ctx context.Context, days int32) ([]QueryExecutedTransactionStatsRow, error) {
+	rows, err := q.db.Query(ctx, queryExecutedTransactionStatsRecent, days)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []QueryExecutedTransactionStatsRow
+	for rows.Next() {
+		var i QueryExecutedTransactionStatsRow
+		if err := rows.Scan(&i.Count, &i.TxStatus); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const queryFromTransactionDetails = `-- name: QueryFromTransactionDetails :many
 SELECT tx_hash as user_tx_hash, encrypted_tx_hash
 FROM transaction_details 
