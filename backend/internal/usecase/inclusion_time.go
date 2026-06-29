@@ -109,6 +109,40 @@ func (uc *InclusionTimeUsecase) QueryExecutedTransactionStats(ctx context.Contex
 	return resp, nil
 }
 
+func (uc *InclusionTimeUsecase) QueryExecutedTransactionStatsRecent(ctx context.Context, days int) (*QueryExectuedTransactionStatsResp, *error.Http) {
+	stats, err := uc.observerDBQuery.QueryExecutedTransactionStatsRecent(ctx, int32(days))
+	if err != nil {
+		log.Err(err).Msg("err encountered while querying DB")
+		err := error.NewHttpError(
+			"error encountered while querying for data",
+			"",
+			http.StatusInternalServerError,
+		)
+		return nil, &err
+	}
+
+	resp := &QueryExectuedTransactionStatsResp{}
+	for i := 0; i < len(stats); i++ {
+		resp.Total += stats[i].Count
+		switch stats[i].TxStatus {
+		case data.TxStatusValInvalid:
+			resp.Invalid = stats[i].Count
+		case data.TxStatusValNotdecrypted:
+			resp.NotDecrypted = stats[i].Count
+		case data.TxStatusValNotincluded:
+			resp.NotIncluded = stats[i].Count
+		case data.TxStatusValPending:
+			resp.Pending = stats[i].Count
+		case data.TxStatusValShieldedinclusion:
+			resp.Shielded = stats[i].Count
+		case data.TxStatusValUnshieldedinclusion:
+			resp.Unshielded = stats[i].Count
+		}
+	}
+
+	return resp, nil
+}
+
 func (uc *InclusionTimeUsecase) QueryHistoricalInclusionTimes(ctx context.Context) ([]data.QueryHistoricalInclusionTimesRow, *error.Http) {
 	historicalInclusionTimes, err := uc.observerDBQuery.QueryHistoricalInclusionTimes(ctx)
 	if err != nil {

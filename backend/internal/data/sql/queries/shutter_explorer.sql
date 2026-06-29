@@ -181,6 +181,11 @@ LIMIT $1;
 SELECT COUNT(id), tx_status FROM decrypted_tx
 GROUP BY tx_status;
 
+-- name: QueryExecutedTransactionStatsRecent :many
+SELECT COUNT(id), tx_status FROM decrypted_tx
+WHERE created_at >= NOW() - ($1::int * INTERVAL '1 day')
+GROUP BY tx_status;
+
 -- name: QueryHistoricalInclusionTimes :many
 WITH daily_inclusion_times AS (
     SELECT
