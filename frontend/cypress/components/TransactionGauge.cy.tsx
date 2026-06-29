@@ -7,15 +7,14 @@ import { ThemeProvider as MUIThemeProvider } from '@mui/material/styles';
 import { ThemeProvider as StyledThemeProvider } from 'styled-components';
 import { customTheme, muiTheme } from '../../src/theme';
 
-const mockSocket = {
-    onopen: cy.stub(),
-    onmessage: cy.stub(),
-    onclose: cy.stub(),
-    onerror: cy.stub(),
-};
-
-const mountGauge = () =>
-    mount(
+const mountGauge = () => {
+    const mockSocket = {
+        onopen: cy.stub(),
+        onmessage: cy.stub(),
+        onclose: cy.stub(),
+        onerror: cy.stub(),
+    };
+    return mount(
         <MUIThemeProvider theme={muiTheme}>
             <StyledThemeProvider theme={customTheme}>
                 <WebSocketContext.Provider value={{ socket: mockSocket as unknown as WebSocket }}>
@@ -26,6 +25,7 @@ const mountGauge = () =>
             </StyledThemeProvider>
         </MUIThemeProvider>
     );
+};
 
 describe('<TransactionGauge />', () => {
     it('renders the gauge with default 30-day window', () => {
