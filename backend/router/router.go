@@ -52,6 +52,7 @@ func NewRouter(ctx context.Context, usecases *usecase.Usecases) *gin.Engine {
 		inclusionTime := api.Group("inclusion_time")
 		inclusionTime.GET("/estimated_inclusion_time", inclusionTimeService.QueryEstimatedInclusionTime)
 		inclusionTime.GET("/executed_transactions", inclusionTimeService.QueryExecutedTransactionStats)
+		inclusionTime.GET("/executed_transactions_recent", inclusionTimeService.QueryExecutedTransactionStatsRecent)
 		inclusionTime.GET("/historical_inclusion_time", inclusionTimeService.QueryHistoricalInclusionTimes)
 	}
 	return router
